@@ -501,3 +501,5 @@ Or run all at once: `make bench`
 - `merged_tokens(tokenizer)` — tokens created by each merge, in order
 - `vocab_char_set(tokenizer)` — set of characters in the vocabulary
 - `special_token_count(tokenizer)` — number of special tokens
+- `word_final_tokens(tokenizer)` — tokens that end with the word boundary
+- `batch_count_tokens(tokenizer, texts)` — token count for each text
