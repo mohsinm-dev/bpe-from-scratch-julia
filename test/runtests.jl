@@ -2109,3 +2109,10 @@ end
     @test max_encoded_length(t, ["low", "low lower"]) == length(encode(t, "low lower"))
     @test max_encoded_length(t, String[]) == 0
 end
+
+@testset "min_encoded_length" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test min_encoded_length(t, ["low", "low lower"]) == length(encode(t, "low"))
+    @test min_encoded_length(t, String[]) == 0
+end
