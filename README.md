@@ -503,3 +503,6 @@ Or run all at once: `make bench`
 - `special_token_count(tokenizer)` — number of special tokens
 - `word_final_tokens(tokenizer)` — tokens that end with the word boundary
 - `batch_count_tokens(tokenizer, texts)` — token count for each text
+- `max_encoded_length(tokenizer, texts)` — longest encoding in a batch
+- `min_encoded_length(tokenizer, texts)` — shortest encoding in a batch
+- `token_frequency_of(tokens, token)` — occurrences of a token in a sequence
