@@ -150,6 +150,7 @@ export word_final_tokens
 export batch_count_tokens
 export max_encoded_length
 export min_encoded_length
+export token_frequency_of
 
 
 using Unicode
@@ -3339,6 +3340,11 @@ end
 
 function min_encoded_length(t::BPETokenizer, texts::Vector{String})::Int
     return isempty(texts) ? 0 : minimum(batch_count_tokens(t, texts))
+end
+
+
+function token_frequency_of(tokens::Vector{String}, token::String)::Int
+    return count(==(token), tokens)
 end
 
 end
