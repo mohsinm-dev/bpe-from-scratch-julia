@@ -147,6 +147,7 @@ export merged_tokens
 export vocab_char_set
 export special_token_count
 export word_final_tokens
+export batch_count_tokens
 
 
 using Unicode
@@ -3321,6 +3322,11 @@ end
 
 function word_final_tokens(t::BPETokenizer; word_boundary::String="</w>")::Vector{String}
     return sort([v for v in t.vocab if endswith(v, word_boundary)])
+end
+
+
+function batch_count_tokens(t::BPETokenizer, texts::Vector{String})::Vector{Int}
+    return [length(encode(t, s)) for s in texts]
 end
 
 end
