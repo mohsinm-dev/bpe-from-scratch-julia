@@ -148,6 +148,7 @@ export vocab_char_set
 export special_token_count
 export word_final_tokens
 export batch_count_tokens
+export max_encoded_length
 
 
 using Unicode
@@ -3327,6 +3328,11 @@ end
 
 function batch_count_tokens(t::BPETokenizer, texts::Vector{String})::Vector{Int}
     return [length(encode(t, s)) for s in texts]
+end
+
+
+function max_encoded_length(t::BPETokenizer, texts::Vector{String})::Int
+    return isempty(texts) ? 0 : maximum(batch_count_tokens(t, texts))
 end
 
 end
