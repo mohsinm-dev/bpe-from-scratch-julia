@@ -2116,3 +2116,10 @@ end
     @test min_encoded_length(t, ["low", "low lower"]) == length(encode(t, "low"))
     @test min_encoded_length(t, String[]) == 0
 end
+
+@testset "token_frequency_of" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test token_frequency_of(["a", "b", "a"], "a") == 2
+    @test token_frequency_of(String[], "a") == 0
+end
