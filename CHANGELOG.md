@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-12-20
+
+### Added
+- `all_ids_valid`, `encode_words`, `merge_pair_string`, `merged_tokens`, `vocab_char_set`, `special_token_count`, `word_final_tokens`, `batch_count_tokens`, `max_encoded_length`, `min_encoded_length`, `token_frequency_of`
+
+
 ## [0.8.0] - 2026-11-14
 
 ### Added
