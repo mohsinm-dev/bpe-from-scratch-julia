@@ -2095,3 +2095,10 @@ end
     t = train_tokenizer(corpus, 10)
     @test all(endswith(v, "</w>") for v in word_final_tokens(t))
 end
+
+@testset "batch_count_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test batch_count_tokens(t, ["low", "low lower"]) == [length(encode(t, "low")), length(encode(t, "low lower"))]
+    @test batch_count_tokens(t, String[]) == Int[]
+end
