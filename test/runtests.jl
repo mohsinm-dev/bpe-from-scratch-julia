@@ -2102,3 +2102,10 @@ end
     @test batch_count_tokens(t, ["low", "low lower"]) == [length(encode(t, "low")), length(encode(t, "low lower"))]
     @test batch_count_tokens(t, String[]) == Int[]
 end
+
+@testset "max_encoded_length" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test max_encoded_length(t, ["low", "low lower"]) == length(encode(t, "low lower"))
+    @test max_encoded_length(t, String[]) == 0
+end
