@@ -2089,3 +2089,9 @@ end
     @test special_token_count(t) == length(t.special_tokens)
     @test special_token_count(t) >= 2
 end
+
+@testset "word_final_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test all(endswith(v, "</w>") for v in word_final_tokens(t))
+end
