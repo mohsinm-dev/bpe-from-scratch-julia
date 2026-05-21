@@ -5,7 +5,8 @@ export word_to_symbols,
     initialize_word_symbols,
     count_pairs,
     best_pair,
-    merge_symbols
+    merge_symbols,
+    train_bpe
 
 
 """
@@ -126,8 +127,6 @@ function best_pair(
     return best
 
 end
-end
-
 
 
 function merge_symbols(
@@ -153,4 +152,39 @@ function merge_symbols(
         index += 1
     end
     return merged_symbols
+end
+
+
+"""
+    train_bpe(corpus, num_merges)
+
+Run the full BPE training loop for a given number of merges.
+
+Returns the final vocabulary (word_symbols) and the list of merges performed.
+"""
+function train_bpe(corpus::String, num_merges::Int)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    merges = Tuple{String,String}[]
+
+    for i in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
+
+        if pair === nothing
+            break
+        end
+
+        push!(merges, pair)
+
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_word_symbols
+    end
+
+    return (word_symbols, merges)
+end
+
 end
