@@ -12,12 +12,12 @@ Byte Pair Encoding is a subword tokenization algorithm used in modern language m
 include("src/BytePairEncoding.jl")
 using .BytePairEncoding
 
-corpus = "low lower lowest lower"
+corpus = "low low low lower lower lowest"
+vocab, merges = train_bpe(corpus, 10)
 
-frequencies = count_word_frequencies(corpus)
-word_symbols = initialize_word_symbols(frequencies)
-pair_counts = count_pairs(word_symbols)
-pair = best_pair(pair_counts)
+for (i, merge) in enumerate(merges)
+    println("$i. $(merge[1]) + $(merge[2])")
+end
 ```
 
 ## Functions
@@ -28,3 +28,10 @@ pair = best_pair(pair_counts)
 - `count_pairs(word_symbols)` — count adjacent symbol pairs weighted by frequency
 - `best_pair(pair_counts)` — find the most frequent pair
 - `merge_symbols(symbols, pair)` — merge all occurrences of a pair in a symbol sequence
+- `train_bpe(corpus, num_merges)` — run the full BPE training loop
+
+## Running tests
+
+```bash
+julia test/runtests.jl
+```
