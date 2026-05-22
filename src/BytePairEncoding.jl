@@ -6,7 +6,8 @@ export word_to_symbols,
     count_pairs,
     best_pair,
     merge_symbols,
-    train_bpe
+    train_bpe,
+    get_vocabulary
 
 
 """
@@ -185,6 +186,22 @@ function train_bpe(corpus::String, num_merges::Int)::Tuple{Dict{Vector{String},I
     end
 
     return (word_symbols, merges)
+end
+
+
+"""
+    get_vocabulary(word_symbols)
+
+Extract the set of unique tokens from the trained vocabulary.
+"""
+function get_vocabulary(word_symbols::Dict{Vector{String},Int})::Set{String}
+    vocab = Set{String}()
+    for (symbols, _) in word_symbols
+        for symbol in symbols
+            push!(vocab, symbol)
+        end
+    end
+    return vocab
 end
 
 end
