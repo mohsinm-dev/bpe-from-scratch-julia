@@ -53,3 +53,13 @@ end
     @test length(merges) == 3
     @test merges[1] isa Tuple{String,String}
 end
+
+@testset "get_vocabulary" begin
+    ws = Dict(["lo", "w", "</w>"] => 3, ["lo", "w", "er", "</w>"] => 2)
+    v = get_vocabulary(ws)
+    @test "lo" in v
+    @test "w" in v
+    @test "</w>" in v
+    @test "er" in v
+    @test length(v) == 4
+end
