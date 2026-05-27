@@ -8,7 +8,8 @@ export word_to_symbols,
     merge_symbols,
     train_bpe,
     get_vocabulary,
-    preprocess_text
+    preprocess_text,
+    load_corpus
 
 
 """
@@ -23,6 +24,21 @@ function preprocess_text(text::String; lowercase::Bool=true)::String
     result = lowercase ? Base.lowercase(text) : text
     result = replace(result, r"\s+" => " ")
     return strip(result) |> String
+end
+
+
+"""
+    load_corpus(filepath)
+
+Read a text corpus from a file and return it as a trimmed string.
+
+Raises an error if the file does not exist.
+"""
+function load_corpus(filepath::String)::String
+    if !isfile(filepath)
+        error("corpus file not found: $filepath")
+    end
+    return strip(read(filepath, String)) |> String
 end
 
 
