@@ -7,7 +7,23 @@ export word_to_symbols,
     best_pair,
     merge_symbols,
     train_bpe,
-    get_vocabulary
+    get_vocabulary,
+    preprocess_text
+
+
+"""
+    preprocess_text(text; lowercase=true)
+
+Normalize text for BPE training: optionally lowercase and collapse whitespace.
+
+Example:
+"  Hello   World  " -> "hello world"
+"""
+function preprocess_text(text::String; lowercase::Bool=true)::String
+    result = lowercase ? Base.lowercase(text) : text
+    result = replace(result, r"\s+" => " ")
+    return strip(result) |> String
+end
 
 
 """
