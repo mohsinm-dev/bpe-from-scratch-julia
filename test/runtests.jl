@@ -3,6 +3,21 @@ using Test
 include("../src/BytePairEncoding.jl")
 using .BytePairEncoding
 
+@testset "preprocess_text" begin
+    @test preprocess_text("  Hello   World  ") == "hello world"
+    @test preprocess_text("UPPER", lowercase=true) == "upper"
+    @test preprocess_text("KEEP", lowercase=false) == "KEEP"
+    @test preprocess_text("a\t\nb") == "a b"
+end
+
+@testset "load_corpus" begin
+    path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    corpus = load_corpus(path)
+    @test length(corpus) > 0
+    @test occursin("low", corpus)
+    @test_throws ErrorException load_corpus("nonexistent_file.txt")
+end
+
 @testset "word_to_symbols" begin
     @test word_to_symbols("low") == ["l", "o", "w", "</w>"]
     @test word_to_symbols("a") == ["a", "</w>"]
