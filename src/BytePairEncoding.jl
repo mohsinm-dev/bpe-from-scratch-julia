@@ -11,7 +11,8 @@ export word_to_symbols,
     preprocess_text,
     load_corpus,
     encode_word,
-    encode_text
+    encode_text,
+    decode_tokens
 
 
 """
@@ -272,6 +273,23 @@ function encode_text(text::String, merges::Vector{Tuple{String,String}})::Vector
         append!(tokens, encode_word(String(word), merges))
     end
     return tokens
+end
+
+
+"""
+    decode_tokens(tokens)
+
+Reconstruct text from a sequence of BPE tokens.
+
+Joins tokens and converts end-of-word markers back to spaces.
+
+Example:
+    decode_tokens(["low", "</w>", "er", "</w>"]) -> "low er"
+"""
+function decode_tokens(tokens::Vector{String})::String
+    text = join(tokens, "")
+    text = replace(text, "</w>" => " ")
+    return strip(text) |> String
 end
 
 end
