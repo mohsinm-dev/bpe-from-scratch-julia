@@ -10,7 +10,8 @@ export word_to_symbols,
     get_vocabulary,
     preprocess_text,
     load_corpus,
-    encode_word
+    encode_word,
+    encode_text
 
 
 """
@@ -255,6 +256,22 @@ function encode_word(word::String, merges::Vector{Tuple{String,String}})::Vector
         symbols = merge_symbols(symbols, merge)
     end
     return symbols
+end
+
+
+"""
+    encode_text(text, merges)
+
+Tokenize a full text string using learned BPE merges.
+
+Splits text into words, encodes each word, and returns the flat token list.
+"""
+function encode_text(text::String, merges::Vector{Tuple{String,String}})::Vector{String}
+    tokens = String[]
+    for word in split(text)
+        append!(tokens, encode_word(String(word), merges))
+    end
+    return tokens
 end
 
 end
