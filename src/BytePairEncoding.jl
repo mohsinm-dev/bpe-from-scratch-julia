@@ -9,7 +9,8 @@ export word_to_symbols,
     train_bpe,
     get_vocabulary,
     preprocess_text,
-    load_corpus
+    load_corpus,
+    encode_word
 
 
 """
@@ -234,6 +235,26 @@ function get_vocabulary(word_symbols::Dict{Vector{String},Int})::Set{String}
         end
     end
     return vocab
+end
+
+
+"""
+    encode_word(word, merges)
+
+Apply learned BPE merges to tokenize a single word.
+
+Returns the token sequence after applying all merges in order.
+
+Example:
+    merges = [("l", "o"), ("lo", "w")]
+    encode_word("low", merges) -> ["low", "</w>"]
+"""
+function encode_word(word::String, merges::Vector{Tuple{String,String}})::Vector{String}
+    symbols = word_to_symbols(word)
+    for merge in merges
+        symbols = merge_symbols(symbols, merge)
+    end
+    return symbols
 end
 
 end
