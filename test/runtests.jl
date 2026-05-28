@@ -69,6 +69,26 @@ end
     @test merges[1] isa Tuple{String,String}
 end
 
+@testset "encode_word" begin
+    merges = [("l", "o"), ("lo", "w")]
+    @test encode_word("low", merges) == ["low", "</w>"]
+    @test encode_word("a", Tuple{String,String}[]) == ["a", "</w>"]
+    @test encode_word("lo", merges) == ["lo", "</w>"]
+end
+
+@testset "encode_text" begin
+    merges = [("l", "o"), ("lo", "w")]
+    tokens = encode_text("low lo", merges)
+    @test tokens == ["low", "</w>", "lo", "</w>"]
+    @test encode_text("a", Tuple{String,String}[]) == ["a", "</w>"]
+end
+
+@testset "decode_tokens" begin
+    @test decode_tokens(["low", "</w>", "er", "</w>"]) == "low er"
+    @test decode_tokens(["h", "i", "</w>"]) == "hi"
+    @test decode_tokens(String[]) == ""
+end
+
 @testset "get_vocabulary" begin
     ws = Dict(["lo", "w", "</w>"] => 3, ["lo", "w", "er", "</w>"] => 2)
     v = get_vocabulary(ws)
