@@ -12,7 +12,9 @@ export word_to_symbols,
     load_corpus,
     encode_word,
     encode_text,
-    decode_tokens
+    decode_tokens,
+    save_merges,
+    load_merges
 
 
 """
@@ -290,6 +292,42 @@ function decode_tokens(tokens::Vector{String})::String
     text = join(tokens, "")
     text = replace(text, "</w>" => " ")
     return strip(text) |> String
+end
+
+
+"""
+    save_merges(merges, filepath)
+
+Write BPE merge rules to a tab-separated file, one merge per line.
+"""
+function save_merges(merges::Vector{Tuple{String,String}}, filepath::String)
+    open(filepath, "w") do io
+        for (a, b) in merges
+            println(io, a, "\t", b)
+        end
+    end
+end
+
+
+"""
+    load_merges(filepath)
+
+Read BPE merge rules from a tab-separated file.
+
+Raises an error if the file does not exist.
+"""
+function load_merges(filepath::String)::Vector{Tuple{String,String}}
+    if !isfile(filepath)
+        error("merges file not found: $filepath")
+    end
+    merges = Tuple{String,String}[]
+    for line in eachline(filepath)
+        parts = split(line, "\t")
+        if length(parts) == 2
+            push!(merges, (String(parts[1]), String(parts[2])))
+        end
+    end
+    return merges
 end
 
 end
