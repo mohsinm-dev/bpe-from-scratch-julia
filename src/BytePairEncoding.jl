@@ -14,7 +14,8 @@ export word_to_symbols,
     encode_text,
     decode_tokens,
     save_merges,
-    load_merges
+    load_merges,
+    save_vocab
 
 
 """
@@ -328,6 +329,20 @@ function load_merges(filepath::String)::Vector{Tuple{String,String}}
         end
     end
     return merges
+end
+
+
+"""
+    save_vocab(vocab, filepath)
+
+Write vocabulary tokens to a file, one token per line, sorted alphabetically.
+"""
+function save_vocab(vocab::Set{String}, filepath::String)
+    open(filepath, "w") do io
+        for token in sort(collect(vocab))
+            println(io, token)
+        end
+    end
 end
 
 end
