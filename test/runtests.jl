@@ -89,6 +89,33 @@ end
     @test decode_tokens(String[]) == ""
 end
 
+@testset "save_merges and load_merges" begin
+    merges = [("l", "o"), ("lo", "w"), ("low", "</w>")]
+    tmpfile = tempname()
+    try
+        save_merges(merges, tmpfile)
+        loaded = load_merges(tmpfile)
+        @test loaded == merges
+        @test length(loaded) == 3
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+    @test_throws ErrorException load_merges("nonexistent_merges.txt")
+end
+
+@testset "save_vocab" begin
+    vocab = Set(["lo", "w", "</w>", "er"])
+    tmpfile = tempname()
+    try
+        save_vocab(vocab, tmpfile)
+        lines = readlines(tmpfile)
+        @test length(lines) == 4
+        @test lines == sort(collect(vocab))
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+end
+
 @testset "get_vocabulary" begin
     ws = Dict(["lo", "w", "</w>"] => 3, ["lo", "w", "er", "</w>"] => 2)
     v = get_vocabulary(ws)
