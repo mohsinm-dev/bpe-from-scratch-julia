@@ -16,7 +16,8 @@ export word_to_symbols,
     save_merges,
     load_merges,
     save_vocab,
-    compression_ratio
+    compression_ratio,
+    token_frequencies
 
 
 """
@@ -352,6 +353,22 @@ function compression_ratio(original_text::String, tokens::Vector{String})::Float
         return 0.0
     end
     return num_chars / num_tokens
+end
+
+
+"""
+    token_frequencies(tokens)
+
+Count the frequency of each token in a token sequence.
+
+Returns a Dict mapping tokens to their counts.
+"""
+function token_frequencies(tokens::Vector{String})::Dict{String,Int}
+    freqs = Dict{String,Int}()
+    for token in tokens
+        freqs[token] = get(freqs, token, 0) + 1
+    end
+    return freqs
 end
 
 
