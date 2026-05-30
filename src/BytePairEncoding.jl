@@ -17,7 +17,8 @@ export word_to_symbols,
     load_merges,
     save_vocab,
     compression_ratio,
-    token_frequencies
+    token_frequencies,
+    vocab_size_history
 
 
 """
@@ -363,6 +364,35 @@ Count the frequency of each token in a token sequence.
 
 Returns a Dict mapping tokens to their counts.
 """
+"""
+    vocab_size_history(corpus, num_merges)
+
+Track how vocabulary size changes at each merge step during training.
+
+Returns a vector of vocabulary sizes, starting from the initial character-level vocab.
+"""
+function vocab_size_history(corpus::String, num_merges::Int)::Vector{Int}
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    history = Int[length(get_vocabulary(word_symbols))]
+
+    for _ in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
+        if pair === nothing
+            break
+        end
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_word_symbols
+        push!(history, length(get_vocabulary(word_symbols)))
+    end
+    return history
+end
+
+
 function token_frequencies(tokens::Vector{String})::Dict{String,Int}
     freqs = Dict{String,Int}()
     for token in tokens
