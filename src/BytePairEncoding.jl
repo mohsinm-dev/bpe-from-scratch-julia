@@ -336,11 +336,6 @@ end
 
 
 """
-    save_vocab(vocab, filepath)
-
-Write vocabulary tokens to a file, one token per line, sorted alphabetically.
-"""
-"""
     compression_ratio(original_text, tokens)
 
 Compute the ratio of original character count to token count.
@@ -357,13 +352,6 @@ function compression_ratio(original_text::String, tokens::Vector{String})::Float
 end
 
 
-"""
-    token_frequencies(tokens)
-
-Count the frequency of each token in a token sequence.
-
-Returns a Dict mapping tokens to their counts.
-"""
 """
     vocab_size_history(corpus, num_merges)
 
@@ -393,6 +381,13 @@ function vocab_size_history(corpus::String, num_merges::Int)::Vector{Int}
 end
 
 
+"""
+    token_frequencies(tokens)
+
+Count the frequency of each token in a token sequence.
+
+Returns a Dict mapping tokens to their counts.
+"""
 function token_frequencies(tokens::Vector{String})::Dict{String,Int}
     freqs = Dict{String,Int}()
     for token in tokens
@@ -402,6 +397,11 @@ function token_frequencies(tokens::Vector{String})::Dict{String,Int}
 end
 
 
+"""
+    save_vocab(vocab, filepath)
+
+Write vocabulary tokens to a file, one token per line, sorted alphabetically.
+"""
 function save_vocab(vocab::Set{String}, filepath::String)
     open(filepath, "w") do io
         for token in sort(collect(vocab))

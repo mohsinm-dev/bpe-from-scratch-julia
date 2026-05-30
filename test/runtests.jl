@@ -116,6 +116,29 @@ end
     end
 end
 
+@testset "compression_ratio" begin
+    @test compression_ratio("hello world", ["hel", "lo", "</w>", "wor", "ld", "</w>"]) == 11 / 6
+    @test compression_ratio("hi", ["h", "i", "</w>"]) ≈ 2 / 3
+    @test compression_ratio("test", String[]) == 0.0
+end
+
+@testset "token_frequencies" begin
+    tokens = ["lo", "w", "</w>", "lo", "w", "er", "</w>"]
+    freqs = token_frequencies(tokens)
+    @test freqs["lo"] == 2
+    @test freqs["w"] == 2
+    @test freqs["</w>"] == 2
+    @test freqs["er"] == 1
+end
+
+@testset "vocab_size_history" begin
+    corpus = "low low low lower lower lowest"
+    history = vocab_size_history(corpus, 5)
+    @test length(history) >= 2
+    @test history[1] > 0
+    @test history isa Vector{Int}
+end
+
 @testset "get_vocabulary" begin
     ws = Dict(["lo", "w", "</w>"] => 3, ["lo", "w", "er", "</w>"] => 2)
     v = get_vocabulary(ws)
