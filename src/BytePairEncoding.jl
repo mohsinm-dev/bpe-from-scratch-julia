@@ -15,7 +15,8 @@ export word_to_symbols,
     decode_tokens,
     save_merges,
     load_merges,
-    save_vocab
+    save_vocab,
+    compression_ratio
 
 
 """
@@ -337,6 +338,23 @@ end
 
 Write vocabulary tokens to a file, one token per line, sorted alphabetically.
 """
+"""
+    compression_ratio(original_text, tokens)
+
+Compute the ratio of original character count to token count.
+
+Higher values indicate better compression (fewer tokens per character).
+"""
+function compression_ratio(original_text::String, tokens::Vector{String})::Float64
+    num_chars = length(original_text)
+    num_tokens = length(tokens)
+    if num_tokens == 0
+        return 0.0
+    end
+    return num_chars / num_tokens
+end
+
+
 function save_vocab(vocab::Set{String}, filepath::String)
     open(filepath, "w") do io
         for token in sort(collect(vocab))
