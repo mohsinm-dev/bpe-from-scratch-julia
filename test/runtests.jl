@@ -69,6 +69,22 @@ end
     @test merges[1] isa Tuple{String,String}
 end
 
+@testset "train_bpe verbose and min_frequency" begin
+    corpus = "low low low lower lower lowest"
+
+    # verbose mode should not error (output goes to stdout)
+    vocab_v, merges_v = train_bpe(corpus, 3, verbose=true)
+    @test length(merges_v) == 3
+
+    # min_frequency should stop early when pair freq drops below threshold
+    _, merges_mf = train_bpe(corpus, 100, min_frequency=100)
+    @test length(merges_mf) < 100
+
+    # combined: verbose + min_frequency
+    _, merges_both = train_bpe(corpus, 100, verbose=true, min_frequency=100)
+    @test length(merges_both) == length(merges_mf)
+end
+
 @testset "encode_word" begin
     merges = [("l", "o"), ("lo", "w")]
     @test encode_word("low", merges) == ["low", "</w>"]
