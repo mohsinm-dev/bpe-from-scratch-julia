@@ -198,13 +198,15 @@ end
 
 
 """
-    train_bpe(corpus, num_merges)
+    train_bpe(corpus, num_merges; verbose=false)
 
 Run the full BPE training loop for a given number of merges.
 
+Set `verbose=true` to print each merge step as it happens.
+
 Returns the final vocabulary (word_symbols) and the list of merges performed.
 """
-function train_bpe(corpus::String, num_merges::Int)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+function train_bpe(corpus::String, num_merges::Int; verbose::Bool=false)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
     frequencies = count_word_frequencies(corpus)
     word_symbols = initialize_word_symbols(frequencies)
     merges = Tuple{String,String}[]
@@ -214,7 +216,12 @@ function train_bpe(corpus::String, num_merges::Int)::Tuple{Dict{Vector{String},I
         pair = best_pair(pair_counts)
 
         if pair === nothing
+            verbose && println("stopping early: no more pairs at step $i")
             break
+        end
+
+        if verbose
+            println("merge $i: $(pair[1]) + $(pair[2]) -> $(pair[1])$(pair[2]) (freq=$(pair_counts[pair]))")
         end
 
         push!(merges, pair)
