@@ -19,7 +19,8 @@ export word_to_symbols,
     compression_ratio,
     token_frequencies,
     vocab_size_history,
-    add_special_tokens
+    add_special_tokens,
+    encode_batch
 
 
 """
@@ -439,6 +440,18 @@ function add_special_tokens(vocab::Set{String}, special::Vector{String})::Set{St
         push!(new_vocab, token)
     end
     return new_vocab
+end
+
+
+"""
+    encode_batch(texts, merges)
+
+Encode multiple text strings using learned BPE merges.
+
+Returns a vector of token sequences, one per input text.
+"""
+function encode_batch(texts::Vector{String}, merges::Vector{Tuple{String,String}})::Vector{Vector{String}}
+    return [encode_text(text, merges) for text in texts]
 end
 
 end
