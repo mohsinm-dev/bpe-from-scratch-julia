@@ -155,6 +155,33 @@ end
     @test history isa Vector{Int}
 end
 
+@testset "add_special_tokens" begin
+    vocab = Set(["lo", "w", "</w>"])
+    extended = add_special_tokens(vocab, ["<unk>", "<pad>"])
+    @test "<unk>" in extended
+    @test "<pad>" in extended
+    @test "lo" in extended
+    @test length(extended) == 5
+    # original unchanged
+    @test length(vocab) == 3
+end
+
+@testset "encode_batch" begin
+    merges = [("l", "o")]
+    results = encode_batch(["lo", "la"], merges)
+    @test length(results) == 2
+    @test results[1] == ["lo", "</w>"]
+    @test results[2] == ["l", "a", "</w>"]
+end
+
+@testset "encode_word_with_dropout" begin
+    merges = [("l", "o"), ("lo", "w")]
+    # with zero dropout, identical to encode_word
+    @test encode_word_with_dropout("low", merges, dropout=0.0) == ["low", "</w>"]
+    # with full dropout, should return character-level tokenization
+    @test encode_word_with_dropout("low", merges, dropout=1.0) == ["l", "o", "w", "</w>"]
+end
+
 @testset "get_vocabulary" begin
     ws = Dict(["lo", "w", "</w>"] => 3, ["lo", "w", "er", "</w>"] => 2)
     v = get_vocabulary(ws)
