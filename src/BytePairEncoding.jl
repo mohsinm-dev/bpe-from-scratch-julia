@@ -18,7 +18,8 @@ export word_to_symbols,
     save_vocab,
     compression_ratio,
     token_frequencies,
-    vocab_size_history
+    vocab_size_history,
+    add_special_tokens
 
 
 """
@@ -422,6 +423,22 @@ function save_vocab(vocab::Set{String}, filepath::String)
             println(io, token)
         end
     end
+end
+
+
+"""
+    add_special_tokens(vocab, special)
+
+Add special tokens (e.g. "<unk>", "<pad>", "<bos>", "<eos>") to a vocabulary set.
+
+Returns a new set with the special tokens included.
+"""
+function add_special_tokens(vocab::Set{String}, special::Vector{String})::Set{String}
+    new_vocab = copy(vocab)
+    for token in special
+        push!(new_vocab, token)
+    end
+    return new_vocab
 end
 
 end
