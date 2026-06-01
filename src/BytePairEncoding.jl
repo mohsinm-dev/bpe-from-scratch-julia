@@ -20,7 +20,8 @@ export word_to_symbols,
     token_frequencies,
     vocab_size_history,
     add_special_tokens,
-    encode_batch
+    encode_batch,
+    encode_word_with_dropout
 
 
 """
@@ -452,6 +453,28 @@ Returns a vector of token sequences, one per input text.
 """
 function encode_batch(texts::Vector{String}, merges::Vector{Tuple{String,String}})::Vector{Vector{String}}
     return [encode_text(text, merges) for text in texts]
+end
+
+
+"""
+    encode_word_with_dropout(word, merges; dropout=0.1)
+
+Apply BPE merges with stochastic dropout for subword regularization.
+
+Each merge is skipped with probability `dropout`, producing varied tokenizations
+of the same word. Useful for training robustness.
+
+With `dropout=0.0`, behaves identically to `encode_word`.
+"""
+function encode_word_with_dropout(word::String, merges::Vector{Tuple{String,String}}; dropout::Float64=0.1)::Vector{String}
+    symbols = word_to_symbols(word)
+    for merge in merges
+        if dropout > 0.0 && rand() < dropout
+            continue
+        end
+        symbols = merge_symbols(symbols, merge)
+    end
+    return symbols
 end
 
 end
