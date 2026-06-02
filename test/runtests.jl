@@ -239,3 +239,80 @@ end
     batch = encode_batch(["low", "lower"], merges)
     @test length(batch) == 2
 end
+
+@testset "build_vocab_index" begin
+    vocab = Set(["lo", "w", "</w>", "er"])
+    index = build_vocab_index(vocab, ["<unk>", "<pad>"])
+    # special tokens get IDs 1 and 2
+    @test index["<unk>"] == 1
+    @test index["<pad>"] == 2
+    # vocab tokens sorted alphabetically after specials
+    @test index["</w>"] == 3
+    @test index["er"] == 4
+    @test index["lo"] == 5
+    @test index["w"] == 6
+    @test length(index) == 6
+    # without special tokens
+    index2 = build_vocab_index(vocab)
+    @test length(index2) == 4
+    @test index2["</w>"] == 1
+end
+
+@testset "tokens_to_ids" begin
+    index = Dict("lo" => 1, "w" => 2, "</w>" => 3)
+    ids = tokens_to_ids(["lo", "w", "</w>", "unknown"], index)
+    @test ids == [1, 2, 3, 0]
+    # custom unk_id
+    ids2 = tokens_to_ids(["lo", "missing"], index, unk_id=99)
+    @test ids2 == [1, 99]
+    # empty input
+    @test tokens_to_ids(String[], index) == Int[]
+end
+
+@testset "ids_to_tokens" begin
+    index = Dict("lo" => 1, "w" => 2, "</w>" => 3)
+    tokens = ids_to_tokens([1, 2, 3], index)
+    @test tokens == ["lo", "w", "</w>"]
+    # unknown ID maps to "<unk>"
+    tokens2 = ids_to_tokens([1, 999], index)
+    @test tokens2 == ["lo", "<unk>"]
+    # empty input
+    @test ids_to_tokens(Int[], index) == String[]
+end
+
+@testset "save_vocab_index and load_vocab_index" begin
+    index = Dict("lo" => 1, "w" => 2, "</w>" => 3, "er" => 4)
+    tmpfile = tempname()
+    try
+        save_vocab_index(index, tmpfile)
+        loaded = load_vocab_index(tmpfile)
+        @test loaded == index
+        @test length(loaded) == 4
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+    @test_throws ErrorException load_vocab_index("nonexistent_vocab_index.txt")
+end
+
+@testset "token-to-ID round-trip" begin
+    corpus = "low low low lower lower lowest"
+    vocab, merges = train_bpe(corpus, 10)
+    v = get_vocabulary(vocab)
+    extended = add_special_tokens(v, ["<unk>", "<pad>"])
+    index = build_vocab_index(extended, ["<unk>", "<pad>"])
+
+    tokens = encode_text("low lower", merges)
+    ids = tokens_to_ids(tokens, index)
+    recovered = ids_to_tokens(ids, index)
+    @test recovered == tokens
+
+    # save/load round-trip
+    tmpfile = tempname()
+    try
+        save_vocab_index(index, tmpfile)
+        loaded_index = load_vocab_index(tmpfile)
+        @test tokens_to_ids(tokens, loaded_index) == ids
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+end
