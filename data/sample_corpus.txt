@@ -1,1 +1,7 @@
 low low low low low lower lower lower lowest lowest newer newer newer newest widest widest wider wider wider wide
+the cat sat on the mat the cat sat on the hat the dog sat on the mat
+running runner runs run running runner fastest faster fast fastest faster
+playing player plays played playing player played playing
+natural language processing is a subfield of artificial intelligence
+tokenization is the process of breaking text into smaller units called tokens
+byte pair encoding iteratively merges the most frequent pair of adjacent symbols
