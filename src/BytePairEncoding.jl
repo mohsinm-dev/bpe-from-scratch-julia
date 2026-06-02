@@ -24,7 +24,9 @@ export word_to_symbols,
     encode_word_with_dropout,
     build_vocab_index,
     tokens_to_ids,
-    ids_to_tokens
+    ids_to_tokens,
+    save_vocab_index,
+    load_vocab_index
 
 
 """
@@ -524,6 +526,43 @@ Unknown IDs are mapped to "<unk>".
 function ids_to_tokens(ids::Vector{Int}, index::Dict{String,Int})::Vector{String}
     reverse_index = Dict{Int,String}(v => k for (k, v) in index)
     return [get(reverse_index, id, "<unk>") for id in ids]
+end
+
+
+"""
+    save_vocab_index(index, filepath)
+
+Write a vocabulary index to a tab-separated file (token<TAB>id), sorted by ID.
+"""
+function save_vocab_index(index::Dict{String,Int}, filepath::String)
+    sorted = sort(collect(index), by=x -> x[2])
+    open(filepath, "w") do io
+        for (token, id) in sorted
+            println(io, token, "\t", id)
+        end
+    end
+end
+
+
+"""
+    load_vocab_index(filepath) → Dict{String,Int}
+
+Read a vocabulary index from a tab-separated file.
+
+Raises an error if the file does not exist.
+"""
+function load_vocab_index(filepath::String)::Dict{String,Int}
+    if !isfile(filepath)
+        error("vocab index file not found: $filepath")
+    end
+    index = Dict{String,Int}()
+    for line in eachline(filepath)
+        parts = split(line, "\t")
+        if length(parts) == 2
+            index[String(parts[1])] = parse(Int, parts[2])
+        end
+    end
+    return index
 end
 
 end
