@@ -191,3 +191,51 @@ end
     @test "er" in v
     @test length(v) == 4
 end
+
+@testset "integration: train, encode, decode, save, load" begin
+    # load corpus from file
+    path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    raw_corpus = load_corpus(path)
+    corpus = preprocess_text(raw_corpus)
+
+    # train
+    vocab, merges = train_bpe(corpus, 20)
+    @test length(merges) > 0
+    @test length(merges) <= 20
+
+    # encode and decode round-trip
+    test_text = "low lower lowest"
+    tokens = encode_text(test_text, merges)
+    @test length(tokens) > 0
+    decoded = decode_tokens(tokens)
+    @test decoded == test_text
+
+    # save and reload merges
+    tmpfile = tempname()
+    try
+        save_merges(merges, tmpfile)
+        reloaded = load_merges(tmpfile)
+        @test reloaded == merges
+        # encoding with reloaded merges should give same result
+        @test encode_text(test_text, reloaded) == tokens
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+
+    # analytics
+    ratio = compression_ratio(test_text, tokens)
+    @test ratio > 0.0
+    freqs = token_frequencies(tokens)
+    @test sum(values(freqs)) == length(tokens)
+    history = vocab_size_history(corpus, 20)
+    @test length(history) >= 2
+
+    # vocabulary with special tokens
+    v = get_vocabulary(vocab)
+    extended = add_special_tokens(v, ["<unk>", "<pad>"])
+    @test length(extended) == length(v) + 2
+
+    # batch encoding
+    batch = encode_batch(["low", "lower"], merges)
+    @test length(batch) == 2
+end
