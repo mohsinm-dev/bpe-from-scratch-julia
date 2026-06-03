@@ -21,7 +21,8 @@ export word_to_symbols,
     vocab_size_history,
     add_special_tokens,
     encode_batch,
-    encode_word_with_dropout
+    encode_word_with_dropout,
+    build_vocab_index
 
 
 """
@@ -475,6 +476,29 @@ function encode_word_with_dropout(word::String, merges::Vector{Tuple{String,Stri
         symbols = merge_symbols(symbols, merge)
     end
     return symbols
+end
+
+
+"""
+    build_vocab_index(vocab, special_tokens) → Dict{String,Int}
+
+Assign integer IDs to tokens. Special tokens are assigned first (starting at 1),
+followed by vocabulary tokens in sorted order.
+"""
+function build_vocab_index(vocab::Set{String}, special_tokens::Vector{String}=String[])::Dict{String,Int}
+    index = Dict{String,Int}()
+    id = 1
+    for token in special_tokens
+        index[token] = id
+        id += 1
+    end
+    for token in sort(collect(vocab))
+        if !haskey(index, token)
+            index[token] = id
+            id += 1
+        end
+    end
+    return index
 end
 
 end
