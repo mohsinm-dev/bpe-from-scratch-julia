@@ -23,7 +23,8 @@ export word_to_symbols,
     encode_batch,
     encode_word_with_dropout,
     build_vocab_index,
-    tokens_to_ids
+    tokens_to_ids,
+    ids_to_tokens
 
 
 """
@@ -511,6 +512,18 @@ Unknown tokens are mapped to `unk_id`.
 """
 function tokens_to_ids(tokens::Vector{String}, index::Dict{String,Int}; unk_id::Int=0)::Vector{Int}
     return [get(index, token, unk_id) for token in tokens]
+end
+
+
+"""
+    ids_to_tokens(ids, index) → Vector{String}
+
+Reverse-map integer IDs back to string tokens using a vocabulary index.
+Unknown IDs are mapped to "<unk>".
+"""
+function ids_to_tokens(ids::Vector{Int}, index::Dict{String,Int})::Vector{String}
+    reverse_index = Dict{Int,String}(v => k for (k, v) in index)
+    return [get(reverse_index, id, "<unk>") for id in ids]
 end
 
 end
