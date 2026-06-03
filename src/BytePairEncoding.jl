@@ -22,7 +22,8 @@ export word_to_symbols,
     add_special_tokens,
     encode_batch,
     encode_word_with_dropout,
-    build_vocab_index
+    build_vocab_index,
+    tokens_to_ids
 
 
 """
@@ -499,6 +500,17 @@ function build_vocab_index(vocab::Set{String}, special_tokens::Vector{String}=St
         end
     end
     return index
+end
+
+
+"""
+    tokens_to_ids(tokens, index; unk_id=0) → Vector{Int}
+
+Map a sequence of string tokens to integer IDs using a vocabulary index.
+Unknown tokens are mapped to `unk_id`.
+"""
+function tokens_to_ids(tokens::Vector{String}, index::Dict{String,Int}; unk_id::Int=0)::Vector{Int}
+    return [get(index, token, unk_id) for token in tokens]
 end
 
 end
