@@ -28,7 +28,8 @@ export word_to_symbols,
     save_vocab_index,
     load_vocab_index,
     pad_sequence,
-    truncate_sequence
+    truncate_sequence,
+    prepare_batch
 
 
 """
@@ -596,6 +597,18 @@ function truncate_sequence(ids::Vector{Int}, max_len::Int)::Vector{Int}
         return copy(ids)
     end
     return ids[1:max_len]
+end
+
+
+"""
+    prepare_batch(batch, max_len; pad_id=0) → Vector{Vector{Int}}
+
+Truncate and pad a batch of ID sequences to uniform length.
+
+Each sequence is first truncated to `max_len`, then right-padded with `pad_id`.
+"""
+function prepare_batch(batch::Vector{Vector{Int}}, max_len::Int; pad_id::Int=0)::Vector{Vector{Int}}
+    return [pad_sequence(truncate_sequence(seq, max_len), max_len, pad_id=pad_id) for seq in batch]
 end
 
 end
