@@ -27,7 +27,8 @@ export word_to_symbols,
     ids_to_tokens,
     save_vocab_index,
     load_vocab_index,
-    pad_sequence
+    pad_sequence,
+    truncate_sequence
 
 
 """
@@ -580,6 +581,21 @@ function pad_sequence(ids::Vector{Int}, max_len::Int; pad_id::Int=0)::Vector{Int
         return copy(ids)
     end
     return vcat(ids, fill(pad_id, max_len - current_len))
+end
+
+
+"""
+    truncate_sequence(ids, max_len) → Vector{Int}
+
+Truncate a sequence of integer IDs to at most `max_len` elements from the left.
+
+If the sequence is already shorter than or equal to `max_len`, it is returned unchanged.
+"""
+function truncate_sequence(ids::Vector{Int}, max_len::Int)::Vector{Int}
+    if length(ids) <= max_len
+        return copy(ids)
+    end
+    return ids[1:max_len]
 end
 
 end
