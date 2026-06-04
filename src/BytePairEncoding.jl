@@ -26,7 +26,8 @@ export word_to_symbols,
     tokens_to_ids,
     ids_to_tokens,
     save_vocab_index,
-    load_vocab_index
+    load_vocab_index,
+    pad_sequence
 
 
 """
@@ -563,6 +564,22 @@ function load_vocab_index(filepath::String)::Dict{String,Int}
         end
     end
     return index
+end
+
+
+"""
+    pad_sequence(ids, max_len; pad_id=0) → Vector{Int}
+
+Right-pad a sequence of integer IDs to a fixed length.
+
+If the sequence is already longer than `max_len`, it is returned unchanged.
+"""
+function pad_sequence(ids::Vector{Int}, max_len::Int; pad_id::Int=0)::Vector{Int}
+    current_len = length(ids)
+    if current_len >= max_len
+        return copy(ids)
+    end
+    return vcat(ids, fill(pad_id, max_len - current_len))
 end
 
 end
