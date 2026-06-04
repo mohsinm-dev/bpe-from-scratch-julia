@@ -316,3 +316,39 @@ end
         isfile(tmpfile) && rm(tmpfile)
     end
 end
+
+@testset "pad_sequence" begin
+    @test pad_sequence([1, 2, 3], 5) == [1, 2, 3, 0, 0]
+    @test pad_sequence([1, 2, 3], 5, pad_id=99) == [1, 2, 3, 99, 99]
+    # already at max_len
+    @test pad_sequence([1, 2, 3], 3) == [1, 2, 3]
+    # longer than max_len — returned unchanged
+    @test pad_sequence([1, 2, 3, 4], 2) == [1, 2, 3, 4]
+    # empty input
+    @test pad_sequence(Int[], 3) == [0, 0, 0]
+end
+
+@testset "truncate_sequence" begin
+    @test truncate_sequence([1, 2, 3, 4, 5], 3) == [1, 2, 3]
+    # already at max_len
+    @test truncate_sequence([1, 2, 3], 3) == [1, 2, 3]
+    # shorter than max_len — returned unchanged
+    @test truncate_sequence([1, 2], 5) == [1, 2]
+    # empty input
+    @test truncate_sequence(Int[], 3) == Int[]
+end
+
+@testset "prepare_batch" begin
+    batch = [[1, 2], [3, 4, 5, 6, 7], [8]]
+    result = prepare_batch(batch, 4)
+    @test length(result) == 3
+    @test result[1] == [1, 2, 0, 0]
+    @test result[2] == [3, 4, 5, 6]
+    @test result[3] == [8, 0, 0, 0]
+    # custom pad_id
+    result2 = prepare_batch([[1], [2, 3]], 3, pad_id=-1)
+    @test result2[1] == [1, -1, -1]
+    @test result2[2] == [2, 3, -1]
+    # empty batch
+    @test prepare_batch(Vector{Int}[], 5) == Vector{Int}[]
+end
