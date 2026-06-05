@@ -352,3 +352,50 @@ end
     # empty batch
     @test prepare_batch(Vector{Int}[], 5) == Vector{Int}[]
 end
+
+@testset "pretokenize" begin
+    chunks = pretokenize("Hello world")
+    @test chunks == ["Hello", " world"]
+    # punctuation gets its own chunk
+    chunks2 = pretokenize("Hello, world!")
+    @test "Hello" in chunks2
+    @test "," in chunks2
+    @test " world" in chunks2
+    @test "!" in chunks2
+    # contractions
+    chunks3 = pretokenize("I'm don't")
+    @test "'m" in chunks3
+    @test "'t" in chunks3
+    # numbers
+    chunks4 = pretokenize("test 123 words")
+    @test " 123" in chunks4
+    # empty string
+    @test pretokenize("") == String[]
+end
+
+@testset "count_frequencies_pretokenized" begin
+    freqs = count_frequencies_pretokenized("hello world hello")
+    @test freqs["hello"] == 1
+    @test freqs[" hello"] == 1
+    @test freqs[" world"] == 1
+    @test length(freqs) == 3
+    # single word
+    freqs2 = count_frequencies_pretokenized("test")
+    @test freqs2["test"] == 1
+end
+
+@testset "tokenize" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    tokens = tokenize("low lower", merges)
+    @test length(tokens) > 0
+    # result should be decodable
+    decoded = decode_tokens(tokens)
+    @test occursin("low", decoded)
+    @test occursin("lower", decoded)
+    # empty text
+    @test tokenize("", merges) == String[]
+    # handles mixed case via preprocessing
+    tokens2 = tokenize("LOW Lower", merges)
+    @test length(tokens2) > 0
+end
