@@ -31,7 +31,8 @@ export word_to_symbols,
     truncate_sequence,
     prepare_batch,
     pretokenize,
-    count_frequencies_pretokenized
+    count_frequencies_pretokenized,
+    tokenize
 
 
 """
@@ -640,6 +641,28 @@ function count_frequencies_pretokenized(text::String; pattern::Regex=GPT2_PATTER
         frequencies[chunk] = get(frequencies, chunk, 0) + 1
     end
     return frequencies
+end
+
+
+"""
+    tokenize(text, merges; pattern=GPT2_PATTERN) → Vector{String}
+
+High-level end-to-end tokenization: preprocess → pretokenize → encode each chunk → flat token list.
+
+Combines regex pre-tokenization with BPE encoding for a complete pipeline.
+"""
+function tokenize(text::String, merges::Vector{Tuple{String,String}}; pattern::Regex=GPT2_PATTERN)::Vector{String}
+    processed = preprocess_text(text)
+    chunks = pretokenize(processed, pattern=pattern)
+    tokens = String[]
+    for chunk in chunks
+        word = strip(chunk) |> String
+        if isempty(word)
+            continue
+        end
+        append!(tokens, encode_word(word, merges))
+    end
+    return tokens
 end
 
 end
