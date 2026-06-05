@@ -30,7 +30,8 @@ export word_to_symbols,
     pad_sequence,
     truncate_sequence,
     prepare_batch,
-    pretokenize
+    pretokenize,
+    count_frequencies_pretokenized
 
 
 """
@@ -624,6 +625,21 @@ Each match becomes a separate chunk for downstream BPE encoding.
 """
 function pretokenize(text::String; pattern::Regex=GPT2_PATTERN)::Vector{String}
     return [String(m.match) for m in eachmatch(pattern, text)]
+end
+
+
+"""
+    count_frequencies_pretokenized(text; pattern=GPT2_PATTERN) → Dict{String,Int}
+
+Count word frequencies using regex pre-tokenization instead of simple whitespace splitting.
+"""
+function count_frequencies_pretokenized(text::String; pattern::Regex=GPT2_PATTERN)::Dict{String,Int}
+    chunks = pretokenize(text, pattern=pattern)
+    frequencies = Dict{String,Int}()
+    for chunk in chunks
+        frequencies[chunk] = get(frequencies, chunk, 0) + 1
+    end
+    return frequencies
 end
 
 end
