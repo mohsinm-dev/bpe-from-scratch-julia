@@ -29,7 +29,8 @@ export word_to_symbols,
     load_vocab_index,
     pad_sequence,
     truncate_sequence,
-    prepare_batch
+    prepare_batch,
+    pretokenize
 
 
 """
@@ -609,6 +610,20 @@ Each sequence is first truncated to `max_len`, then right-padded with `pad_id`.
 """
 function prepare_batch(batch::Vector{Vector{Int}}, max_len::Int; pad_id::Int=0)::Vector{Vector{Int}}
     return [pad_sequence(truncate_sequence(seq, max_len), max_len, pad_id=pad_id) for seq in batch]
+end
+
+
+const GPT2_PATTERN = r"'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"
+
+"""
+    pretokenize(text; pattern=GPT2_PATTERN) → Vector{String}
+
+Split text into chunks using a regex pattern (GPT-2-style by default).
+
+Each match becomes a separate chunk for downstream BPE encoding.
+"""
+function pretokenize(text::String; pattern::Regex=GPT2_PATTERN)::Vector{String}
+    return [String(m.match) for m in eachmatch(pattern, text)]
 end
 
 end
