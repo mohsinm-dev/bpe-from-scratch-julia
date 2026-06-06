@@ -40,7 +40,8 @@ export word_to_symbols,
     save_tokenizer,
     load_tokenizer,
     most_common_tokens,
-    average_token_length
+    average_token_length,
+    coverage
 
 
 """
@@ -809,6 +810,33 @@ function average_token_length(vocab::Set{String})::Float64
         return 0.0
     end
     return sum(length(t) for t in vocab) / length(vocab)
+end
+
+
+"""
+    coverage(text, merges) → Float64
+
+Measure vocabulary completeness: the fraction of words in `text` that are fully
+encodable without producing single-character tokens (beyond the end-of-word marker).
+
+A word is considered "covered" if all its BPE tokens are multi-character or the
+word itself is a single character. Returns 0.0 for empty text.
+"""
+function coverage(text::String, merges::Vector{Tuple{String,String}})::Float64
+    words = split(text)
+    if isempty(words)
+        return 0.0
+    end
+    covered = 0
+    for word in words
+        tokens = encode_word(String(word), merges)
+        # A word is covered if no token is a single character (excluding </w>)
+        non_marker = filter(t -> t != "</w>", tokens)
+        if all(t -> length(t) > 1 || length(String(word)) == 1, non_marker)
+            covered += 1
+        end
+    end
+    return covered / length(words)
 end
 
 end
