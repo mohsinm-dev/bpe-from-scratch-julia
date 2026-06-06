@@ -399,3 +399,55 @@ end
     tokens2 = tokenize("LOW Lower", merges)
     @test length(tokens2) > 0
 end
+
+@testset "BPETokenizer lifecycle" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+
+    # struct fields are populated
+    @test length(t.merges) > 0
+    @test length(t.vocab) > 0
+    @test length(t.vocab_index) == length(t.vocab)
+    @test length(t.id_to_token) == length(t.vocab_index)
+    @test "<unk>" in t.special_tokens
+    @test "<pad>" in t.special_tokens
+
+    # encode produces integer IDs
+    ids = encode(t, "low lower")
+    @test ids isa Vector{Int}
+    @test length(ids) > 0
+    @test all(id -> id > 0, ids)
+
+    # decode round-trip
+    decoded = decode(t, ids)
+    @test decoded == "low lower"
+
+    # unknown tokens get unk_id
+    ids_unk = encode(t, "xyz")
+    unk_id = t.vocab_index["<unk>"]
+    @test any(id -> id == unk_id, ids_unk)
+
+    # save and reload
+    dir = mktempdir()
+    try
+        save_tokenizer(t, dir)
+        t2 = load_tokenizer(dir)
+        @test t2.merges == t.merges
+        @test t2.vocab_index == t.vocab_index
+        @test t2.special_tokens == t.special_tokens
+        # re-encode produces same IDs
+        @test encode(t2, "low lower") == ids
+        @test decode(t2, ids) == decoded
+    finally
+        rm(dir, recursive=true)
+    end
+
+    # load_tokenizer error on missing dir
+    @test_throws ErrorException load_tokenizer("nonexistent_tokenizer_dir")
+
+    # custom special tokens
+    t3 = train_tokenizer(corpus, 5, special_tokens=["<bos>", "<eos>"])
+    @test "<bos>" in t3.special_tokens
+    @test t3.vocab_index["<bos>"] == 1
+    @test t3.vocab_index["<eos>"] == 2
+end
