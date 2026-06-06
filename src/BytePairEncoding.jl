@@ -36,7 +36,9 @@ export word_to_symbols,
     BPETokenizer,
     train_tokenizer,
     encode,
-    decode
+    decode,
+    save_tokenizer,
+    load_tokenizer
 
 
 """
@@ -731,6 +733,52 @@ Convert integer IDs back to text using the tokenizer's reverse index.
 function decode(t::BPETokenizer, ids::Vector{Int})::String
     string_tokens = [get(t.id_to_token, id, "<unk>") for id in ids]
     return decode_tokens(string_tokens)
+end
+
+
+"""
+    save_tokenizer(t::BPETokenizer, dir)
+
+Save all tokenizer state to a directory: merges.tsv, vocab_index.tsv, and special_tokens.txt.
+
+Creates the directory if it does not exist.
+"""
+function save_tokenizer(t::BPETokenizer, dir::String)
+    mkpath(dir)
+    save_merges(t.merges, joinpath(dir, "merges.tsv"))
+    save_vocab_index(t.vocab_index, joinpath(dir, "vocab_index.tsv"))
+    open(joinpath(dir, "special_tokens.txt"), "w") do io
+        for token in t.special_tokens
+            println(io, token)
+        end
+    end
+end
+
+
+"""
+    load_tokenizer(dir) → BPETokenizer
+
+Load a tokenizer from a directory previously saved by `save_tokenizer`.
+
+Raises an error if the directory does not exist.
+"""
+function load_tokenizer(dir::String)::BPETokenizer
+    if !isdir(dir)
+        error("tokenizer directory not found: $dir")
+    end
+    merges = load_merges(joinpath(dir, "merges.tsv"))
+    vocab_index = load_vocab_index(joinpath(dir, "vocab_index.tsv"))
+
+    special_tokens_path = joinpath(dir, "special_tokens.txt")
+    special_tokens = if isfile(special_tokens_path)
+        filter(!isempty, readlines(special_tokens_path))
+    else
+        String[]
+    end
+
+    vocab = Set(keys(vocab_index))
+    id_to_token = Dict{Int,String}(v => k for (k, v) in vocab_index)
+    return BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
 end
 
 end
