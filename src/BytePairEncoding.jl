@@ -43,7 +43,8 @@ export word_to_symbols,
     average_token_length,
     coverage,
     text_to_bytes,
-    bytes_to_text
+    bytes_to_text,
+    train_byte_bpe
 
 
 """
@@ -870,6 +871,44 @@ function bytes_to_text(byte_tokens::Vector{String})::String
         end
     end
     return String(bytes)
+end
+
+
+"""
+    train_byte_bpe(text, num_merges; verbose=false) → Tuple{Dict{Vector{String},Int}, Vector{Tuple{String,String}}}
+
+Train BPE on byte-level representations instead of characters.
+
+Text is first converted to hex byte sequences, then standard BPE training is applied.
+Returns word_symbols and merges in the byte domain.
+"""
+function train_byte_bpe(text::String, num_merges::Int; verbose::Bool=false)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    words = split(text)
+    word_symbols = Dict{Vector{String},Int}()
+    for word in words
+        byte_seq = text_to_bytes(String(word))
+        word_symbols[byte_seq] = get(word_symbols, byte_seq, 0) + 1
+    end
+
+    merges = Tuple{String,String}[]
+    for i in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
+        if pair === nothing
+            verbose && println("stopping early: no more pairs at step $i")
+            break
+        end
+        if verbose
+            println("merge $i: $(pair[1]) + $(pair[2]) -> $(pair[1])$(pair[2]) (freq=$(pair_counts[pair]))")
+        end
+        push!(merges, pair)
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_word_symbols
+    end
+    return (word_symbols, merges)
 end
 
 end
