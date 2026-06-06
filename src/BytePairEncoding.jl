@@ -41,7 +41,8 @@ export word_to_symbols,
     load_tokenizer,
     most_common_tokens,
     average_token_length,
-    coverage
+    coverage,
+    text_to_bytes
 
 
 """
@@ -837,6 +838,18 @@ function coverage(text::String, merges::Vector{Tuple{String,String}})::Float64
         end
     end
     return covered / length(words)
+end
+
+
+"""
+    text_to_bytes(text) → Vector{String}
+
+Convert text to a sequence of hex byte strings (e.g. 'L' → "4c").
+
+Each byte of the UTF-8 encoding becomes a two-character lowercase hex string.
+"""
+function text_to_bytes(text::String)::Vector{String}
+    return [string(b, base=16, pad=2) for b in Vector{UInt8}(codeunits(text))]
 end
 
 end
