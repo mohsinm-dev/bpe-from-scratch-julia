@@ -39,7 +39,8 @@ export word_to_symbols,
     decode,
     save_tokenizer,
     load_tokenizer,
-    most_common_tokens
+    most_common_tokens,
+    average_token_length
 
 
 """
@@ -793,6 +794,21 @@ function most_common_tokens(tokens::Vector{String}, n::Int)::Vector{Tuple{String
     sorted = sort(collect(freqs), by=x -> -x[2])
     top_n = sorted[1:min(n, length(sorted))]
     return [(k, v) for (k, v) in top_n]
+end
+
+
+"""
+    average_token_length(vocab) → Float64
+
+Compute the mean character count of tokens in a vocabulary set.
+
+Returns 0.0 for an empty vocabulary.
+"""
+function average_token_length(vocab::Set{String})::Float64
+    if isempty(vocab)
+        return 0.0
+    end
+    return sum(length(t) for t in vocab) / length(vocab)
 end
 
 end
