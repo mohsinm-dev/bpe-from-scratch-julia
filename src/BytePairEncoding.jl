@@ -34,7 +34,9 @@ export word_to_symbols,
     count_frequencies_pretokenized,
     tokenize,
     BPETokenizer,
-    train_tokenizer
+    train_tokenizer,
+    encode,
+    decode
 
 
 """
@@ -704,6 +706,31 @@ function train_tokenizer(
     vocab_index = build_vocab_index(vocab, special_tokens)
     id_to_token = Dict{Int,String}(v => k for (k, v) in vocab_index)
     return BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
+end
+
+
+"""
+    encode(t::BPETokenizer, text) → Vector{Int}
+
+Tokenize text and convert to integer IDs using the tokenizer's vocabulary.
+
+Unknown tokens are mapped to the ID of "<unk>" if present, otherwise 0.
+"""
+function encode(t::BPETokenizer, text::String)::Vector{Int}
+    string_tokens = tokenize(text, t.merges)
+    unk_id = get(t.vocab_index, "<unk>", 0)
+    return tokens_to_ids(string_tokens, t.vocab_index, unk_id=unk_id)
+end
+
+
+"""
+    decode(t::BPETokenizer, ids) → String
+
+Convert integer IDs back to text using the tokenizer's reverse index.
+"""
+function decode(t::BPETokenizer, ids::Vector{Int})::String
+    string_tokens = [get(t.id_to_token, id, "<unk>") for id in ids]
+    return decode_tokens(string_tokens)
 end
 
 end
