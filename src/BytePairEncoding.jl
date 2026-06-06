@@ -38,7 +38,8 @@ export word_to_symbols,
     encode,
     decode,
     save_tokenizer,
-    load_tokenizer
+    load_tokenizer,
+    most_common_tokens
 
 
 """
@@ -779,6 +780,19 @@ function load_tokenizer(dir::String)::BPETokenizer
     vocab = Set(keys(vocab_index))
     id_to_token = Dict{Int,String}(v => k for (k, v) in vocab_index)
     return BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
+end
+
+
+"""
+    most_common_tokens(tokens, n) → Vector{Tuple{String,Int}}
+
+Return the top-N most frequent tokens from a token sequence, sorted by descending frequency.
+"""
+function most_common_tokens(tokens::Vector{String}, n::Int)::Vector{Tuple{String,Int}}
+    freqs = token_frequencies(tokens)
+    sorted = sort(collect(freqs), by=x -> -x[2])
+    top_n = sorted[1:min(n, length(sorted))]
+    return [(k, v) for (k, v) in top_n]
 end
 
 end
