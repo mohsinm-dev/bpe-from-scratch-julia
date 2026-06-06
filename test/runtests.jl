@@ -483,3 +483,54 @@ end
     # empty text
     @test coverage("", merges) == 0.0
 end
+
+@testset "text_to_bytes" begin
+    @test text_to_bytes("Low") == ["4c", "6f", "77"]
+    @test text_to_bytes("a") == ["61"]
+    @test text_to_bytes("") == String[]
+    # multibyte UTF-8
+    bytes = text_to_bytes("ñ")
+    @test length(bytes) == 2
+end
+
+@testset "bytes_to_text" begin
+    @test bytes_to_text(["4c", "6f", "77"]) == "Low"
+    @test bytes_to_text(["61"]) == "a"
+    # merged tokens
+    @test bytes_to_text(["4c6f", "77"]) == "Low"
+    @test bytes_to_text(["4c6f77"]) == "Low"
+    # empty
+    @test bytes_to_text(String[]) == ""
+    # round-trip
+    text = "Hello world"
+    @test bytes_to_text(text_to_bytes(text)) == text
+end
+
+@testset "train_byte_bpe" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_byte_bpe(corpus, 5)
+    @test length(merges) == 5
+    @test merges[1] isa Tuple{String,String}
+    # all merge components should be hex strings
+    for (a, b) in merges
+        @test all(c -> c in "0123456789abcdef", a)
+        @test all(c -> c in "0123456789abcdef", b)
+    end
+    # early stopping when no pairs remain
+    _, merges_max = train_byte_bpe("a", 100)
+    @test length(merges_max) == 0
+end
+
+@testset "encode_byte_level" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_byte_bpe(corpus, 5)
+    tokens = encode_byte_level("low", merges)
+    @test length(tokens) >= 1
+    # decoded bytes should reconstruct the word
+    @test bytes_to_text(tokens) == "low"
+    # encoding trained text produces merged tokens
+    tokens2 = encode_byte_level("low lower", merges)
+    @test bytes_to_text(tokens2) == "lowlower"
+    # empty word handling
+    @test encode_byte_level("", merges) == String[]
+end
