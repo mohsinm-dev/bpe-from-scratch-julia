@@ -32,7 +32,8 @@ export word_to_symbols,
     prepare_batch,
     pretokenize,
     count_frequencies_pretokenized,
-    tokenize
+    tokenize,
+    BPETokenizer
 
 
 """
@@ -663,6 +664,21 @@ function tokenize(text::String, merges::Vector{Tuple{String,String}}; pattern::R
         append!(tokens, encode_word(word, merges))
     end
     return tokens
+end
+
+
+"""
+    BPETokenizer
+
+A complete BPE tokenizer bundling trained merges, vocabulary, token-to-ID index,
+ID-to-token reverse index, and special tokens into a single struct.
+"""
+struct BPETokenizer
+    merges::Vector{Tuple{String,String}}
+    vocab::Set{String}
+    vocab_index::Dict{String,Int}
+    id_to_token::Dict{Int,String}
+    special_tokens::Vector{String}
 end
 
 end
