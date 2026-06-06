@@ -44,7 +44,8 @@ export word_to_symbols,
     coverage,
     text_to_bytes,
     bytes_to_text,
-    train_byte_bpe
+    train_byte_bpe,
+    encode_byte_level
 
 
 """
@@ -909,6 +910,26 @@ function train_byte_bpe(text::String, num_merges::Int; verbose::Bool=false)::Tup
         word_symbols = new_word_symbols
     end
     return (word_symbols, merges)
+end
+
+
+"""
+    encode_byte_level(text, merges) → Vector{String}
+
+Apply byte-level BPE merges to encode text.
+
+Text is converted to hex bytes, then merges are applied to produce byte-level tokens.
+"""
+function encode_byte_level(text::String, merges::Vector{Tuple{String,String}})::Vector{String}
+    tokens = String[]
+    for word in split(text)
+        symbols = text_to_bytes(String(word))
+        for merge in merges
+            symbols = merge_symbols(symbols, merge)
+        end
+        append!(tokens, symbols)
+    end
+    return tokens
 end
 
 end
