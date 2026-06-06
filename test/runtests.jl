@@ -451,3 +451,35 @@ end
     @test t3.vocab_index["<bos>"] == 1
     @test t3.vocab_index["<eos>"] == 2
 end
+
+@testset "most_common_tokens" begin
+    tokens = ["a", "b", "a", "c", "a", "b", "d"]
+    top2 = most_common_tokens(tokens, 2)
+    @test length(top2) == 2
+    @test top2[1] == ("a", 3)
+    @test top2[2] == ("b", 2)
+    # request more than available
+    all_tokens = most_common_tokens(tokens, 100)
+    @test length(all_tokens) == 4
+    # empty input
+    @test most_common_tokens(String[], 5) == Tuple{String,Int}[]
+end
+
+@testset "average_token_length" begin
+    @test average_token_length(Set(["ab", "cdef", "g"])) ≈ 7 / 3
+    @test average_token_length(Set(["hello"])) ≈ 5.0
+    @test average_token_length(Set{String}()) == 0.0
+end
+
+@testset "coverage" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    # all trained words should be fully covered
+    @test coverage("low lower lowest", merges) ≈ 1.0
+    # unknown word drops coverage
+    cov = coverage("low xyz", merges)
+    @test cov < 1.0
+    @test cov > 0.0
+    # empty text
+    @test coverage("", merges) == 0.0
+end
