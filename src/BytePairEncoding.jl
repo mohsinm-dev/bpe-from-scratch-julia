@@ -33,7 +33,8 @@ export word_to_symbols,
     pretokenize,
     count_frequencies_pretokenized,
     tokenize,
-    BPETokenizer
+    BPETokenizer,
+    train_tokenizer
 
 
 """
@@ -679,6 +680,30 @@ struct BPETokenizer
     vocab_index::Dict{String,Int}
     id_to_token::Dict{Int,String}
     special_tokens::Vector{String}
+end
+
+
+"""
+    train_tokenizer(corpus, num_merges; special_tokens=["<unk>", "<pad>"], verbose=false, min_frequency=0) → BPETokenizer
+
+Train a complete BPE tokenizer from a text corpus.
+
+Returns a `BPETokenizer` with trained merges, vocabulary, and token-to-ID mappings.
+"""
+function train_tokenizer(
+    corpus::String,
+    num_merges::Int;
+    special_tokens::Vector{String}=["<unk>", "<pad>"],
+    verbose::Bool=false,
+    min_frequency::Int=0
+)::BPETokenizer
+    processed = preprocess_text(corpus)
+    word_symbols, merges = train_bpe(processed, num_merges, verbose=verbose, min_frequency=min_frequency)
+    vocab = get_vocabulary(word_symbols)
+    vocab = add_special_tokens(vocab, special_tokens)
+    vocab_index = build_vocab_index(vocab, special_tokens)
+    id_to_token = Dict{Int,String}(v => k for (k, v) in vocab_index)
+    return BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
 end
 
 end
