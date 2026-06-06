@@ -42,7 +42,8 @@ export word_to_symbols,
     most_common_tokens,
     average_token_length,
     coverage,
-    text_to_bytes
+    text_to_bytes,
+    bytes_to_text
 
 
 """
@@ -850,6 +851,25 @@ Each byte of the UTF-8 encoding becomes a two-character lowercase hex string.
 """
 function text_to_bytes(text::String)::Vector{String}
     return [string(b, base=16, pad=2) for b in Vector{UInt8}(codeunits(text))]
+end
+
+
+"""
+    bytes_to_text(byte_tokens) → String
+
+Reconstruct a string from a sequence of hex byte tokens.
+
+Each token is parsed as a sequence of hex byte pairs and converted back to characters.
+For example, ["4c6f", "77"] → "Low".
+"""
+function bytes_to_text(byte_tokens::Vector{String})::String
+    bytes = UInt8[]
+    for token in byte_tokens
+        for i in 1:2:length(token)
+            push!(bytes, parse(UInt8, token[i:i+1], base=16))
+        end
+    end
+    return String(bytes)
 end
 
 end
