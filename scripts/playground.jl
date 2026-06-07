@@ -77,3 +77,63 @@ for (step, size) in enumerate(history)
     label = step == 1 ? "initial" : "merge $(step - 1)"
     println("  $label: $size tokens")
 end
+
+println("\n=== BPETokenizer struct ===\n")
+
+tokenizer = train_tokenizer(corpus, 10)
+println("Trained tokenizer:")
+println("  Merges: $(length(tokenizer.merges))")
+println("  Vocab size: $(length(tokenizer.vocab))")
+println("  Special tokens: $(tokenizer.special_tokens)")
+
+ids = encode(tokenizer, "low lower")
+println("\nEncode \"low lower\": $ids")
+println("Decode back: \"$(decode(tokenizer, ids))\"")
+
+# save and reload tokenizer
+dir = mktempdir()
+save_tokenizer(tokenizer, dir)
+reloaded_tokenizer = load_tokenizer(dir)
+println("\nSaved and reloaded tokenizer")
+println("Re-encode matches: $(encode(reloaded_tokenizer, "low lower") == ids)")
+rm(dir, recursive=true)
+
+println("\n=== Sequence utilities ===\n")
+
+println("Pad [1,2,3] to length 5: $(pad_sequence([1,2,3], 5))")
+println("Truncate [1,2,3,4,5] to length 3: $(truncate_sequence([1,2,3,4,5], 3))")
+batch = prepare_batch([[1,2], [3,4,5,6,7], [8]], 4)
+println("Prepare batch to length 4: $batch")
+
+println("\n=== Pretokenization ===\n")
+
+sample = "Hello, world! It's a test."
+chunks = pretokenize(sample)
+println("Pretokenize \"$sample\":")
+for chunk in chunks
+    println("  \"$chunk\"")
+end
+
+println("\n=== Vocabulary analysis ===\n")
+
+all_tokens = encode_text("low low lower lower lowest", merges)
+top = most_common_tokens(all_tokens, 3)
+println("Top 3 tokens:")
+for (token, count) in top
+    println("  $token => $count")
+end
+
+v = get_vocabulary(vocab)
+println("\nAverage token length: $(round(average_token_length(v), digits=2))")
+println("Coverage on trained words: $(coverage("low lower lowest", merges))")
+println("Coverage with unknown word: $(coverage("low xyz", merges))")
+
+println("\n=== Byte-level BPE ===\n")
+
+println("\"Low\" as bytes: $(text_to_bytes("Low"))")
+println("Bytes back to text: $(bytes_to_text(["4c", "6f", "77"]))")
+
+_, byte_merges = train_byte_bpe(corpus, 5, verbose=true)
+byte_tokens = encode_byte_level("low lower", byte_merges)
+println("\nByte-level tokens: $byte_tokens")
+println("Decoded: $(bytes_to_text(byte_tokens))")
