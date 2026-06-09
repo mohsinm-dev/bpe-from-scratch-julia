@@ -18,6 +18,32 @@ end
     @test_throws ErrorException load_corpus("nonexistent_file.txt")
 end
 
+@testset "normalize_unicode" begin
+    # NFC normalization combines decomposed characters
+    decomposed = "e\u0301"  # e + combining acute
+    @test normalize_unicode(decomposed) == "é"
+    # already normalized text is unchanged
+    @test normalize_unicode("hello") == "hello"
+    # NFD decomposes characters
+    @test length(normalize_unicode("é", form=:NFD)) == 2
+end
+
+@testset "is_valid_utf8" begin
+    @test is_valid_utf8("hello") == true
+    @test is_valid_utf8("日本語") == true
+    @test is_valid_utf8(Vector{UInt8}("hello")) == true
+    # invalid UTF-8 byte sequence
+    @test is_valid_utf8(UInt8[0xff, 0xfe]) == false
+end
+
+@testset "word_to_graphemes" begin
+    @test word_to_graphemes("low") == ["l", "o", "w", "</w>"]
+    # accented character stays as one unit
+    @test word_to_graphemes("café") == ["c", "a", "f", "é", "</w>"]
+    # single char
+    @test word_to_graphemes("a") == ["a", "</w>"]
+end
+
 @testset "word_to_symbols" begin
     @test word_to_symbols("low") == ["l", "o", "w", "</w>"]
     @test word_to_symbols("a") == ["a", "</w>"]
