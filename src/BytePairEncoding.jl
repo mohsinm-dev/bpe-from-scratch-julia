@@ -1,6 +1,8 @@
 module BytePairEncoding
 
-export word_to_symbols,
+export normalize_unicode,
+    is_valid_utf8,
+    word_to_symbols,
     count_word_frequencies,
     initialize_word_symbols,
     count_pairs,
@@ -46,6 +48,33 @@ export word_to_symbols,
     bytes_to_text,
     train_byte_bpe,
     encode_byte_level
+
+
+using Unicode
+
+"""
+    normalize_unicode(text; form=:NFC) → String
+
+Normalize Unicode text to the specified form (:NFC, :NFD, :NFKC, :NFKD).
+NFC is the default and recommended form for tokenizer input.
+"""
+function normalize_unicode(text::String; form::Symbol=:NFC)::String
+    return Unicode.normalize(text, form)
+end
+
+
+"""
+    is_valid_utf8(data) → Bool
+
+Check whether a byte vector or string contains valid UTF-8.
+"""
+function is_valid_utf8(data::Vector{UInt8})::Bool
+    return isvalid(String, data)
+end
+
+function is_valid_utf8(text::String)::Bool
+    return isvalid(text)
+end
 
 
 """
