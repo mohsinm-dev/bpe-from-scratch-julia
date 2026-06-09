@@ -2,6 +2,7 @@ module BytePairEncoding
 
 export normalize_unicode,
     is_valid_utf8,
+    word_to_graphemes,
     word_to_symbols,
     count_word_frequencies,
     initialize_word_symbols,
@@ -104,6 +105,20 @@ function load_corpus(filepath::String)::String
         error("corpus file not found: $filepath")
     end
     return strip(read(filepath, String)) |> String
+end
+
+
+"""
+    word_to_graphemes(word) → Vector{String}
+
+Convert a word into grapheme clusters with an end-of-word marker.
+Unlike `word_to_symbols`, this correctly handles multi-codepoint characters
+like emoji (👨‍👩‍👧) and accented characters as single units.
+"""
+function word_to_graphemes(word::String)::Vector{String}
+    graphemes_list = [String(g) for g in graphemes(word)]
+    push!(graphemes_list, "</w>")
+    return graphemes_list
 end
 
 
