@@ -48,7 +48,10 @@ export normalize_unicode,
     text_to_bytes,
     bytes_to_text,
     train_byte_bpe,
-    encode_byte_level
+    encode_byte_level,
+    validate_merges,
+    validate_vocab_index,
+    validate_tokenizer
 
 
 using Unicode
@@ -974,6 +977,76 @@ function encode_byte_level(text::String, merges::Vector{Tuple{String,String}})::
         append!(tokens, symbols)
     end
     return tokens
+end
+
+
+"""
+    validate_merges(merges) → Vector{String}
+
+Check merge rules for consistency issues. Returns a list of warning messages.
+Empty list means all merges are valid.
+"""
+function validate_merges(merges::Vector{Tuple{String,String}})::Vector{String}
+    warnings = String[]
+    seen = Set{Tuple{String,String}}()
+    for (i, merge) in enumerate(merges)
+        if merge in seen
+            push!(warnings, "duplicate merge at position $i: $(merge[1]) + $(merge[2])")
+        end
+        push!(seen, merge)
+        if isempty(merge[1]) || isempty(merge[2])
+            push!(warnings, "empty component in merge at position $i")
+        end
+    end
+    return warnings
+end
+
+
+"""
+    validate_vocab_index(index) → Vector{String}
+
+Check a vocabulary index for integrity issues: duplicate IDs, gaps, or missing entries.
+Returns a list of warning messages.
+"""
+function validate_vocab_index(index::Dict{String,Int})::Vector{String}
+    warnings = String[]
+    if isempty(index)
+        push!(warnings, "vocabulary index is empty")
+        return warnings
+    end
+    ids = collect(values(index))
+    if length(ids) != length(Set(ids))
+        push!(warnings, "duplicate IDs found in vocabulary index")
+    end
+    min_id, max_id = extrema(ids)
+    expected = max_id - min_id + 1
+    if length(ids) != expected
+        push!(warnings, "gaps in ID sequence: $(length(ids)) tokens but ID range is $min_id:$max_id")
+    end
+    return warnings
+end
+
+
+"""
+    validate_tokenizer(t::BPETokenizer) → Vector{String}
+
+Run all validation checks on a tokenizer. Returns a list of warning messages.
+"""
+function validate_tokenizer(t::BPETokenizer)::Vector{String}
+    warnings = String[]
+    append!(warnings, validate_merges(t.merges))
+    append!(warnings, validate_vocab_index(t.vocab_index))
+    # check that special tokens are in the index
+    for token in t.special_tokens
+        if !haskey(t.vocab_index, token)
+            push!(warnings, "special token '$token' missing from vocabulary index")
+        end
+    end
+    # check id_to_token matches vocab_index
+    if length(t.id_to_token) != length(t.vocab_index)
+        push!(warnings, "id_to_token size ($(length(t.id_to_token))) != vocab_index size ($(length(t.vocab_index)))")
+    end
+    return warnings
 end
 
 end
