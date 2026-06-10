@@ -832,7 +832,12 @@ function load_tokenizer(dir::String)::BPETokenizer
 
     vocab = Set(keys(vocab_index))
     id_to_token = Dict{Int,String}(v => k for (k, v) in vocab_index)
-    return BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
+    t = BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
+    warnings = validate_tokenizer(t)
+    for w in warnings
+        @warn "tokenizer validation: $w"
+    end
+    return t
 end
 
 
