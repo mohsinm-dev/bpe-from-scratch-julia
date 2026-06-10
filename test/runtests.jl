@@ -547,6 +547,37 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "validate_merges" begin
+    # valid merges produce no warnings
+    @test validate_merges([("a", "b"), ("ab", "c")]) == String[]
+    # duplicate merges
+    warns = validate_merges([("a", "b"), ("a", "b")])
+    @test length(warns) == 1
+    @test occursin("duplicate", warns[1])
+    # empty component
+    warns2 = validate_merges([("", "b")])
+    @test length(warns2) == 1
+    @test occursin("empty", warns2[1])
+end
+
+@testset "validate_vocab_index" begin
+    # valid index
+    @test validate_vocab_index(Dict("a" => 1, "b" => 2, "c" => 3)) == String[]
+    # empty index
+    warns = validate_vocab_index(Dict{String,Int}())
+    @test length(warns) == 1
+    # gaps in IDs
+    warns2 = validate_vocab_index(Dict("a" => 1, "b" => 5))
+    @test any(w -> occursin("gaps", w), warns2)
+end
+
+@testset "validate_tokenizer" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    # a well-trained tokenizer should have no warnings
+    @test validate_tokenizer(t) == String[]
+end
+
 @testset "encode_byte_level" begin
     corpus = "low low low lower lower lowest"
     _, merges = train_byte_bpe(corpus, 5)
