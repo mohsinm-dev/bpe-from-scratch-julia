@@ -52,7 +52,8 @@ export normalize_unicode,
     validate_merges,
     validate_vocab_index,
     validate_tokenizer,
-    train_bpe_protected
+    train_bpe_protected,
+    encode_with_protected_tokens
 
 
 using Unicode
@@ -1030,6 +1031,49 @@ function train_bpe_protected(
         word_symbols = new_word_symbols
     end
     return (word_symbols, merges)
+end
+
+
+"""
+    encode_with_protected_tokens(text, merges; protected=String[])
+
+Encode text while preserving protected token strings intact.
+Protected strings are matched literally and emitted as single tokens.
+"""
+function encode_with_protected_tokens(
+    text::String,
+    merges::Vector{Tuple{String,String}};
+    protected::Vector{String}=String[]
+)::Vector{String}
+    if isempty(protected)
+        return encode_text(text, merges)
+    end
+    # split text around protected tokens, keeping them as-is
+    parts = [text]
+    for p in protected
+        new_parts = String[]
+        for part in parts
+            chunks = split(part, p)
+            for (i, chunk) in enumerate(chunks)
+                if !isempty(String(chunk))
+                    push!(new_parts, String(chunk))
+                end
+                if i < length(chunks)
+                    push!(new_parts, p)
+                end
+            end
+        end
+        parts = new_parts
+    end
+    tokens = String[]
+    for part in parts
+        if part in protected
+            push!(tokens, part)
+        else
+            append!(tokens, encode_text(part, merges))
+        end
+    end
+    return tokens
 end
 
 
