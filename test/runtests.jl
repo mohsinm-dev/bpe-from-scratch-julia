@@ -559,6 +559,16 @@ end
     @test length(merges_protected) > 0
 end
 
+@testset "encode_with_protected_tokens" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    # without protection, encode normally
+    @test encode_with_protected_tokens("low lower", merges) == encode_text("low lower", merges)
+    # with protection, protected string appears as single token
+    tokens = encode_with_protected_tokens("low [MASK] lower", merges, protected=["[MASK]"])
+    @test "[MASK]" in tokens
+end
+
 @testset "validate_merges" begin
     # valid merges produce no warnings
     @test validate_merges([("a", "b"), ("ab", "c")]) == String[]
