@@ -547,6 +547,18 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "train_bpe_protected" begin
+    corpus = "low low low lower lower lowest"
+    # without protection, first merge should be ("l", "o")
+    _, merges_normal = train_bpe(corpus, 3)
+    # protect ("l", "o") — it should never appear in merges
+    _, merges_protected = train_bpe_protected(corpus, 3, never_merge=Set([("l", "o")]))
+    @test ("l", "o") in merges_normal
+    @test !( ("l", "o") in merges_protected )
+    # should still produce merges
+    @test length(merges_protected) > 0
+end
+
 @testset "validate_merges" begin
     # valid merges produce no warnings
     @test validate_merges([("a", "b"), ("ab", "c")]) == String[]
