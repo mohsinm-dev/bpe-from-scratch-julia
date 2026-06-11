@@ -51,7 +51,8 @@ export normalize_unicode,
     encode_byte_level,
     validate_merges,
     validate_vocab_index,
-    validate_tokenizer
+    validate_tokenizer,
+    train_bpe_protected
 
 
 using Unicode
@@ -982,6 +983,53 @@ function encode_byte_level(text::String, merges::Vector{Tuple{String,String}})::
         append!(tokens, symbols)
     end
     return tokens
+end
+
+
+"""
+    train_bpe_protected(corpus, num_merges; never_merge=Set(), verbose=false, min_frequency=0)
+
+Train BPE with a set of pairs that should never be merged.
+Pairs in `never_merge` are skipped during training even if they are the most frequent.
+"""
+function train_bpe_protected(
+    corpus::String,
+    num_merges::Int;
+    never_merge::Set{Tuple{String,String}}=Set{Tuple{String,String}}(),
+    verbose::Bool=false,
+    min_frequency::Int=0
+)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    merges = Tuple{String,String}[]
+
+    for i in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        # filter out protected pairs
+        for p in never_merge
+            delete!(pair_counts, p)
+        end
+        pair = best_pair(pair_counts)
+
+        if pair === nothing
+            verbose && println("stopping early: no more pairs at step $i")
+            break
+        end
+        if min_frequency > 0 && pair_counts[pair] < min_frequency
+            verbose && println("stopping early: best pair frequency $(pair_counts[pair]) < min_frequency $min_frequency at step $i")
+            break
+        end
+        if verbose
+            println("merge $i: $(pair[1]) + $(pair[2]) -> $(pair[1])$(pair[2]) (freq=$(pair_counts[pair]))")
+        end
+        push!(merges, pair)
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_word_symbols
+    end
+    return (word_symbols, merges)
 end
 
 
