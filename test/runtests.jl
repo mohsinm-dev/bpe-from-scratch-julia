@@ -547,6 +547,26 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "count_word_frequencies_streaming" begin
+    path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    freqs = count_word_frequencies_streaming(path)
+    @test freqs["low"] > 0
+    @test freqs["the"] > 0
+    @test_throws ErrorException count_word_frequencies_streaming("nonexistent.txt")
+end
+
+@testset "train_bpe_streaming" begin
+    path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    _, merges = train_bpe_streaming(path, 10)
+    @test length(merges) > 0
+    @test length(merges) <= 10
+    # results should match in-memory training on same data
+    corpus = load_corpus(path)
+    _, merges_mem = train_bpe(corpus, 10)
+    # same first merge since data is identical
+    @test merges[1] == merges_mem[1]
+end
+
 @testset "train_bpe_protected" begin
     corpus = "low low low lower lower lowest"
     # without protection, first merge should be ("l", "o")
