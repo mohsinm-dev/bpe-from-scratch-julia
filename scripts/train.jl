@@ -21,12 +21,21 @@ function main()
     num_merges = parse(Int, ARGS[2])
     output_dir = ARGS[3]
 
+    streaming = "--streaming" in ARGS
+
     println("Loading corpus from: $corpus_file")
-    corpus = load_corpus(corpus_file)
-    println("Corpus size: $(length(corpus)) characters")
+    if streaming
+        println("Using streaming mode for memory efficiency")
+        _, merges = train_bpe_streaming(corpus_file, num_merges, verbose=true)
+        corpus = load_corpus(corpus_file)
+        tokenizer = train_tokenizer(corpus, num_merges, verbose=false)
+    else
+        corpus = load_corpus(corpus_file)
+        println("Corpus size: $(length(corpus)) characters")
+        tokenizer = train_tokenizer(corpus, num_merges, verbose=true)
+    end
 
     println("Training BPE with $num_merges merges...")
-    tokenizer = train_tokenizer(corpus, num_merges, verbose=true)
 
     println("\nSaving tokenizer to: $output_dir")
     save_tokenizer(tokenizer, output_dir)
