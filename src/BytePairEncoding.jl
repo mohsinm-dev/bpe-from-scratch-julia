@@ -53,7 +53,9 @@ export normalize_unicode,
     validate_vocab_index,
     validate_tokenizer,
     train_bpe_protected,
-    encode_with_protected_tokens
+    encode_with_protected_tokens,
+    count_word_frequencies_streaming,
+    train_bpe_streaming
 
 
 using Unicode
@@ -1012,6 +1014,70 @@ function train_bpe_protected(
         end
         pair = best_pair(pair_counts)
 
+        if pair === nothing
+            verbose && println("stopping early: no more pairs at step $i")
+            break
+        end
+        if min_frequency > 0 && pair_counts[pair] < min_frequency
+            verbose && println("stopping early: best pair frequency $(pair_counts[pair]) < min_frequency $min_frequency at step $i")
+            break
+        end
+        if verbose
+            println("merge $i: $(pair[1]) + $(pair[2]) -> $(pair[1])$(pair[2]) (freq=$(pair_counts[pair]))")
+        end
+        push!(merges, pair)
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_word_symbols
+    end
+    return (word_symbols, merges)
+end
+
+
+"""
+    count_word_frequencies_streaming(filepath) → Dict{String,Int}
+
+Count word frequencies from a file line by line without loading the entire file into memory.
+"""
+function count_word_frequencies_streaming(filepath::String)::Dict{String,Int}
+    if !isfile(filepath)
+        error("corpus file not found: $filepath")
+    end
+    frequencies = Dict{String,Int}()
+    open(filepath, "r") do io
+        for line in eachline(io)
+            for word in split(strip(line))
+                w = String(word)
+                frequencies[w] = get(frequencies, w, 0) + 1
+            end
+        end
+    end
+    return frequencies
+end
+
+
+"""
+    train_bpe_streaming(filepath, num_merges; verbose=false, min_frequency=0)
+
+Train BPE by streaming word frequencies from a file instead of loading the full corpus.
+Uses `count_word_frequencies_streaming` for memory-efficient frequency counting,
+then runs the standard merge loop.
+"""
+function train_bpe_streaming(
+    filepath::String,
+    num_merges::Int;
+    verbose::Bool=false,
+    min_frequency::Int=0
+)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    frequencies = count_word_frequencies_streaming(filepath)
+    word_symbols = initialize_word_symbols(frequencies)
+    merges = Tuple{String,String}[]
+
+    for i in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
         if pair === nothing
             verbose && println("stopping early: no more pairs at step $i")
             break
