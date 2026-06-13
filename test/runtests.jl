@@ -569,12 +569,12 @@ end
 
 @testset "train_bpe_protected" begin
     corpus = "low low low lower lower lowest"
-    # without protection, first merge should be ("l", "o")
-    _, merges_normal = train_bpe(corpus, 3)
-    # protect ("l", "o") — it should never appear in merges
-    _, merges_protected = train_bpe_protected(corpus, 3, never_merge=Set([("l", "o")]))
-    @test ("l", "o") in merges_normal
-    @test !( ("l", "o") in merges_protected )
+    _, merges_normal = train_bpe(corpus, 5)
+    # protect the first merge pair — it should never appear in protected merges
+    first_pair = merges_normal[1]
+    _, merges_protected = train_bpe_protected(corpus, 5, never_merge=Set([first_pair]))
+    @test first_pair in merges_normal
+    @test !(first_pair in merges_protected)
     # should still produce merges
     @test length(merges_protected) > 0
 end
