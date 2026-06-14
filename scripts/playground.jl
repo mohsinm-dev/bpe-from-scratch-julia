@@ -128,6 +128,15 @@ println("\nAverage token length: $(round(average_token_length(v), digits=2))")
 println("Coverage on trained words: $(coverage("low lower lowest", merges))")
 println("Coverage with unknown word: $(coverage("low xyz", merges))")
 
+println("\n=== WordPiece tokenization ===\n")
+
+wp_vocab = train_wordpiece(corpus, 30)
+println("WordPiece vocab size: $(length(wp_vocab))")
+for word in ["low", "lower", "lowest"]
+    wp_tokens = wordpiece_tokenize(word, wp_vocab)
+    println("  \"$word\" => $wp_tokens")
+end
+
 println("\n=== Byte-level BPE ===\n")
 
 println("\"Low\" as bytes: $(text_to_bytes("Low"))")
