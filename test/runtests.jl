@@ -547,6 +547,28 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "train_wordpiece" begin
+    corpus = "low low low lower lower lowest"
+    vocab = train_wordpiece(corpus, 30)
+    @test "l" in vocab
+    @test length(vocab) > 0
+    @test length(vocab) <= 30
+end
+
+@testset "wordpiece_tokenize" begin
+    corpus = "low low low lower lower lowest"
+    vocab = train_wordpiece(corpus, 30)
+    tokens = wordpiece_tokenize("low", vocab)
+    @test length(tokens) >= 1
+    @test tokens[1] == "l" || occursin("low", tokens[1]) || tokens[1] == "l"
+    # unknown word should return [UNK]
+    tokens_unk = wordpiece_tokenize("zzzzz", vocab)
+    @test tokens_unk == ["[UNK]"]
+    # very long word
+    tokens_long = wordpiece_tokenize("a" ^ 200, vocab, max_word_len=100)
+    @test tokens_long == ["[UNK]"]
+end
+
 @testset "count_word_frequencies_streaming" begin
     path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
     freqs = count_word_frequencies_streaming(path)
