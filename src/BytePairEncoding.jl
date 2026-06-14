@@ -55,7 +55,9 @@ export normalize_unicode,
     train_bpe_protected,
     encode_with_protected_tokens,
     count_word_frequencies_streaming,
-    train_bpe_streaming
+    train_bpe_streaming,
+    wordpiece_tokenize,
+    train_wordpiece
 
 
 using Unicode
@@ -1033,6 +1035,88 @@ function train_bpe_protected(
         word_symbols = new_word_symbols
     end
     return (word_symbols, merges)
+end
+
+
+"""
+    train_wordpiece(corpus, vocab_size; min_frequency=2) → Set{String}
+
+Build a WordPiece vocabulary from a corpus. Starts with character-level tokens
+and iteratively adds the most frequent subword that improves coverage.
+Returns the vocabulary set (including ## prefixed continuation tokens).
+"""
+function train_wordpiece(corpus::String, vocab_size::Int; min_frequency::Int=2)::Set{String}
+    words = split(preprocess_text(corpus))
+    word_freqs = Dict{String,Int}()
+    for w in words
+        word_freqs[String(w)] = get(word_freqs, String(w), 0) + 1
+    end
+
+    # start with all single characters
+    vocab = Set{String}()
+    for word in keys(word_freqs)
+        for (i, ch) in enumerate(word)
+            token = i == 1 ? string(ch) : "##" * string(ch)
+            push!(vocab, token)
+        end
+    end
+
+    # iteratively add most frequent pairs as merged tokens
+    while length(vocab) < vocab_size
+        pair_scores = Dict{String,Int}()
+        for (word, freq) in word_freqs
+            freq < min_frequency && continue
+            chars = collect(word)
+            tokens = String[]
+            for (i, ch) in enumerate(chars)
+                push!(tokens, i == 1 ? string(ch) : "##" * string(ch))
+            end
+            # try merging adjacent token pairs
+            for j in 1:length(tokens)-1
+                merged = tokens[j] * replace(tokens[j+1], "##" => "")
+                if !(merged in vocab)
+                    pair_scores[merged] = get(pair_scores, merged, 0) + freq
+                end
+            end
+        end
+        isempty(pair_scores) && break
+        best = argmax(pair_scores)
+        push!(vocab, best)
+    end
+    return vocab
+end
+
+
+"""
+    wordpiece_tokenize(word, vocab; unk_token="[UNK]", max_word_len=100) → Vector{String}
+
+Tokenize a word using greedy longest-match-first WordPiece algorithm.
+Continuation tokens are prefixed with "##".
+Returns `[unk_token]` if the word cannot be tokenized.
+"""
+function wordpiece_tokenize(word::String, vocab::Set{String}; unk_token::String="[UNK]", max_word_len::Int=100)::Vector{String}
+    if length(word) > max_word_len
+        return [unk_token]
+    end
+    tokens = String[]
+    start = 1
+    while start <= length(word)
+        found = false
+        for stop in length(word):-1:start
+            substr = word[start:stop]
+            candidate = start == 1 ? substr : "##" * substr
+            if candidate in vocab
+                push!(tokens, candidate)
+                start = stop + 1
+                found = true
+                break
+            end
+        end
+        if !found
+            return [unk_token]
+        end
+    end
+    return tokens
 end
 
 
