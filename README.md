@@ -130,6 +130,13 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### WordPiece tokenization
+
+```julia
+vocab = train_wordpiece(corpus, 30)
+tokens = wordpiece_tokenize("lower", vocab)  # ["l", "##o", "##w", "##e", "##r"]
+```
+
 ### Byte-level BPE
 
 ```julia
