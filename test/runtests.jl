@@ -547,6 +547,35 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "token_length_distribution" begin
+    vocab = Set(["a", "ab", "abc", "de", "f"])
+    dist = token_length_distribution(vocab)
+    @test dist[1] == 2  # "a", "f"
+    @test dist[2] == 2  # "ab", "de"
+    @test dist[3] == 1  # "abc"
+    @test token_length_distribution(Set{String}()) == Dict{Int,Int}()
+end
+
+@testset "subword_fertility" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    fert = subword_fertility("low lower lowest", merges)
+    @test fert > 0.0
+    # trained words should have low fertility
+    @test fert < 5.0
+    @test subword_fertility("", merges) == 0.0
+end
+
+@testset "vocab_overlap" begin
+    v1 = Set(["a", "b", "c"])
+    v2 = Set(["b", "c", "d"])
+    result = vocab_overlap(v1, v2)
+    @test result.shared == Set(["b", "c"])
+    @test result.only1 == Set(["a"])
+    @test result.only2 == Set(["d"])
+    @test result.jaccard ≈ 2 / 4
+end
+
 @testset "train_wordpiece" begin
     corpus = "low low low lower lower lowest"
     vocab = train_wordpiece(corpus, 30)
