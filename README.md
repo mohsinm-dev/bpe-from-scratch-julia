@@ -130,6 +130,14 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Extended vocabulary analysis
+
+```julia
+dist = token_length_distribution(vocab)        # histogram of token lengths
+fert = subword_fertility("hello world", merges) # avg tokens per word
+overlap = vocab_overlap(vocab1, vocab2)         # Jaccard similarity + set diffs
+```
+
 ### WordPiece tokenization
 
 ```julia
