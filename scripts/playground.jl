@@ -128,6 +128,17 @@ println("\nAverage token length: $(round(average_token_length(v), digits=2))")
 println("Coverage on trained words: $(coverage("low lower lowest", merges))")
 println("Coverage with unknown word: $(coverage("low xyz", merges))")
 
+println("\n=== Vocabulary analysis (extended) ===\n")
+
+dist = token_length_distribution(v)
+println("Token length distribution:")
+for len in sort(collect(keys(dist)))
+    println("  length $len: $(dist[len]) tokens")
+end
+
+fert = subword_fertility("low lower lowest running", merges)
+println("\nSubword fertility: $(round(fert, digits=2)) tokens/word")
+
 println("\n=== WordPiece tokenization ===\n")
 
 wp_vocab = train_wordpiece(corpus, 30)
