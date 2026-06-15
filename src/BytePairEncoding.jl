@@ -57,7 +57,10 @@ export normalize_unicode,
     count_word_frequencies_streaming,
     train_bpe_streaming,
     wordpiece_tokenize,
-    train_wordpiece
+    train_wordpiece,
+    token_length_distribution,
+    subword_fertility,
+    vocab_overlap
 
 
 using Unicode
@@ -1035,6 +1038,58 @@ function train_bpe_protected(
         word_symbols = new_word_symbols
     end
     return (word_symbols, merges)
+end
+
+
+"""
+    token_length_distribution(vocab) → Dict{Int,Int}
+
+Compute a histogram of token lengths in a vocabulary.
+Returns a Dict mapping character count to number of tokens with that length.
+"""
+function token_length_distribution(vocab::Set{String})::Dict{Int,Int}
+    dist = Dict{Int,Int}()
+    for token in vocab
+        len = length(token)
+        dist[len] = get(dist, len, 0) + 1
+    end
+    return dist
+end
+
+
+"""
+    subword_fertility(text, merges) → Float64
+
+Measure the average number of subword tokens per original word.
+Lower values indicate better compression / vocabulary coverage.
+"""
+function subword_fertility(text::String, merges::Vector{Tuple{String,String}})::Float64
+    words = split(text)
+    if isempty(words)
+        return 0.0
+    end
+    total_tokens = 0
+    for word in words
+        tokens = encode_word(String(word), merges)
+        total_tokens += length(tokens)
+    end
+    return total_tokens / length(words)
+end
+
+
+"""
+    vocab_overlap(vocab1, vocab2) → NamedTuple{(:jaccard, :shared, :only1, :only2)}
+
+Compare two vocabularies and compute overlap statistics.
+Returns Jaccard similarity and the sets of shared/unique tokens.
+"""
+function vocab_overlap(vocab1::Set{String}, vocab2::Set{String})
+    shared = intersect(vocab1, vocab2)
+    only1 = setdiff(vocab1, vocab2)
+    only2 = setdiff(vocab2, vocab1)
+    union_size = length(union(vocab1, vocab2))
+    jaccard = union_size == 0 ? 0.0 : length(shared) / union_size
+    return (jaccard=jaccard, shared=shared, only1=only1, only2=only2)
 end
 
 
