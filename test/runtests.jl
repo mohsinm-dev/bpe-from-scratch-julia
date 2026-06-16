@@ -547,6 +547,25 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "train_bpe_with_history" begin
+    corpus = "low low low lower lower lowest"
+    _, merges, history = train_bpe_with_history(corpus, 5)
+    @test length(history) == length(merges)
+    @test history[1].step == 1
+    @test history[1].frequency > 0
+    @test history[1].new_token == history[1].pair[1] * history[1].pair[2]
+    @test history[1].vocab_size > 0
+end
+
+@testset "format_merge_history" begin
+    corpus = "low low low lower lower lowest"
+    _, _, history = train_bpe_with_history(corpus, 3)
+    table = format_merge_history(history)
+    @test occursin("Step", table)
+    @test occursin("Freq", table)
+    @test length(split(table, "\n")) == length(history) + 2  # header + separator + rows
+end
+
 @testset "token_length_distribution" begin
     vocab = Set(["a", "ab", "abc", "de", "f"])
     dist = token_length_distribution(vocab)
