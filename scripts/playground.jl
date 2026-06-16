@@ -128,6 +128,11 @@ println("\nAverage token length: $(round(average_token_length(v), digits=2))")
 println("Coverage on trained words: $(coverage("low lower lowest", merges))")
 println("Coverage with unknown word: $(coverage("low xyz", merges))")
 
+println("\n=== Merge history ===\n")
+
+_, _, history = train_bpe_with_history(corpus, 10)
+println(format_merge_history(history))
+
 println("\n=== Vocabulary analysis (extended) ===\n")
 
 dist = token_length_distribution(v)
