@@ -130,6 +130,15 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Merge history tracking
+
+```julia
+_, merges, history = train_bpe_with_history(corpus, 10)
+println(format_merge_history(history))
+# Step | Pair            | Freq | New Token   | Vocab Size
+# ...
+```
+
 ### Extended vocabulary analysis
 
 ```julia
