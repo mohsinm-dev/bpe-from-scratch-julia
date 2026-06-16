@@ -60,7 +60,10 @@ export normalize_unicode,
     train_wordpiece,
     token_length_distribution,
     subword_fertility,
-    vocab_overlap
+    vocab_overlap,
+    MergeRecord,
+    train_bpe_with_history,
+    format_merge_history
 
 
 using Unicode
@@ -1038,6 +1041,80 @@ function train_bpe_protected(
         word_symbols = new_word_symbols
     end
     return (word_symbols, merges)
+end
+
+
+"""
+    MergeRecord
+
+A record of a single merge step during BPE training.
+"""
+struct MergeRecord
+    step::Int
+    pair::Tuple{String,String}
+    frequency::Int
+    new_token::String
+    vocab_size::Int
+end
+
+
+"""
+    train_bpe_with_history(corpus, num_merges; verbose=false, min_frequency=0)
+
+Train BPE and return a full merge history alongside the standard outputs.
+Returns (word_symbols, merges, history::Vector{MergeRecord}).
+"""
+function train_bpe_with_history(
+    corpus::String,
+    num_merges::Int;
+    verbose::Bool=false,
+    min_frequency::Int=0
+)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}},Vector{MergeRecord}}
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    merges = Tuple{String,String}[]
+    history = MergeRecord[]
+
+    for i in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
+        if pair === nothing
+            break
+        end
+        freq = pair_counts[pair]
+        if min_frequency > 0 && freq < min_frequency
+            break
+        end
+        if verbose
+            println("merge $i: $(pair[1]) + $(pair[2]) -> $(pair[1])$(pair[2]) (freq=$freq)")
+        end
+        push!(merges, pair)
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, f) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = f
+        end
+        word_symbols = new_word_symbols
+        vs = length(get_vocabulary(word_symbols))
+        push!(history, MergeRecord(i, pair, freq, pair[1] * pair[2], vs))
+    end
+    return (word_symbols, merges, history)
+end
+
+
+"""
+    format_merge_history(history) → String
+
+Format merge history as a readable table.
+"""
+function format_merge_history(history::Vector{MergeRecord})::String
+    lines = ["Step | Pair            | Freq | New Token   | Vocab Size"]
+    push!(lines, "-" ^ 60)
+    for r in history
+        pair_str = "$(r.pair[1]) + $(r.pair[2])"
+        line = "$(lpad(r.step, 4)) | $(rpad(pair_str, 15)) | $(lpad(r.frequency, 4)) | $(rpad(r.new_token, 11)) | $(lpad(r.vocab_size, 10))"
+        push!(lines, line)
+    end
+    return join(lines, "\n")
 end
 
 
