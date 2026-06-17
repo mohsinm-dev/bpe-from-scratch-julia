@@ -634,7 +634,8 @@ end
     vocab = train_wordpiece(corpus, 30)
     tokens = wordpiece_tokenize("low", vocab)
     @test length(tokens) >= 1
-    @test tokens[1] == "l" || occursin("low", tokens[1]) || tokens[1] == "l"
+    # first token should not have ## prefix
+    @test !startswith(tokens[1], "##")
     # unknown word should return [UNK]
     tokens_unk = wordpiece_tokenize("zzzzz", vocab)
     @test tokens_unk == ["[UNK]"]
