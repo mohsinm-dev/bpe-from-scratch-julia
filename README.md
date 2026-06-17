@@ -130,6 +130,15 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Configuration files
+
+```julia
+config = TokenizerConfig(num_merges=100, min_frequency=2)
+save_config(config, "config.json")
+loaded = load_config("config.json")
+tokenizer = train_from_config(corpus, loaded)
+```
+
 ### Merge history tracking
 
 ```julia
