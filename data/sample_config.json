@@ -1,0 +1,7 @@
+{
+  "num_merges": 100,
+  "min_frequency": 2,
+  "special_tokens": ["<unk>", "<pad>", "<bos>", "<eos>"],
+  "lowercase": true,
+  "verbose": false
+}
