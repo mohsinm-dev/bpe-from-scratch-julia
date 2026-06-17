@@ -63,7 +63,11 @@ export normalize_unicode,
     vocab_overlap,
     MergeRecord,
     train_bpe_with_history,
-    format_merge_history
+    format_merge_history,
+    TokenizerConfig,
+    save_config,
+    load_config,
+    train_from_config
 
 
 using Unicode
@@ -1041,6 +1045,88 @@ function train_bpe_protected(
         word_symbols = new_word_symbols
     end
     return (word_symbols, merges)
+end
+
+
+"""
+    TokenizerConfig
+
+Configuration struct for training parameters.
+"""
+struct TokenizerConfig
+    num_merges::Int
+    min_frequency::Int
+    special_tokens::Vector{String}
+    lowercase::Bool
+    verbose::Bool
+end
+
+TokenizerConfig(;
+    num_merges::Int=1000,
+    min_frequency::Int=0,
+    special_tokens::Vector{String}=["<unk>", "<pad>"],
+    lowercase::Bool=true,
+    verbose::Bool=false
+) = TokenizerConfig(num_merges, min_frequency, special_tokens, lowercase, verbose)
+
+
+"""
+    save_config(config, filepath)
+
+Save a TokenizerConfig to a JSON file.
+"""
+function save_config(config::TokenizerConfig, filepath::String)
+    open(filepath, "w") do io
+        println(io, "{")
+        println(io, "  \"num_merges\": $(config.num_merges),")
+        println(io, "  \"min_frequency\": $(config.min_frequency),")
+        println(io, "  \"special_tokens\": [$(join(["\"$t\"" for t in config.special_tokens], ", "))],")
+        println(io, "  \"lowercase\": $(config.lowercase),")
+        println(io, "  \"verbose\": $(config.verbose)")
+        println(io, "}")
+    end
+end
+
+
+"""
+    load_config(filepath) → TokenizerConfig
+
+Load a TokenizerConfig from a JSON file. Uses simple parsing (no JSON dependency).
+"""
+function load_config(filepath::String)::TokenizerConfig
+    if !isfile(filepath)
+        error("config file not found: $filepath")
+    end
+    text = read(filepath, String)
+    # simple JSON parsing for flat config
+    get_int(key) = parse(Int, match(Regex("\"$key\":\\s*(\\d+)"), text).captures[1])
+    get_bool(key) = match(Regex("\"$key\":\\s*(true|false)"), text).captures[1] == "true"
+    function get_string_array(key)
+        m = match(Regex("\"$key\":\\s*\\[([^\\]]*)\\]"), text)
+        m === nothing && return String[]
+        return [String(s.captures[1]) for s in eachmatch(r"\"([^\"]+)\"", m.captures[1])]
+    end
+    return TokenizerConfig(
+        num_merges=get_int("num_merges"),
+        min_frequency=get_int("min_frequency"),
+        special_tokens=get_string_array("special_tokens"),
+        lowercase=get_bool("lowercase"),
+        verbose=get_bool("verbose")
+    )
+end
+
+
+"""
+    train_from_config(corpus, config) → BPETokenizer
+
+Train a tokenizer using parameters from a TokenizerConfig.
+"""
+function train_from_config(corpus::String, config::TokenizerConfig)::BPETokenizer
+    processed = config.lowercase ? preprocess_text(corpus) : preprocess_text(corpus, lowercase=false)
+    return train_tokenizer(processed, config.num_merges,
+        special_tokens=config.special_tokens,
+        verbose=config.verbose,
+        min_frequency=config.min_frequency)
 end
 
 
