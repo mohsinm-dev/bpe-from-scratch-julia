@@ -547,6 +547,32 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "TokenizerConfig save/load" begin
+    config = TokenizerConfig(num_merges=50, min_frequency=2,
+        special_tokens=["<unk>", "<pad>", "<bos>"], lowercase=true, verbose=false)
+    tmpfile = tempname()
+    try
+        save_config(config, tmpfile)
+        loaded = load_config(tmpfile)
+        @test loaded.num_merges == 50
+        @test loaded.min_frequency == 2
+        @test loaded.special_tokens == ["<unk>", "<pad>", "<bos>"]
+        @test loaded.lowercase == true
+        @test loaded.verbose == false
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+    @test_throws ErrorException load_config("nonexistent.json")
+end
+
+@testset "train_from_config" begin
+    corpus = "low low low lower lower lowest"
+    config = TokenizerConfig(num_merges=5)
+    t = train_from_config(corpus, config)
+    @test length(t.merges) > 0
+    @test "<unk>" in t.special_tokens
+end
+
 @testset "train_bpe_with_history" begin
     corpus = "low low low lower lower lowest"
     _, merges, history = train_bpe_with_history(corpus, 5)
