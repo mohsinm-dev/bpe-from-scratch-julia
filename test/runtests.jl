@@ -547,6 +547,29 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "viterbi_segment" begin
+    scores = Dict("l" => -1.0, "o" => -1.0, "w" => -1.0, "lo" => -0.5, "low" => -0.3)
+    tokens = viterbi_segment("low", scores)
+    # should prefer "low" as single token (highest score)
+    @test tokens == ["low"]
+    # with only single chars
+    scores2 = Dict("a" => -1.0, "b" => -1.0, "c" => -1.0)
+    @test viterbi_segment("abc", scores2) == ["a", "b", "c"]
+    @test viterbi_segment("", scores) == String[]
+end
+
+@testset "train_unigram" begin
+    corpus = "low low low lower lower lowest"
+    scores = train_unigram(corpus, 15)
+    @test length(scores) <= 15
+    # all single chars should be in vocab
+    @test haskey(scores, "l")
+    @test haskey(scores, "o")
+    @test haskey(scores, "w")
+    # scores should be negative log-probs
+    @test all(v -> v <= 0.0, values(scores))
+end
+
 @testset "TokenizerConfig save/load" begin
     config = TokenizerConfig(num_merges=50, min_frequency=2,
         special_tokens=["<unk>", "<pad>", "<bos>"], lowercase=true, verbose=false)
