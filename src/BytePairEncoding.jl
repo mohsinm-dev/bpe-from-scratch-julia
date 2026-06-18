@@ -67,7 +67,9 @@ export normalize_unicode,
     TokenizerConfig,
     save_config,
     load_config,
-    train_from_config
+    train_from_config,
+    viterbi_segment,
+    train_unigram
 
 
 using Unicode
@@ -1127,6 +1129,112 @@ function train_from_config(corpus::String, config::TokenizerConfig)::BPETokenize
         special_tokens=config.special_tokens,
         verbose=config.verbose,
         min_frequency=config.min_frequency)
+end
+
+
+"""
+    viterbi_segment(word, vocab_scores; unk_score=-100.0) → Vector{String}
+
+Segment a word using the Viterbi algorithm with unigram scores.
+`vocab_scores` maps tokens to their log-probability scores.
+Uses dynamic programming to find the highest-scoring segmentation.
+"""
+function viterbi_segment(word::String, vocab_scores::Dict{String,Float64}; unk_score::Float64=-100.0)::Vector{String}
+    n = length(word)
+    if n == 0
+        return String[]
+    end
+    # best_score[i] = best log-prob for segmenting word[1:i]
+    best_score = fill(-Inf, n + 1)
+    best_score[1] = 0.0  # empty prefix
+    best_edge = fill(0, n + 1)
+
+    for i in 1:n
+        for j in 0:i-1
+            substr = word[j+1:i]
+            score = get(vocab_scores, substr, unk_score)
+            candidate = best_score[j+1] + score
+            if candidate > best_score[i+1]
+                best_score[i+1] = candidate
+                best_edge[i+1] = j
+            end
+        end
+    end
+
+    # backtrack
+    tokens = String[]
+    pos = n + 1
+    while pos > 1
+        start = best_edge[pos]
+        pushfirst!(tokens, word[start+1:pos-1])
+        pos = start + 1
+    end
+    return tokens
+end
+
+
+"""
+    train_unigram(corpus, vocab_size; initial_vocab_size=0) → Dict{String,Float64}
+
+Train a unigram language model tokenizer.
+Starts with all substrings up to a maximum length, assigns log-probability scores,
+and iteratively prunes the lowest-scoring tokens until `vocab_size` is reached.
+Returns a Dict of token → log-probability score.
+"""
+function train_unigram(corpus::String, vocab_size::Int; initial_vocab_size::Int=0)::Dict{String,Float64}
+    processed = preprocess_text(corpus)
+    words = split(processed)
+    word_freqs = Dict{String,Int}()
+    for w in words
+        word_freqs[String(w)] = get(word_freqs, String(w), 0) + 1
+    end
+
+    # build initial vocab from all substrings up to length 8
+    max_piece_len = 8
+    substr_freq = Dict{String,Int}()
+    for (word, freq) in word_freqs
+        for i in 1:length(word)
+            for j in i:min(i + max_piece_len - 1, length(word))
+                s = word[i:j]
+                substr_freq[s] = get(substr_freq, s, 0) + freq
+            end
+        end
+    end
+
+    # keep top-N by frequency for initial vocab
+    target_init = initial_vocab_size > 0 ? initial_vocab_size : vocab_size * 4
+    sorted_substrs = sort(collect(substr_freq), by=x -> -x[2])
+    vocab_scores = Dict{String,Float64}()
+    total = sum(v for (_, v) in sorted_substrs[1:min(target_init, length(sorted_substrs))])
+    for (s, f) in sorted_substrs[1:min(target_init, length(sorted_substrs))]
+        vocab_scores[s] = log(f / total)
+    end
+
+    # ensure all single chars are in vocab
+    for (word, _) in word_freqs
+        for ch in word
+            s = string(ch)
+            if !haskey(vocab_scores, s)
+                vocab_scores[s] = log(1 / total)
+            end
+        end
+    end
+
+    # iteratively prune
+    while length(vocab_scores) > vocab_size
+        # score each token by how much removing it would hurt
+        remove_count = max(1, div(length(vocab_scores) - vocab_size, 2))
+        scored = sort(collect(vocab_scores), by=x -> x[2])
+        # never remove single-char tokens
+        removable = [(k, v) for (k, v) in scored if length(k) > 1]
+        to_remove = min(remove_count, length(removable))
+        to_remove == 0 && break
+        for i in 1:to_remove
+            delete!(vocab_scores, removable[i][1])
+        end
+    end
+
+    return vocab_scores
 end
 
 
