@@ -128,6 +128,15 @@ println("\nAverage token length: $(round(average_token_length(v), digits=2))")
 println("Coverage on trained words: $(coverage("low lower lowest", merges))")
 println("Coverage with unknown word: $(coverage("low xyz", merges))")
 
+println("\n=== Unigram tokenization ===\n")
+
+scores = train_unigram(corpus, 20)
+println("Unigram vocab size: $(length(scores))")
+for word in ["low", "lower", "lowest"]
+    tokens_u = viterbi_segment(word, scores)
+    println("  \"$word\" => $tokens_u")
+end
+
 println("\n=== Merge history ===\n")
 
 _, _, history = train_bpe_with_history(corpus, 10)
