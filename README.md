@@ -130,6 +130,13 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Unigram tokenization
+
+```julia
+scores = train_unigram(corpus, 50)                     # train vocab with scores
+tokens = viterbi_segment("lower", scores)               # optimal segmentation
+```
+
 ### Configuration files
 
 ```julia
