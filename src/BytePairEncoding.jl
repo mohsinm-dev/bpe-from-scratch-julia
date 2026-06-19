@@ -69,7 +69,9 @@ export normalize_unicode,
     load_config,
     train_from_config,
     viterbi_segment,
-    train_unigram
+    train_unigram,
+    compare_tokenizers,
+    compare_compression
 
 
 using Unicode
@@ -1235,6 +1237,36 @@ function train_unigram(corpus::String, vocab_size::Int; initial_vocab_size::Int=
     end
 
     return vocab_scores
+end
+
+
+"""
+    compare_tokenizers(text, tokenizers::Dict{String,Function}) → Dict{String,Vector{String}}
+
+Compare how different tokenizers segment the same text.
+`tokenizers` maps names to functions that take text and return Vector{String}.
+"""
+function compare_tokenizers(text::String, tokenizers::Dict{String,Function})::Dict{String,Vector{String}}
+    results = Dict{String,Vector{String}}()
+    for (name, tokenize_fn) in tokenizers
+        results[name] = tokenize_fn(text)
+    end
+    return results
+end
+
+
+"""
+    compare_compression(text, tokenizers::Dict{String,Function}) → Dict{String,Float64}
+
+Compare compression ratios across multiple tokenizers on the same text.
+"""
+function compare_compression(text::String, tokenizers::Dict{String,Function})::Dict{String,Float64}
+    results = Dict{String,Float64}()
+    for (name, tokenize_fn) in tokenizers
+        tokens = tokenize_fn(text)
+        results[name] = compression_ratio(text, tokens)
+    end
+    return results
 end
 
 
