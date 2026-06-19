@@ -547,6 +547,31 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "compare_tokenizers" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    tokenizers = Dict{String,Function}(
+        "bpe" => text -> encode_text(text, merges),
+        "char" => text -> string.(collect(text))
+    )
+    results = compare_tokenizers("low", tokenizers)
+    @test haskey(results, "bpe")
+    @test haskey(results, "char")
+    @test length(results["char"]) == 3  # l, o, w
+end
+
+@testset "compare_compression" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    tokenizers = Dict{String,Function}(
+        "bpe" => text -> encode_text(text, merges),
+        "char" => text -> string.(collect(text))
+    )
+    ratios = compare_compression("low lower lowest", tokenizers)
+    # BPE should compress better (higher ratio) than character-level
+    @test ratios["bpe"] > ratios["char"]
+end
+
 @testset "viterbi_segment" begin
     scores = Dict("l" => -1.0, "o" => -1.0, "w" => -1.0, "lo" => -0.5, "low" => -0.3)
     tokens = viterbi_segment("low", scores)
