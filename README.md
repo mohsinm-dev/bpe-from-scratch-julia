@@ -130,6 +130,15 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Tokenizer comparison
+
+```julia
+tokenizers = Dict("bpe" => text -> encode_text(text, merges),
+                  "char" => text -> string.(collect(text)))
+results = compare_tokenizers("hello world", tokenizers)
+ratios = compare_compression("hello world", tokenizers)
+```
+
 ### Unigram tokenization
 
 ```julia
