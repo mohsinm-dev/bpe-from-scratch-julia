@@ -262,6 +262,9 @@ julia scripts/playground.jl
 
 ### Pre-tokenization
 - `pretokenize(text; pattern)` — regex-based word splitting (GPT-2-style)
+- `GPT2_PATTERN` — GPT-2 pre-tokenization regex
+- `LLAMA_PATTERN` — LLaMA-style pre-tokenization regex
+- `CLIP_PATTERN` — CLIP-style pre-tokenization regex
 - `count_frequencies_pretokenized(text; pattern)` — frequency counting with pre-tokenization
 - `tokenize(text, merges; pattern)` — end-to-end tokenization pipeline
 
