@@ -128,6 +128,13 @@ println("\nAverage token length: $(round(average_token_length(v), digits=2))")
 println("Coverage on trained words: $(coverage("low lower lowest", merges))")
 println("Coverage with unknown word: $(coverage("low xyz", merges))")
 
+println("\n=== Pretokenization patterns ===\n")
+
+sample_pt = "Hello, world! It's a test 123."
+println("GPT-2:  ", pretokenize(sample_pt))
+println("LLaMA:  ", pretokenize(sample_pt, pattern=LLAMA_PATTERN))
+println("CLIP:   ", pretokenize(sample_pt, pattern=CLIP_PATTERN))
+
 println("\n=== Unigram tokenization ===\n")
 
 scores = train_unigram(corpus, 20)
