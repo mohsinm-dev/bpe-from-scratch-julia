@@ -71,7 +71,9 @@ export normalize_unicode,
     viterbi_segment,
     train_unigram,
     compare_tokenizers,
-    compare_compression
+    compare_compression,
+    LLAMA_PATTERN,
+    CLIP_PATTERN
 
 
 using Unicode
@@ -696,6 +698,8 @@ end
 
 
 const GPT2_PATTERN = r"'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"
+const LLAMA_PATTERN = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"
+const CLIP_PATTERN = r"\p{L}+|\p{N}|[^\s\p{L}\p{N}]+"
 
 """
     pretokenize(text; pattern=GPT2_PATTERN) → Vector{String}
