@@ -379,6 +379,19 @@ end
     @test prepare_batch(Vector{Int}[], 5) == Vector{Int}[]
 end
 
+@testset "pretokenize patterns" begin
+    # LLaMA pattern
+    chunks_llama = pretokenize("Hello, world! 123", pattern=LLAMA_PATTERN)
+    @test length(chunks_llama) > 0
+    # CLIP pattern splits more aggressively
+    chunks_clip = pretokenize("Hello, world!", pattern=CLIP_PATTERN)
+    @test "Hello" in chunks_clip
+    @test length(chunks_clip) > 0
+    # custom pattern
+    chunks_custom = pretokenize("hello-world", pattern=r"[a-z]+")
+    @test chunks_custom == ["hello", "world"]
+end
+
 @testset "pretokenize" begin
     chunks = pretokenize("Hello world")
     @test chunks == ["Hello", " world"]
