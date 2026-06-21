@@ -316,6 +316,12 @@ Options:
 Returns the final vocabulary (word_symbols) and the list of merges performed.
 """
 function train_bpe(corpus::String, num_merges::Int; verbose::Bool=false, min_frequency::Int=0)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    if isempty(strip(corpus))
+        throw(TokenizerError("corpus is empty; provide non-empty text for training"))
+    end
+    if num_merges < 0
+        throw(TokenizerError("num_merges must be non-negative, got $num_merges"))
+    end
     frequencies = count_word_frequencies(corpus)
     word_symbols = initialize_word_symbols(frequencies)
     merges = Tuple{String,String}[]
