@@ -401,6 +401,9 @@ Tokenize a full text string using learned BPE merges.
 Splits text into words, encodes each word, and returns the flat token list.
 """
 function encode_text(text::String, merges::Vector{Tuple{String,String}})::Vector{String}
+    if isempty(text)
+        return String[]
+    end
     tokens = String[]
     for word in split(text)
         append!(tokens, encode_word(String(word), merges))
