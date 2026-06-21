@@ -560,6 +560,15 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "TokenizerError" begin
+    @test_throws TokenizerError train_bpe("", 10)
+    @test_throws TokenizerError train_bpe("   ", 10)
+    @test_throws TokenizerError train_bpe("hello", -1)
+    # valid input should not throw
+    _, merges = train_bpe("hello hello", 1)
+    @test length(merges) >= 0
+end
+
 @testset "compare_tokenizers" begin
     corpus = "low low low lower lower lowest"
     _, merges = train_bpe(corpus, 10)
