@@ -73,10 +73,21 @@ export normalize_unicode,
     compare_tokenizers,
     compare_compression,
     LLAMA_PATTERN,
-    CLIP_PATTERN
+    CLIP_PATTERN,
+    TokenizerError
 
 
 using Unicode
+
+"""
+    TokenizerError <: Exception
+
+Custom exception type for tokenizer-specific errors.
+"""
+struct TokenizerError <: Exception
+    msg::String
+end
+Base.showerror(io::IO, e::TokenizerError) = print(io, "TokenizerError: ", e.msg)
 
 """
     normalize_unicode(text; form=:NFC) → String
