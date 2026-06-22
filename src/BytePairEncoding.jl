@@ -74,7 +74,9 @@ export normalize_unicode,
     compare_compression,
     LLAMA_PATTERN,
     CLIP_PATTERN,
-    TokenizerError
+    TokenizerError,
+    parallel_count_pairs,
+    train_bpe_parallel
 
 
 using Unicode
@@ -1261,6 +1263,84 @@ function train_unigram(corpus::String, vocab_size::Int; initial_vocab_size::Int=
     end
 
     return vocab_scores
+end
+
+
+"""
+    parallel_count_pairs(word_symbols) → Dict{Tuple{String,String},Int}
+
+Count adjacent symbol pairs using threads when available.
+Falls back to single-threaded count_pairs when Threads.nthreads() == 1.
+"""
+function parallel_count_pairs(word_symbols::Dict{Vector{String},Int})::Dict{Tuple{String,String},Int}
+    entries = collect(word_symbols)
+    n = length(entries)
+    nt = Threads.nthreads()
+    if nt <= 1 || n < 100
+        return count_pairs(word_symbols)
+    end
+    # partition work across threads
+    chunk_size = max(1, div(n, nt))
+    local_counts = [Dict{Tuple{String,String},Int}() for _ in 1:nt]
+    Threads.@threads for t in 1:nt
+        start_idx = (t - 1) * chunk_size + 1
+        end_idx = t == nt ? n : t * chunk_size
+        for idx in start_idx:end_idx
+            symbols, frequency = entries[idx]
+            if length(symbols) < 2
+                continue
+            end
+            for i in 1:(length(symbols)-1)
+                pair = (symbols[i], symbols[i+1])
+                local_counts[t][pair] = get(local_counts[t], pair, 0) + frequency
+            end
+        end
+    end
+    # merge results
+    merged = Dict{Tuple{String,String},Int}()
+    for lc in local_counts
+        for (pair, count) in lc
+            merged[pair] = get(merged, pair, 0) + count
+        end
+    end
+    return merged
+end
+
+
+"""
+    train_bpe_parallel(corpus, num_merges; verbose=false, min_frequency=0)
+
+Train BPE using threaded pair counting for improved performance on large vocabularies.
+"""
+function train_bpe_parallel(corpus::String, num_merges::Int; verbose::Bool=false, min_frequency::Int=0)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    if isempty(strip(corpus))
+        throw(TokenizerError("corpus is empty; provide non-empty text for training"))
+    end
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    merges = Tuple{String,String}[]
+
+    for i in 1:num_merges
+        pair_counts = parallel_count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
+        if pair === nothing
+            verbose && println("stopping early: no more pairs at step $i")
+            break
+        end
+        if min_frequency > 0 && pair_counts[pair] < min_frequency
+            break
+        end
+        if verbose
+            println("merge $i: $(pair[1]) + $(pair[2]) -> $(pair[1])$(pair[2]) (freq=$(pair_counts[pair]))")
+        end
+        push!(merges, pair)
+        new_word_symbols = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_word_symbols[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_word_symbols
+    end
+    return (word_symbols, merges)
 end
 
 
