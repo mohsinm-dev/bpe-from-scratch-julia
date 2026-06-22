@@ -130,6 +130,13 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Parallel training
+
+```julia
+# Run with: julia --threads=4
+vocab, merges = train_bpe_parallel(corpus, 100)  # threaded pair counting
+```
+
 ### Tokenizer comparison
 
 ```julia
