@@ -560,6 +560,23 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "parallel_count_pairs" begin
+    ws = Dict(["l", "o", "w", "</w>"] => 3)
+    pc = parallel_count_pairs(ws)
+    @test pc[("l", "o")] == 3
+    @test pc[("o", "w")] == 3
+    # should match single-threaded results
+    @test pc == count_pairs(ws)
+end
+
+@testset "train_bpe_parallel" begin
+    corpus = "low low low lower lower lowest"
+    _, merges_par = train_bpe_parallel(corpus, 5)
+    _, merges_seq = train_bpe(corpus, 5)
+    # parallel and sequential should produce same merges
+    @test merges_par == merges_seq
+end
+
 @testset "TokenizerError" begin
     @test_throws TokenizerError train_bpe("", 10)
     @test_throws TokenizerError train_bpe("   ", 10)
