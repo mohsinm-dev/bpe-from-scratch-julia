@@ -560,6 +560,34 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "export/import huggingface merges" begin
+    merges = [("l", "o"), ("lo", "w"), ("low", "</w>")]
+    tmpfile = tempname()
+    try
+        export_huggingface_merges(merges, tmpfile)
+        loaded = import_huggingface_merges(tmpfile)
+        @test loaded == merges
+        # file should have version header
+        lines = readlines(tmpfile)
+        @test startswith(lines[1], "#version")
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+end
+
+@testset "export_sentencepiece_vocab" begin
+    index = Dict("lo" => 1, "w" => 2, "</w>" => 3)
+    tmpfile = tempname()
+    try
+        export_sentencepiece_vocab(index, tmpfile)
+        lines = readlines(tmpfile)
+        @test length(lines) == 3
+        @test occursin("\t", lines[1])
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+end
+
 @testset "parallel_count_pairs" begin
     ws = Dict(["l", "o", "w", "</w>"] => 3)
     pc = parallel_count_pairs(ws)
