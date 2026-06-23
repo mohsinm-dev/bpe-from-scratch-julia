@@ -130,6 +130,17 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Export / import formats
+
+```julia
+# HuggingFace format
+export_huggingface_merges(merges, "merges.txt")
+loaded = import_huggingface_merges("merges.txt")
+
+# SentencePiece vocab format
+export_sentencepiece_vocab(vocab_index, "vocab.model")
+```
+
 ### Parallel training
 
 ```julia
