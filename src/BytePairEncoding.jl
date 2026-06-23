@@ -76,7 +76,10 @@ export normalize_unicode,
     CLIP_PATTERN,
     TokenizerError,
     parallel_count_pairs,
-    train_bpe_parallel
+    train_bpe_parallel,
+    export_huggingface_merges,
+    import_huggingface_merges,
+    export_sentencepiece_vocab
 
 
 using Unicode
@@ -1263,6 +1266,58 @@ function train_unigram(corpus::String, vocab_size::Int; initial_vocab_size::Int=
     end
 
     return vocab_scores
+end
+
+
+"""
+    export_huggingface_merges(merges, filepath)
+
+Export merge rules in HuggingFace tokenizers format (space-separated, with version header).
+"""
+function export_huggingface_merges(merges::Vector{Tuple{String,String}}, filepath::String)
+    open(filepath, "w") do io
+        println(io, "#version: 0.2")
+        for (a, b) in merges
+            println(io, a, " ", b)
+        end
+    end
+end
+
+
+"""
+    import_huggingface_merges(filepath) → Vector{Tuple{String,String}}
+
+Import merge rules from a HuggingFace tokenizers format file.
+"""
+function import_huggingface_merges(filepath::String)::Vector{Tuple{String,String}}
+    if !isfile(filepath)
+        error("merges file not found: $filepath")
+    end
+    merges = Tuple{String,String}[]
+    for line in eachline(filepath)
+        startswith(line, "#") && continue
+        parts = split(strip(line))
+        if length(parts) == 2
+            push!(merges, (String(parts[1]), String(parts[2])))
+        end
+    end
+    return merges
+end
+
+
+"""
+    export_sentencepiece_vocab(vocab_index, filepath)
+
+Export vocabulary in SentencePiece .vocab format (token<TAB>score, sorted by ID).
+"""
+function export_sentencepiece_vocab(vocab_index::Dict{String,Int}, filepath::String)
+    sorted = sort(collect(vocab_index), by=x -> x[2])
+    open(filepath, "w") do io
+        for (token, id) in sorted
+            # SentencePiece uses negative log scores; approximate with -id
+            println(io, token, "\t", -id)
+        end
+    end
 end
 
 
