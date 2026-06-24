@@ -217,6 +217,19 @@ loaded_merges = load_merges("merges.tsv")
 save_vocab(vocab, "vocab.txt")
 ```
 
+## Examples
+
+See the `examples/` directory for runnable scripts:
+
+- `examples/basic_training.jl` — train, encode, decode in 20 lines
+- `examples/byte_level.jl` — byte-level BPE for language-agnostic tokenization
+- `examples/custom_tokenizer.jl` — full workflow with special tokens and save/load
+- `examples/multilingual.jl` — training on multilingual text with Unicode normalization
+
+```bash
+julia examples/basic_training.jl
+```
+
 ## CLI scripts
 
 ### Train a tokenizer
