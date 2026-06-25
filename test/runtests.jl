@@ -560,6 +560,31 @@ end
     @test length(merges_max) == 0
 end
 
+@testset "nbest_encode" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    results = nbest_encode("lower", merges, 3)
+    @test length(results) >= 1
+    @test length(results) <= 3
+    # each result should be a valid tokenization
+    for tokens in results
+        @test length(tokens) > 0
+    end
+end
+
+@testset "sample_segmentation" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    # temperature 0 should be deterministic
+    t1 = sample_segmentation("low", merges, temperature=0.0)
+    t2 = sample_segmentation("low", merges, temperature=0.0)
+    @test t1 == t2
+    @test t1 == encode_word("low", merges)
+    # high temperature should produce tokens
+    t3 = sample_segmentation("low", merges, temperature=5.0)
+    @test length(t3) > 0
+end
+
 @testset "export/import huggingface merges" begin
     merges = [("l", "o"), ("lo", "w"), ("low", "</w>")]
     tmpfile = tempname()
