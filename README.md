@@ -130,6 +130,16 @@ results = encode_batch(["low", "lower", "lowest"], merges)
 tokens = encode_word_with_dropout("lower", merges, dropout=0.1)
 ```
 
+### Subword regularization
+
+```julia
+# N-best tokenizations via BPE dropout
+variants = nbest_encode("lower", merges, 5)
+
+# Temperature-controlled sampling
+tokens = sample_segmentation("lower", merges, temperature=1.0)
+```
+
 ### Export / import formats
 
 ```julia
