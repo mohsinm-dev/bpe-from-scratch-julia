@@ -128,6 +128,20 @@ println("\nAverage token length: $(round(average_token_length(v), digits=2))")
 println("Coverage on trained words: $(coverage("low lower lowest", merges))")
 println("Coverage with unknown word: $(coverage("low xyz", merges))")
 
+println("\n=== Subword regularization ===\n")
+
+variants = nbest_encode("lowest", merges, 5)
+println("N-best encodings of \"lowest\":")
+for (i, v) in enumerate(variants)
+    println("  $i. $v")
+end
+
+println("\nSampled segmentations at different temperatures:")
+for temp in [0.0, 1.0, 3.0]
+    s = sample_segmentation("lowest", merges, temperature=temp)
+    println("  temp=$temp: $s")
+end
+
 println("\n=== Pretokenization patterns ===\n")
 
 sample_pt = "Hello, world! It's a test 123."
