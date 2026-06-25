@@ -79,7 +79,9 @@ export normalize_unicode,
     train_bpe_parallel,
     export_huggingface_merges,
     import_huggingface_merges,
-    export_sentencepiece_vocab
+    export_sentencepiece_vocab,
+    nbest_encode,
+    sample_segmentation
 
 
 using Unicode
@@ -1266,6 +1268,58 @@ function train_unigram(corpus::String, vocab_size::Int; initial_vocab_size::Int=
     end
 
     return vocab_scores
+end
+
+
+"""
+    nbest_encode(word, merges, n; dropout_range=(0.05, 0.3)) → Vector{Vector{String}}
+
+Generate N different tokenizations of the same word by applying BPE dropout
+with varying dropout rates. Useful for subword regularization.
+"""
+function nbest_encode(
+    word::String,
+    merges::Vector{Tuple{String,String}},
+    n::Int;
+    dropout_range::Tuple{Float64,Float64}=(0.05, 0.3)
+)::Vector{Vector{String}}
+    results = Set{Vector{String}}()
+    attempts = 0
+    max_attempts = n * 10
+    while length(results) < n && attempts < max_attempts
+        dropout = dropout_range[1] + rand() * (dropout_range[2] - dropout_range[1])
+        tokens = encode_word_with_dropout(word, merges, dropout=dropout)
+        push!(results, tokens)
+        attempts += 1
+    end
+    return collect(results)
+end
+
+
+"""
+    sample_segmentation(word, merges; temperature=1.0) → Vector{String}
+
+Sample a tokenization of a word with temperature-controlled randomness.
+Higher temperature → more random (more fragmented).
+Temperature 0 → deterministic (same as encode_word).
+"""
+function sample_segmentation(
+    word::String,
+    merges::Vector{Tuple{String,String}};
+    temperature::Float64=1.0
+)::Vector{String}
+    if temperature <= 0.0
+        return encode_word(word, merges)
+    end
+    symbols = word_to_symbols(word)
+    for merge in merges
+        # probability of applying this merge decreases with temperature
+        p = 1.0 / (1.0 + temperature * 0.5)
+        if rand() < p
+            symbols = merge_symbols(symbols, merge)
+        end
+    end
+    return symbols
 end
 
 
