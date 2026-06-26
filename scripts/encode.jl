@@ -12,6 +12,20 @@ include(joinpath(@__DIR__, "..", "src", "BytePairEncoding.jl"))
 using .BytePairEncoding
 
 function main()
+    if "--help" in ARGS || "-h" in ARGS
+        println("Encode text using a trained BPE tokenizer.")
+        println()
+        println("Usage: julia scripts/encode.jl <merges_file> <text>")
+        println()
+        println("Arguments:")
+        println("  merges_file   Path to the merges.tsv file from training")
+        println("  text          Text string to tokenize (in quotes)")
+        println()
+        println("Example:")
+        println("  julia scripts/encode.jl /tmp/bpe_out/merges.tsv \"hello world\"")
+        return
+    end
+
     if length(ARGS) < 2
         println(stderr, "Usage: julia scripts/encode.jl <merges_file> <text>")
         exit(1)
