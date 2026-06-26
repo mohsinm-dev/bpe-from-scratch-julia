@@ -12,6 +12,25 @@ include(joinpath(@__DIR__, "..", "src", "BytePairEncoding.jl"))
 using .BytePairEncoding
 
 function main()
+    if "--help" in ARGS || "-h" in ARGS
+        println("Train a BPE tokenizer from a text corpus.")
+        println()
+        println("Usage: julia scripts/train.jl <corpus_file> <num_merges> <output_dir> [--streaming]")
+        println()
+        println("Arguments:")
+        println("  corpus_file   Path to the training corpus text file")
+        println("  num_merges    Number of BPE merge operations to perform")
+        println("  output_dir    Directory to save the trained tokenizer")
+        println()
+        println("Options:")
+        println("  --streaming   Use streaming mode for large files (lower memory)")
+        println("  --help, -h    Show this help message")
+        println()
+        println("Example:")
+        println("  julia scripts/train.jl data/sample_corpus.txt 20 /tmp/bpe_out")
+        return
+    end
+
     if length(ARGS) < 3
         println(stderr, "Usage: julia scripts/train.jl <corpus_file> <num_merges> <output_dir>")
         exit(1)
