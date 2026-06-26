@@ -256,6 +256,24 @@ julia scripts/encode.jl <merges_file> <text>
 julia scripts/encode.jl /tmp/bpe_out/merges.tsv "hello world"
 ```
 
+### Analyze vocabulary
+
+```bash
+julia scripts/analyze.jl /tmp/bpe_out "hello world test"
+```
+
+### Convert formats
+
+```bash
+julia scripts/convert.jl merges.tsv merges.txt hf
+```
+
+### Validate tokenizer
+
+```bash
+julia scripts/validate.jl /tmp/bpe_out
+```
+
 ### Interactive playground
 
 ```bash
