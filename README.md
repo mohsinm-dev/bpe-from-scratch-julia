@@ -1,6 +1,6 @@
 # BPE from Scratch — Julia
 
-A minimal implementation of Byte Pair Encoding (BPE) in Julia, built step by step for learning purposes.
+A complete implementation of subword tokenization algorithms in Julia — BPE, WordPiece, and Unigram — built from scratch for learning and experimentation.
 
 ## What is BPE?
 
