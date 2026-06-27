@@ -354,3 +354,13 @@ julia scripts/playground.jl
 ```bash
 julia test/runtests.jl
 ```
+
+## Benchmarks
+
+```bash
+julia benchmarks/training.jl
+julia benchmarks/encoding.jl
+julia benchmarks/byte_level.jl
+julia benchmarks/memory.jl
+julia --threads=4 benchmarks/parallel.jl
+```
