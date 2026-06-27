@@ -857,6 +857,62 @@ end
     @test validate_tokenizer(t) == String[]
 end
 
+@testset "integration: WordPiece full pipeline" begin
+    corpus = "the cat sat on the mat the dog sat on the log running runs runner"
+    vocab = train_wordpiece(corpus, 40)
+    @test length(vocab) > 0
+    # tokenize all words from corpus
+    for word in split(corpus)
+        tokens = wordpiece_tokenize(String(word), vocab)
+        @test length(tokens) >= 1
+        # first token should not have ## prefix
+        @test !startswith(tokens[1], "##")
+    end
+end
+
+@testset "integration: Unigram full pipeline" begin
+    corpus = "low low low lower lower lowest high higher highest"
+    scores = train_unigram(corpus, 20)
+    @test length(scores) > 0
+    # segment all words
+    for word in split(corpus)
+        tokens = viterbi_segment(String(word), scores)
+        @test length(tokens) >= 1
+        @test join(tokens) == word
+    end
+end
+
+@testset "integration: cross-tokenizer comparison" begin
+    corpus = "low low low lower lower lowest running runner runs"
+    _, bpe_merges = train_bpe(corpus, 15)
+    wp_vocab = train_wordpiece(corpus, 30)
+    uni_scores = train_unigram(corpus, 20)
+
+    text = "low lower"
+    bpe_tokens = encode_text(text, bpe_merges)
+    @test length(bpe_tokens) > 0
+
+    for word in split(text)
+        wp_tokens = wordpiece_tokenize(String(word), wp_vocab)
+        @test length(wp_tokens) >= 1
+        uni_tokens = viterbi_segment(String(word), uni_scores)
+        @test length(uni_tokens) >= 1
+    end
+end
+
+@testset "stress: large vocabulary training" begin
+    words = ["low", "lower", "lowest", "high", "higher", "highest",
+             "run", "running", "runner", "the", "cat", "sat", "on", "mat"]
+    corpus = join(rand(words, 500), " ")
+    _, merges = train_bpe(corpus, 100)
+    @test length(merges) > 0
+    # encode should still work
+    tokens = encode_text("low lower highest running", merges)
+    @test length(tokens) > 0
+    decoded = decode_tokens(tokens)
+    @test decoded == "low lower highest running"
+end
+
 @testset "encode_byte_level" begin
     corpus = "low low low lower lower lowest"
     _, merges = train_byte_bpe(corpus, 5)
