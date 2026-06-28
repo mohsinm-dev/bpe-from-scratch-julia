@@ -7,3 +7,9 @@ Manifest.toml
 *.jl.mem
 /docs/build/
 /tmp/
+/output/
+*.tsv
+!data/*.tsv
+*.model
+.vscode/
+.idea/
