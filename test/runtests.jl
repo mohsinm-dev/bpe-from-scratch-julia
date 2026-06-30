@@ -926,3 +926,35 @@ end
     # empty word handling
     @test encode_byte_level("", merges) == String[]
 end
+
+@testset "edge cases: empty and whitespace input" begin
+    # empty corpus errors
+    @test_throws TokenizerError train_bpe("", 5)
+    @test_throws TokenizerError train_bpe("   \t\n  ", 5)
+
+    # empty text encoding returns empty
+    merges = [("l", "o")]
+    @test encode_text("", merges) == String[]
+    @test encode_batch(String[], merges) == Vector{String}[]
+
+    # decode empty tokens
+    @test decode_tokens(String[]) == ""
+
+    # single character word
+    @test encode_word("a", Tuple{String,String}[]) == ["a", "</w>"]
+    @test word_to_symbols("a") == ["a", "</w>"]
+    @test word_to_graphemes("a") == ["a", "</w>"]
+
+    # whitespace-only text
+    @test pretokenize("") == String[]
+    @test tokenize("", Tuple{String,String}[]) == String[]
+
+    # zero merges is valid
+    vocab, merges0 = train_bpe("hello hello", 0)
+    @test length(merges0) == 0
+    @test length(vocab) > 0
+
+    # single-word corpus
+    _, m = train_bpe("hello", 5)
+    @test length(m) > 0
+end
