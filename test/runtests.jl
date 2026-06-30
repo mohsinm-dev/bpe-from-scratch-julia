@@ -1047,3 +1047,33 @@ end
     @test graphemes_flag[end] == "</w>"
     @test length(graphemes_flag) >= 2
 end
+
+@testset "round-trip consistency across algorithms" begin
+    corpus = "the quick brown fox jumps over the lazy dog the fox"
+    text = "the fox"
+
+    # BPE round-trip
+    _, bpe_merges = train_bpe(corpus, 10)
+    bpe_tokens = encode_text(text, bpe_merges)
+    @test decode_tokens(bpe_tokens) == text
+
+    # byte-level round-trip
+    _, byte_merges = train_byte_bpe(corpus, 5)
+    byte_tokens = encode_byte_level(text, byte_merges)
+    # byte level encodes words separately, no spaces
+    @test bytes_to_text(byte_tokens) == replace(text, " " => "")
+
+    # unigram covers all characters
+    scores = train_unigram(corpus, 20)
+    for word in split(text)
+        segments = viterbi_segment(String(word), scores)
+        @test join(segments) == word
+    end
+
+    # wordpiece covers trained words
+    wp_vocab = train_wordpiece(corpus, 30)
+    for word in split(corpus)
+        tokens = wordpiece_tokenize(String(word), wp_vocab)
+        @test tokens != ["[UNK]"]
+    end
+end
