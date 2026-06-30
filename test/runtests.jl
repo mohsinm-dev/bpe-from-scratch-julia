@@ -958,3 +958,46 @@ end
     _, m = train_bpe("hello", 5)
     @test length(m) > 0
 end
+
+@testset "error recovery: corrupted and missing files" begin
+    # missing files raise errors
+    @test_throws ErrorException load_merges("does_not_exist.tsv")
+    @test_throws ErrorException load_vocab_index("does_not_exist.tsv")
+    @test_throws ErrorException load_corpus("does_not_exist.txt")
+    @test_throws ErrorException load_config("does_not_exist.json")
+    @test_throws ErrorException load_tokenizer("does_not_exist_dir")
+    @test_throws ErrorException count_word_frequencies_streaming("does_not_exist.txt")
+
+    # malformed merges file (missing tab separator) loads with zero entries
+    tmpfile = tempname()
+    try
+        open(tmpfile, "w") do io
+            println(io, "no_tab_here")
+            println(io, "also broken")
+        end
+        loaded = load_merges(tmpfile)
+        @test length(loaded) == 0
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+
+    # malformed vocab index (non-integer IDs) should error on parse
+    tmpfile2 = tempname()
+    try
+        open(tmpfile2, "w") do io
+            println(io, "token\tnot_a_number")
+        end
+        @test_throws Exception load_vocab_index(tmpfile2)
+    finally
+        isfile(tmpfile2) && rm(tmpfile2)
+    end
+
+    # empty file loads as empty merges
+    tmpfile3 = tempname()
+    try
+        open(tmpfile3, "w") do io end
+        @test load_merges(tmpfile3) == Tuple{String,String}[]
+    finally
+        isfile(tmpfile3) && rm(tmpfile3)
+    end
+end
