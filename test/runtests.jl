@@ -1001,3 +1001,49 @@ end
         isfile(tmpfile3) && rm(tmpfile3)
     end
 end
+
+@testset "unicode edge cases" begin
+    # combining characters
+    decomposed = "e\u0301"  # e + combining acute = é
+    @test normalize_unicode(decomposed) == "é"
+    @test is_valid_utf8(decomposed)
+
+    # zero-width joiner (emoji sequences)
+    zwj_text = "a\u200Bb"  # zero-width space
+    @test is_valid_utf8(zwj_text)
+    processed = preprocess_text(zwj_text)
+    @test length(processed) > 0
+
+    # CJK characters
+    cjk = "你好世界"
+    @test is_valid_utf8(cjk)
+    syms = word_to_symbols(cjk)
+    @test length(syms) == 5  # 4 chars + </w>
+    graphemes_cjk = word_to_graphemes(cjk)
+    @test length(graphemes_cjk) == 5
+
+    # emoji
+    emoji = "🎉🚀"
+    @test is_valid_utf8(emoji)
+    bytes = text_to_bytes(emoji)
+    @test length(bytes) > 0
+    @test bytes_to_text(bytes) == emoji
+
+    # mixed script training
+    mixed = "hello 你好 hello 你好 world"
+    _, merges = train_bpe(mixed, 5)
+    @test length(merges) > 0
+    tokens = encode_text("hello 你好", merges)
+    @test decode_tokens(tokens) == "hello 你好"
+
+    # RTL text (Arabic)
+    rtl = "مرحبا مرحبا"
+    _, merges_rtl = train_bpe(rtl, 3)
+    @test length(merges_rtl) > 0
+
+    # single grapheme cluster with multiple codepoints
+    flag = "🇺🇸"
+    graphemes_flag = word_to_graphemes(flag)
+    @test graphemes_flag[end] == "</w>"
+    @test length(graphemes_flag) >= 2
+end
