@@ -816,6 +816,9 @@ function train_tokenizer(
     verbose::Bool=false,
     min_frequency::Int=0
 )::BPETokenizer
+    if num_merges < 0
+        throw(TokenizerError("num_merges must be non-negative, got $num_merges"))
+    end
     processed = preprocess_text(corpus)
     word_symbols, merges = train_bpe(processed, num_merges, verbose=verbose, min_frequency=min_frequency)
     vocab = get_vocabulary(word_symbols)
@@ -1233,6 +1236,9 @@ and iteratively prunes the lowest-scoring tokens until `vocab_size` is reached.
 Returns a Dict of token → log-probability score.
 """
 function train_unigram(corpus::String, vocab_size::Int; initial_vocab_size::Int=0)::Dict{String,Float64}
+    if vocab_size < 1
+        throw(TokenizerError("vocab_size must be positive, got $vocab_size"))
+    end
     processed = preprocess_text(corpus)
     words = split(processed)
     word_freqs = Dict{String,Int}()
@@ -1642,6 +1648,9 @@ and iteratively adds the most frequent subword that improves coverage.
 Returns the vocabulary set (including ## prefixed continuation tokens).
 """
 function train_wordpiece(corpus::String, vocab_size::Int; min_frequency::Int=2)::Set{String}
+    if vocab_size < 1
+        throw(TokenizerError("vocab_size must be positive, got $vocab_size"))
+    end
     words = split(preprocess_text(corpus))
     word_freqs = Dict{String,Int}()
     for w in words

@@ -1077,3 +1077,19 @@ end
         @test tokens != ["[UNK]"]
     end
 end
+
+@testset "input validation at API boundaries" begin
+    # train_tokenizer rejects negative num_merges
+    @test_throws TokenizerError train_tokenizer("hello hello", -1)
+
+    # train_wordpiece rejects non-positive vocab_size
+    @test_throws TokenizerError train_wordpiece("hello hello", 0)
+    @test_throws TokenizerError train_wordpiece("hello hello", -5)
+
+    # train_unigram rejects non-positive vocab_size
+    @test_throws TokenizerError train_unigram("hello hello", 0)
+    @test_throws TokenizerError train_unigram("hello hello", -1)
+
+    # train_bpe rejects negative num_merges (already tested but grouped here)
+    @test_throws TokenizerError train_bpe("hello hello", -1)
+end
