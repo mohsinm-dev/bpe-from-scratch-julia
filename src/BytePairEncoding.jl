@@ -782,6 +782,13 @@ end
 
 A complete BPE tokenizer bundling trained merges, vocabulary, token-to-ID index,
 ID-to-token reverse index, and special tokens into a single struct.
+
+Fields:
+- `merges::Vector{Tuple{String,String}}` — ordered list of learned merge rules
+- `vocab::Set{String}` — set of all tokens in the vocabulary
+- `vocab_index::Dict{String,Int}` — token → integer ID mapping
+- `id_to_token::Dict{Int,String}` — integer ID → token reverse mapping
+- `special_tokens::Vector{String}` — reserved tokens (assigned lowest IDs)
 """
 struct BPETokenizer
     merges::Vector{Tuple{String,String}}
@@ -1087,6 +1094,13 @@ end
     TokenizerConfig
 
 Configuration struct for training parameters.
+
+Fields:
+- `num_merges::Int` — maximum number of BPE merges to perform
+- `min_frequency::Int` — stop merging when best pair count drops below this
+- `special_tokens::Vector{String}` — tokens to reserve (e.g. "<unk>", "<pad>")
+- `lowercase::Bool` — whether to lowercase corpus before training
+- `verbose::Bool` — print merge steps during training
 """
 struct TokenizerConfig
     num_merges::Int
@@ -1487,6 +1501,13 @@ end
     MergeRecord
 
 A record of a single merge step during BPE training.
+
+Fields:
+- `step::Int` — 1-based merge step number
+- `pair::Tuple{String,String}` — the pair that was merged
+- `frequency::Int` — how often this pair appeared when merged
+- `new_token::String` — the resulting merged token
+- `vocab_size::Int` — vocabulary size after this merge
 """
 struct MergeRecord
     step::Int
