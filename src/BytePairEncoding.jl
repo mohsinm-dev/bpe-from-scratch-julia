@@ -235,6 +235,7 @@ Pairs:
 ("w", "</w>") => 2
 """
 
+# O(total_symbols) — linear scan over all symbol sequences
 function count_pairs(
     word_symbols::Dict{Vector{String},Int},
 )::Dict{Tuple{String,String},Int}
@@ -322,6 +323,7 @@ Options:
 
 Returns the final vocabulary (word_symbols) and the list of merges performed.
 """
+# O(num_merges * total_symbols) — each merge scans all word symbols to count pairs and apply merges
 function train_bpe(corpus::String, num_merges::Int; verbose::Bool=false, min_frequency::Int=0)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
     if isempty(strip(corpus))
         throw(TokenizerError("corpus is empty; provide non-empty text for training"))
@@ -391,6 +393,7 @@ Example:
     merges = [("l", "o"), ("lo", "w")]
     encode_word("low", merges) -> ["low", "</w>"]
 """
+# O(num_merges * word_length) — applies each merge rule sequentially
 function encode_word(word::String, merges::Vector{Tuple{String,String}})::Vector{String}
     symbols = word_to_symbols(word)
     for merge in merges
@@ -1186,6 +1189,7 @@ Segment a word using the Viterbi algorithm with unigram scores.
 `vocab_scores` maps tokens to their log-probability scores.
 Uses dynamic programming to find the highest-scoring segmentation.
 """
+# O(n^2) where n = length(word) — quadratic dynamic programming over all substrings
 function viterbi_segment(word::String, vocab_scores::Dict{String,Float64}; unk_score::Float64=-100.0)::Vector{String}
     n = length(word)
     if n == 0
@@ -1686,6 +1690,7 @@ Tokenize a word using greedy longest-match-first WordPiece algorithm.
 Continuation tokens are prefixed with "##".
 Returns `[unk_token]` if the word cannot be tokenized.
 """
+# O(n^2) worst case — greedy longest-match from left, falls back to shorter substrings
 function wordpiece_tokenize(word::String, vocab::Set{String}; unk_token::String="[UNK]", max_word_len::Int=100)::Vector{String}
     if length(word) > max_word_len
         return [unk_token]
