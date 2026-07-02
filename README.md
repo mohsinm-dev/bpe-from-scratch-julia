@@ -218,6 +218,18 @@ tokens = encode_byte_level("low lower", byte_merges)
 decoded = bytes_to_text(tokens)
 ```
 
+### Streaming encode
+
+```julia
+# Encode a file line by line without loading into memory
+tokens = encode_streaming("corpus.txt", merges)
+
+# With progress callback
+encode_streaming("corpus.txt", merges, callback=function(line_num, tokens)
+    println("line $line_num: $(length(tokens)) tokens")
+end)
+```
+
 ### Save and load
 
 ```julia
@@ -235,6 +247,7 @@ See the `examples/` directory for runnable scripts:
 - `examples/byte_level.jl` — byte-level BPE for language-agnostic tokenization
 - `examples/custom_tokenizer.jl` — full workflow with special tokens and save/load
 - `examples/multilingual.jl` — training on multilingual text with Unicode normalization
+- `examples/streaming_encode.jl` — streaming file encoding with progress tracking
 
 ```bash
 julia examples/basic_training.jl
@@ -254,6 +267,9 @@ julia scripts/train.jl data/sample_corpus.txt 20 /tmp/bpe_out
 ```bash
 julia scripts/encode.jl <merges_file> <text>
 julia scripts/encode.jl /tmp/bpe_out/merges.tsv "hello world"
+
+# Streaming mode: encode a file line by line
+julia scripts/encode.jl /tmp/bpe_out/merges.tsv --file data/sample_corpus.txt
 ```
 
 ### Analyze vocabulary
@@ -306,6 +322,7 @@ julia scripts/playground.jl
 - `decode_tokens(tokens)` — reconstruct text from BPE tokens
 - `encode_batch(texts, merges)` — encode multiple texts at once
 - `encode_word_with_dropout(word, merges; dropout)` — stochastic tokenization
+- `encode_streaming(filepath, merges; callback)` — encode a file line by line
 
 ### Token-to-ID mapping
 - `build_vocab_index(vocab, special_tokens)` — assign integer IDs to tokens
