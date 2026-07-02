@@ -81,7 +81,8 @@ export normalize_unicode,
     import_huggingface_merges,
     export_sentencepiece_vocab,
     nbest_encode,
-    sample_segmentation
+    sample_segmentation,
+    encode_streaming
 
 
 using Unicode
@@ -1900,6 +1901,41 @@ function validate_tokenizer(t::BPETokenizer)::Vector{String}
         push!(warnings, "id_to_token size ($(length(t.id_to_token))) != vocab_index size ($(length(t.vocab_index)))")
     end
     return warnings
+end
+
+
+"""
+    encode_streaming(filepath, merges; callback=nothing) → Vector{String}
+
+Encode a text file line by line without loading it entirely into memory.
+Each line is tokenized independently and tokens are appended to the result.
+
+If `callback` is provided, it is called with `(line_number, tokens)` for each line,
+allowing progress tracking or incremental processing.
+"""
+function encode_streaming(
+    filepath::String,
+    merges::Vector{Tuple{String,String}};
+    callback::Union{Nothing,Function}=nothing
+)::Vector{String}
+    if !isfile(filepath)
+        error("file not found: $filepath")
+    end
+    all_tokens = String[]
+    line_num = 0
+    open(filepath, "r") do io
+        for line in eachline(io)
+            line_num += 1
+            stripped = strip(line)
+            isempty(stripped) && continue
+            tokens = encode_text(String(stripped), merges)
+            append!(all_tokens, tokens)
+            if callback !== nothing
+                callback(line_num, tokens)
+            end
+        end
+    end
+    return all_tokens
 end
 
 end
