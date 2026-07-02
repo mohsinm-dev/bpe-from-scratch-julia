@@ -1093,3 +1093,47 @@ end
     # train_bpe rejects negative num_merges (already tested but grouped here)
     @test_throws TokenizerError train_bpe("hello hello", -1)
 end
+
+@testset "encode_streaming" begin
+    corpus_path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    corpus = load_corpus(corpus_path)
+    _, merges = train_bpe(corpus, 10)
+
+    # streaming encode should produce same tokens as in-memory encode
+    streaming_tokens = encode_streaming(corpus_path, merges)
+    @test length(streaming_tokens) > 0
+
+    # callback is invoked for each non-empty line
+    lines_seen = Int[]
+    encode_streaming(corpus_path, merges, callback=(n, _) -> push!(lines_seen, n))
+    @test length(lines_seen) > 0
+    @test issorted(lines_seen)
+
+    # missing file raises error
+    @test_throws ErrorException encode_streaming("nonexistent.txt", merges)
+
+    # empty file produces empty tokens
+    tmpfile = tempname()
+    try
+        open(tmpfile, "w") do io end
+        @test encode_streaming(tmpfile, merges) == String[]
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+
+    # file with blank lines skips them
+    tmpfile2 = tempname()
+    try
+        open(tmpfile2, "w") do io
+            println(io, "low lower")
+            println(io, "")
+            println(io, "lowest")
+        end
+        tokens = encode_streaming(tmpfile2, merges)
+        @test length(tokens) > 0
+        decoded = decode_tokens(tokens)
+        @test occursin("low", decoded)
+    finally
+        isfile(tmpfile2) && rm(tmpfile2)
+    end
+end
