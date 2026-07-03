@@ -82,7 +82,11 @@ export normalize_unicode,
     export_sentencepiece_vocab,
     nbest_encode,
     sample_segmentation,
-    encode_streaming
+    encode_streaming,
+    CachedEncoder,
+    cached_encode_word,
+    cache_stats,
+    clear_cache!
 
 
 using Unicode
@@ -1936,6 +1940,73 @@ function encode_streaming(
         end
     end
     return all_tokens
+end
+
+
+"""
+    CachedEncoder
+
+Wraps a set of BPE merges with an LRU-style cache for repeated word encodings.
+Avoids redundant work when the same words appear many times in a corpus.
+
+# ponytail: bounded Dict, no eviction — add LRU eviction if memory matters
+"""
+mutable struct CachedEncoder
+    merges::Vector{Tuple{String,String}}
+    cache::Dict{String,Vector{String}}
+    max_size::Int
+    hits::Int
+    misses::Int
+end
+
+CachedEncoder(merges::Vector{Tuple{String,String}}; max_size::Int=10000) =
+    CachedEncoder(merges, Dict{String,Vector{String}}(), max_size, 0, 0)
+
+
+"""
+    cached_encode_word(enc::CachedEncoder, word) → Vector{String}
+
+Encode a word using cached results. Cache miss triggers `encode_word` and stores the result.
+When cache exceeds `max_size`, the oldest half is evicted.
+"""
+function cached_encode_word(enc::CachedEncoder, word::String)::Vector{String}
+    cached = get(enc.cache, word, nothing)
+    if cached !== nothing
+        enc.hits += 1
+        return cached
+    end
+    enc.misses += 1
+    result = encode_word(word, enc.merges)
+    if length(enc.cache) >= enc.max_size
+        # evict oldest half
+        keys_to_remove = collect(keys(enc.cache))[1:div(enc.max_size, 2)]
+        for k in keys_to_remove
+            delete!(enc.cache, k)
+        end
+    end
+    enc.cache[word] = result
+    return result
+end
+
+
+"""
+    cache_stats(enc::CachedEncoder) → NamedTuple
+
+Return cache hit/miss statistics.
+"""
+cache_stats(enc::CachedEncoder) = (hits=enc.hits, misses=enc.misses, size=length(enc.cache),
+    hit_rate=enc.hits + enc.misses == 0 ? 0.0 : enc.hits / (enc.hits + enc.misses))
+
+
+"""
+    clear_cache!(enc::CachedEncoder)
+
+Reset the cache and statistics.
+"""
+function clear_cache!(enc::CachedEncoder)
+    empty!(enc.cache)
+    enc.hits = 0
+    enc.misses = 0
 end
 
 end
