@@ -225,19 +225,14 @@ end
 
 
 """
-    count_pairs(word_symbols)
+    count_pairs(word_symbols) → Dict{Tuple{String,String},Int}
 
-Count adjacent symbol pairs across all tokenized words.
-
-Word frequency is used, so repeated words influence pair counts.
+Count adjacent symbol pairs across all tokenized words, weighted by word frequency.
+Words appearing N times contribute N to each of their pair counts.
 
 Example:
-["l", "o", "w", "</w>"] => 2
-
-Pairs:
-("l", "o") => 2
-("o", "w") => 2
-("w", "</w>") => 2
+    word_symbols = Dict(["l", "o", "w", "</w>"] => 2)
+    count_pairs(word_symbols) → Dict(("l","o")=>2, ("o","w")=>2, ("w","</w>")=>2)
 """
 
 # O(total_symbols) — linear scan over all symbol sequences
@@ -262,11 +257,10 @@ end
 
 
 """
-    best_pair(pair_counts)
+    best_pair(pair_counts) → Union{Tuple{String,String}, Nothing}
 
-Return the most frequent adjacent pair.
-
-If there are no pairs, return 'nothing'
+Return the most frequent adjacent pair, or `nothing` if no pairs exist.
+Ties are broken arbitrarily by Dict iteration order.
 """
 
 function best_pair(
@@ -291,6 +285,15 @@ function best_pair(
 end
 
 
+"""
+    merge_symbols(symbols, pair) → Vector{String}
+
+Merge all adjacent occurrences of `pair` in a symbol sequence into a single concatenated token.
+Scans left-to-right; each merge consumes both symbols and advances past them.
+
+Example:
+    merge_symbols(["a", "b", "a", "b", "c"], ("a", "b")) → ["ab", "ab", "c"]
+"""
 function merge_symbols(
     symbols::Vector{String},
     pair::Tuple{String,String},
