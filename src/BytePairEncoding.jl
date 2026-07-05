@@ -735,8 +735,15 @@ function prepare_batch(batch::Vector{Vector{Int}}, max_len::Int; pad_id::Int=0):
 end
 
 
+# GPT-2 pattern: contractions | optional-space + letters | optional-space + digits |
+# optional-space + punctuation | trailing whitespace | whitespace
 const GPT2_PATTERN = r"'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"
+
+# LLaMA pattern: case-insensitive contractions | optional-punctuation + letters |
+# 1-3 digit numbers | punctuation with newlines | newlines | trailing whitespace
 const LLAMA_PATTERN = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"
+
+# CLIP pattern: letters | single digit | non-whitespace punctuation (simpler, more aggressive)
 const CLIP_PATTERN = r"\p{L}+|\p{N}|[^\s\p{L}\p{N}]+"
 
 """
