@@ -366,6 +366,17 @@ julia scripts/playground.jl
 - `train_byte_bpe(text, num_merges; verbose)` — train BPE on byte sequences
 - `encode_byte_level(text, merges)` — apply byte-level BPE merges
 
+### Caching
+- `CachedEncoder(merges; max_size)` — create a cached encoder for repeated words
+- `cached_encode_word(enc, word)` — encode with cache lookup
+- `cache_stats(enc)` — hit/miss statistics
+- `clear_cache!(enc)` — reset cache
+
+### Validation
+- `validate_merges(merges)` — check merge rules for consistency issues
+- `validate_vocab_index(index)` — check vocabulary index integrity
+- `validate_tokenizer(tokenizer)` — run all validation checks
+
 ## Running tests
 
 ```bash
@@ -379,5 +390,6 @@ julia benchmarks/training.jl
 julia benchmarks/encoding.jl
 julia benchmarks/byte_level.jl
 julia benchmarks/memory.jl
+julia benchmarks/cache.jl
 julia --threads=4 benchmarks/parallel.jl
 ```
