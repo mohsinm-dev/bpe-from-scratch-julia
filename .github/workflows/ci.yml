@@ -19,3 +19,11 @@ jobs:
           version: ${{ matrix.julia-version }}
       - name: Run tests
         run: julia test/runtests.jl
+      - name: Smoke test examples
+        run: |
+          julia examples/basic_training.jl
+          julia examples/byte_level.jl
+          julia examples/custom_tokenizer.jl
+          julia examples/multilingual.jl
+          julia examples/streaming_encode.jl
+          julia examples/training_comparison.jl
