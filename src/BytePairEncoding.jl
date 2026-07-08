@@ -2069,4 +2069,17 @@ function vocabulary_coverage_report(text::String, merges::Vector{Tuple{String,St
         uncovered=unique(uncovered), coverage=covered_count / length(words))
 end
 
+
+"""
+    oov_rate(text, vocab_index; unk_token="<unk>") → Float64
+
+Compute the out-of-vocabulary rate: fraction of encoded tokens that map to the unknown token.
+Lower is better. Returns 0.0 if the text produces no tokens.
+"""
+function oov_rate(tokens::Vector{String}, vocab_index::Dict{String,Int}; unk_token::String="<unk>")::Float64
+    isempty(tokens) && return 0.0
+    unk_count = count(t -> !haskey(vocab_index, t), tokens)
+    return unk_count / length(tokens)
+end
+
 end
