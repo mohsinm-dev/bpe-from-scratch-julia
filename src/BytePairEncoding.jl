@@ -86,7 +86,10 @@ export normalize_unicode,
     CachedEncoder,
     cached_encode_word,
     cache_stats,
-    clear_cache!
+    clear_cache!,
+    token_entropy,
+    vocabulary_coverage_report,
+    oov_rate
 
 
 using Unicode
@@ -2017,6 +2020,26 @@ function clear_cache!(enc::CachedEncoder)
     empty!(enc.cache)
     enc.hits = 0
     enc.misses = 0
+end
+
+
+"""
+    token_entropy(tokens) → Float64
+
+Compute Shannon entropy (in bits) of a token sequence.
+Higher entropy means more uniform token distribution; lower means a few tokens dominate.
+Returns 0.0 for empty input.
+"""
+function token_entropy(tokens::Vector{String})::Float64
+    isempty(tokens) && return 0.0
+    freqs = token_frequencies(tokens)
+    total = length(tokens)
+    entropy = 0.0
+    for (_, count) in freqs
+        p = count / total
+        entropy -= p * log2(p)
+    end
+    return entropy
 end
 
 end
