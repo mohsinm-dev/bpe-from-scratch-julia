@@ -1137,3 +1137,85 @@ end
         isfile(tmpfile2) && rm(tmpfile2)
     end
 end
+
+@testset "token_entropy" begin
+    # uniform distribution has maximum entropy
+    uniform = ["a", "b", "c", "d"]
+    @test token_entropy(uniform) ≈ 2.0  # log2(4) = 2
+
+    # single token has zero entropy
+    @test token_entropy(["a", "a", "a"]) ≈ 0.0
+
+    # empty input
+    @test token_entropy(String[]) == 0.0
+
+    # more varied = higher entropy
+    low_var = ["a", "a", "a", "b"]
+    high_var = ["a", "b", "c", "d"]
+    @test token_entropy(low_var) < token_entropy(high_var)
+end
+
+@testset "vocabulary_coverage_report" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+
+    report = vocabulary_coverage_report("low lower lowest", merges)
+    @test report.total == 3
+    @test report.covered == 3
+    @test report.coverage ≈ 1.0
+    @test isempty(report.uncovered)
+
+    # with unknown words
+    report2 = vocabulary_coverage_report("low xyz", merges)
+    @test report2.total == 2
+    @test report2.covered < report2.total
+    @test "xyz" in report2.uncovered
+
+    # empty text
+    report3 = vocabulary_coverage_report("", merges)
+    @test report3.total == 0
+    @test report3.coverage == 0.0
+end
+
+@testset "oov_rate" begin
+    index = Dict("lo" => 1, "w" => 2, "</w>" => 3)
+
+    # all tokens known
+    @test oov_rate(["lo", "w", "</w>"], index) ≈ 0.0
+
+    # some unknown tokens
+    @test oov_rate(["lo", "unknown", "</w>"], index) ≈ 1/3
+
+    # all unknown
+    @test oov_rate(["x", "y", "z"], index) ≈ 1.0
+
+    # empty input
+    @test oov_rate(String[], index) == 0.0
+end
+
+@testset "CachedEncoder" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+
+    enc = CachedEncoder(merges)
+
+    # first call is a miss
+    result1 = cached_encode_word(enc, "low")
+    @test result1 == encode_word("low", merges)
+    stats = cache_stats(enc)
+    @test stats.misses == 1
+    @test stats.hits == 0
+
+    # second call is a hit
+    result2 = cached_encode_word(enc, "low")
+    @test result2 == result1
+    stats2 = cache_stats(enc)
+    @test stats2.hits == 1
+
+    # clear resets
+    clear_cache!(enc)
+    stats3 = cache_stats(enc)
+    @test stats3.hits == 0
+    @test stats3.misses == 0
+    @test stats3.size == 0
+end
