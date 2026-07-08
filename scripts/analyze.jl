@@ -52,6 +52,17 @@ function main()
 
         cov = coverage(text, t.merges)
         println("  Coverage:    $(round(cov * 100, digits=1))%")
+
+        entropy = token_entropy(tokens)
+        println("  Entropy:     $(round(entropy, digits=2)) bits")
+
+        oov = oov_rate(tokens, t.vocab_index)
+        println("  OOV rate:    $(round(oov * 100, digits=1))%")
+
+        report = vocabulary_coverage_report(text, t.merges)
+        if !isempty(report.uncovered)
+            println("  Uncovered:   $(join(report.uncovered, ", "))")
+        end
     end
 end
 
