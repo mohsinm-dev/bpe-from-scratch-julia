@@ -366,6 +366,11 @@ julia scripts/playground.jl
 - `train_byte_bpe(text, num_merges; verbose)` — train BPE on byte sequences
 - `encode_byte_level(text, merges)` — apply byte-level BPE merges
 
+### Statistics
+- `token_entropy(tokens)` — Shannon entropy (bits) of token distribution
+- `vocabulary_coverage_report(text, merges)` — detailed coverage breakdown with uncovered words
+- `oov_rate(tokens, vocab_index)` — fraction of tokens not in vocabulary
+
 ### Caching
 - `CachedEncoder(merges; max_size)` — create a cached encoder for repeated words
 - `cached_encode_word(enc, word)` — encode with cache lookup
