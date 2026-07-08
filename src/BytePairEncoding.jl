@@ -2042,4 +2042,31 @@ function token_entropy(tokens::Vector{String})::Float64
     return entropy
 end
 
+
+"""
+    vocabulary_coverage_report(text, merges) → NamedTuple
+
+Generate a detailed coverage report for how well the vocabulary handles given text.
+Returns total words, covered count, uncovered words, and coverage percentage.
+"""
+function vocabulary_coverage_report(text::String, merges::Vector{Tuple{String,String}})
+    words = split(text)
+    if isempty(words)
+        return (total=0, covered=0, uncovered=String[], coverage=0.0)
+    end
+    uncovered = String[]
+    covered_count = 0
+    for word in words
+        tokens = encode_word(String(word), merges)
+        non_marker = filter(t -> t != "</w>", tokens)
+        if all(t -> length(t) > 1 || length(String(word)) == 1, non_marker)
+            covered_count += 1
+        else
+            push!(uncovered, String(word))
+        end
+    end
+    return (total=length(words), covered=covered_count,
+        uncovered=unique(uncovered), coverage=covered_count / length(words))
+end
+
 end
