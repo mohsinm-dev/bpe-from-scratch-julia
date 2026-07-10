@@ -304,7 +304,7 @@ function merge_symbols(
     merged_symbols = String[]
     index = 1
 
-    while index <= length(symbols)
+    @inbounds while index <= length(symbols)
         has_next_symbol = index < length(symbols)
         should_merge = has_next_symbol &&
             symbols[index] == pair[1] &&
@@ -1221,7 +1221,7 @@ function viterbi_segment(word::String, vocab_scores::Dict{String,Float64}; unk_s
     best_score[1] = 0.0  # empty prefix
     best_edge = fill(0, n + 1)
 
-    for i in 1:n
+    @inbounds for i in 1:n
         for j in 0:i-1
             substr = word[j+1:i]
             score = get(vocab_scores, substr, unk_score)
