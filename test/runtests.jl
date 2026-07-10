@@ -1219,3 +1219,24 @@ end
     @test stats3.misses == 0
     @test stats3.size == 0
 end
+
+@testset "performance: training completes in bounded time" begin
+    # generate a reasonably sized corpus
+    words = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
+             "running", "runner", "highest", "lower", "lowest", "newer"]
+    corpus = join(rand(words, 1000), " ")
+
+    # training 200 merges should complete without hanging
+    t = @elapsed begin
+        _, merges = train_bpe(corpus, 200)
+    end
+    @test length(merges) > 0
+    @test t < 30.0  # should finish well under 30 seconds
+
+    # encoding 1000 words should be fast
+    t2 = @elapsed begin
+        tokens = encode_text(corpus, merges)
+    end
+    @test length(tokens) > 0
+    @test t2 < 10.0
+end
