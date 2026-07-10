@@ -391,10 +391,12 @@ julia test/runtests.jl
 ## Benchmarks
 
 ```bash
-julia benchmarks/training.jl
-julia benchmarks/encoding.jl
-julia benchmarks/byte_level.jl
-julia benchmarks/memory.jl
-julia benchmarks/cache.jl
-julia --threads=4 benchmarks/parallel.jl
+julia benchmarks/training.jl      # training speed at various scales
+julia benchmarks/encoding.jl      # encoding throughput
+julia benchmarks/byte_level.jl    # byte-level BPE performance
+julia benchmarks/memory.jl        # memory usage profiling
+julia benchmarks/cache.jl         # cached vs uncached encoding
+julia --threads=4 benchmarks/parallel.jl  # multi-threaded training
 ```
+
+Or run all at once: `make bench`
