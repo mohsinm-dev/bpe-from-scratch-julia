@@ -1,95 +1,61 @@
 module BytePairEncoding
 
-export normalize_unicode,
-    is_valid_utf8,
-    word_to_graphemes,
-    word_to_symbols,
-    count_word_frequencies,
-    initialize_word_symbols,
-    count_pairs,
-    best_pair,
-    merge_symbols,
-    train_bpe,
-    get_vocabulary,
-    preprocess_text,
-    load_corpus,
-    encode_word,
-    encode_text,
-    decode_tokens,
-    save_merges,
-    load_merges,
-    save_vocab,
-    compression_ratio,
-    token_frequencies,
-    vocab_size_history,
-    add_special_tokens,
-    encode_batch,
-    encode_word_with_dropout,
-    build_vocab_index,
-    tokens_to_ids,
-    ids_to_tokens,
-    save_vocab_index,
-    load_vocab_index,
-    pad_sequence,
-    truncate_sequence,
-    prepare_batch,
-    pretokenize,
-    count_frequencies_pretokenized,
-    tokenize,
-    BPETokenizer,
-    train_tokenizer,
-    encode,
-    decode,
-    save_tokenizer,
-    load_tokenizer,
-    most_common_tokens,
-    average_token_length,
-    coverage,
-    text_to_bytes,
-    bytes_to_text,
-    train_byte_bpe,
-    encode_byte_level,
-    validate_merges,
-    validate_vocab_index,
-    validate_tokenizer,
-    train_bpe_protected,
-    encode_with_protected_tokens,
-    count_word_frequencies_streaming,
-    train_bpe_streaming,
-    wordpiece_tokenize,
-    train_wordpiece,
-    token_length_distribution,
-    subword_fertility,
-    vocab_overlap,
-    MergeRecord,
-    train_bpe_with_history,
-    format_merge_history,
-    TokenizerConfig,
-    save_config,
-    load_config,
-    train_from_config,
-    viterbi_segment,
-    train_unigram,
-    compare_tokenizers,
-    compare_compression,
-    LLAMA_PATTERN,
-    CLIP_PATTERN,
-    TokenizerError,
-    parallel_count_pairs,
-    train_bpe_parallel,
-    export_huggingface_merges,
-    import_huggingface_merges,
-    export_sentencepiece_vocab,
-    nbest_encode,
-    sample_segmentation,
-    encode_streaming,
-    CachedEncoder,
-    cached_encode_word,
-    cache_stats,
-    clear_cache!,
-    token_entropy,
-    vocabulary_coverage_report,
-    oov_rate
+# --- Types ---
+export TokenizerError, BPETokenizer, TokenizerConfig, MergeRecord, CachedEncoder
+
+# --- Preprocessing & I/O ---
+export preprocess_text, load_corpus, normalize_unicode, is_valid_utf8,
+    save_merges, load_merges, save_vocab, save_vocab_index, load_vocab_index,
+    save_config, load_config, save_tokenizer, load_tokenizer
+
+# --- Core BPE training ---
+export word_to_symbols, word_to_graphemes, count_word_frequencies, initialize_word_symbols,
+    count_pairs, best_pair, merge_symbols, train_bpe, get_vocabulary,
+    train_bpe_protected, train_bpe_streaming, count_word_frequencies_streaming,
+    train_bpe_parallel, parallel_count_pairs, train_bpe_with_history
+
+# --- BPETokenizer ---
+export train_tokenizer, encode, decode, train_from_config
+
+# --- Encoding & decoding ---
+export encode_word, encode_text, decode_tokens, encode_batch,
+    encode_word_with_dropout, encode_with_protected_tokens,
+    encode_byte_level, encode_streaming
+
+# --- Pre-tokenization ---
+export pretokenize, count_frequencies_pretokenized, tokenize,
+    LLAMA_PATTERN, CLIP_PATTERN
+
+# --- Token-to-ID mapping ---
+export build_vocab_index, tokens_to_ids, ids_to_tokens, add_special_tokens
+
+# --- Sequence utilities ---
+export pad_sequence, truncate_sequence, prepare_batch
+
+# --- Byte-level BPE ---
+export text_to_bytes, bytes_to_text, train_byte_bpe
+
+# --- WordPiece & Unigram ---
+export train_wordpiece, wordpiece_tokenize, train_unigram, viterbi_segment
+
+# --- Analytics & comparison ---
+export compression_ratio, token_frequencies, vocab_size_history,
+    most_common_tokens, average_token_length, coverage,
+    token_length_distribution, subword_fertility, vocab_overlap,
+    compare_tokenizers, compare_compression, format_merge_history,
+    token_entropy, vocabulary_coverage_report, oov_rate
+
+# --- Subword regularization ---
+export nbest_encode, sample_segmentation
+
+# --- Format conversion ---
+export export_huggingface_merges, import_huggingface_merges, export_sentencepiece_vocab
+
+# --- Validation ---
+export validate_merges, validate_vocab_index, validate_tokenizer
+
+# --- Caching ---
+export cached_encode_word, cache_stats, clear_cache!
 
 
 using Unicode
