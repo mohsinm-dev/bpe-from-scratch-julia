@@ -1072,6 +1072,7 @@ end
 
 Train BPE with a set of pairs that should never be merged.
 Pairs in `never_merge` are skipped during training even if they are the most frequent.
+Useful for preserving morpheme boundaries or preventing specific character combinations.
 """
 function train_bpe_protected(
     corpus::String,
@@ -1421,7 +1422,8 @@ end
     parallel_count_pairs(word_symbols) → Dict{Tuple{String,String},Int}
 
 Count adjacent symbol pairs using threads when available.
-Falls back to single-threaded count_pairs when Threads.nthreads() == 1.
+Falls back to single-threaded `count_pairs` when `Threads.nthreads() == 1` or
+when the vocabulary has fewer than 100 entries (threading overhead not worth it).
 """
 function parallel_count_pairs(word_symbols::Dict{Vector{String},Int})::Dict{Tuple{String,String},Int}
     entries = collect(word_symbols)
