@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-07-12
+
+### Added
+- Streaming file encoding (`encode_streaming`) with progress callback
+- `CachedEncoder` with LRU eviction for repeated word encodings
+- Statistics functions: `token_entropy`, `vocabulary_coverage_report`, `oov_rate`
+- Input validation for `train_tokenizer`, `train_wordpiece`, `train_unigram`
+- Algorithm complexity comments on core functions
+- GitHub issue templates for bug reports and feature requests
+- Makefile with test, bench, and examples targets
+- CHANGELOG.md and CONTRIBUTING.md
+- Streaming `--file` mode for encode.jl CLI
+- Performance baseline tests and expanded edge case / unicode tests
+
+### Changed
+- CI now runs examples as smoke tests
+- Export list reorganized into logical groups
+- Regex patterns documented with component breakdowns
+- README expanded with caching, validation, and statistics API reference
+
 ## [0.3.0] - 2026-06-27
 
 ### Added
