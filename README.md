@@ -248,9 +248,11 @@ See the `examples/` directory for runnable scripts:
 - `examples/custom_tokenizer.jl` — full workflow with special tokens and save/load
 - `examples/multilingual.jl` — training on multilingual text with Unicode normalization
 - `examples/streaming_encode.jl` — streaming file encoding with progress tracking
+- `examples/training_comparison.jl` — side-by-side BPE vs WordPiece vs Unigram
 
 ```bash
 julia examples/basic_training.jl
+# or run all: make examples
 ```
 
 ## CLI scripts
