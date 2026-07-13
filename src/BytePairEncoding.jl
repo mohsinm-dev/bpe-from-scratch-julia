@@ -30,7 +30,7 @@ export pretokenize, count_frequencies_pretokenized, tokenize,
 export build_vocab_index, tokens_to_ids, ids_to_tokens, add_special_tokens
 
 # --- Sequence utilities ---
-export pad_sequence, truncate_sequence, prepare_batch
+export pad_sequence, truncate_sequence, prepare_batch, attention_mask
 
 # --- Byte-level BPE ---
 export text_to_bytes, bytes_to_text, train_byte_bpe
@@ -43,7 +43,8 @@ export compression_ratio, token_frequencies, vocab_size_history,
     most_common_tokens, average_token_length, coverage,
     token_length_distribution, subword_fertility, vocab_overlap,
     compare_tokenizers, compare_compression, format_merge_history,
-    token_entropy, vocabulary_coverage_report, oov_rate
+    token_entropy, vocabulary_coverage_report, oov_rate,
+    corpus_statistics
 
 # --- Subword regularization ---
 export nbest_encode, sample_segmentation
@@ -2048,6 +2049,34 @@ function oov_rate(tokens::Vector{String}, vocab_index::Dict{String,Int}; unk_tok
     isempty(tokens) && return 0.0
     unk_count = count(t -> !haskey(vocab_index, t), tokens)
     return unk_count / length(tokens)
+end
+
+
+"""
+    corpus_statistics(corpus) → NamedTuple
+
+Compute basic statistics about a text corpus: word count, character count,
+unique word count, and average word length.
+"""
+function corpus_statistics(corpus::String)
+    words = split(corpus)
+    word_count = length(words)
+    char_count = length(corpus)
+    unique_words = length(Set(words))
+    avg_word_length = word_count == 0 ? 0.0 : sum(length(String(w)) for w in words) / word_count
+    return (word_count=word_count, char_count=char_count,
+            unique_words=unique_words, avg_word_length=avg_word_length)
+end
+
+
+"""
+    attention_mask(ids; pad_id=0) → Vector{Int}
+
+Generate an attention mask for a sequence of token IDs.
+Returns 1 for real tokens and 0 for padding tokens.
+"""
+function attention_mask(ids::Vector{Int}; pad_id::Int=0)::Vector{Int}
+    return [id == pad_id ? 0 : 1 for id in ids]
 end
 
 end
