@@ -1220,6 +1220,28 @@ end
     @test stats3.size == 0
 end
 
+@testset "corpus_statistics" begin
+    stats = corpus_statistics("low low low lower lower lowest")
+    @test stats.word_count == 6
+    @test stats.char_count == length("low low low lower lower lowest")
+    @test stats.unique_words == 3
+    @test stats.avg_word_length > 0.0
+
+    # empty corpus
+    stats_empty = corpus_statistics("")
+    @test stats_empty.word_count == 0
+    @test stats_empty.avg_word_length == 0.0
+end
+
+@testset "attention_mask" begin
+    @test attention_mask([1, 2, 3, 0, 0]) == [1, 1, 1, 0, 0]
+    @test attention_mask([0, 0, 0]) == [0, 0, 0]
+    @test attention_mask([5, 10, 15]) == [1, 1, 1]
+    @test attention_mask(Int[]) == Int[]
+    # custom pad_id
+    @test attention_mask([1, 99, 99], pad_id=99) == [1, 0, 0]
+end
+
 @testset "performance: training completes in bounded time" begin
     # generate a reasonably sized corpus
     words = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
