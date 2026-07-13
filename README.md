@@ -337,6 +337,7 @@ julia scripts/playground.jl
 - `pad_sequence(ids, max_len; pad_id)` — right-pad sequence to fixed length
 - `truncate_sequence(ids, max_len)` — truncate sequence to max length
 - `prepare_batch(batch, max_len; pad_id)` — truncate and pad a batch of sequences
+- `attention_mask(ids; pad_id)` — generate 1/0 attention mask from padded sequences
 
 ### Pre-tokenization
 - `pretokenize(text; pattern)` — regex-based word splitting (GPT-2-style)
@@ -372,6 +373,7 @@ julia scripts/playground.jl
 - `token_entropy(tokens)` — Shannon entropy (bits) of token distribution
 - `vocabulary_coverage_report(text, merges)` — detailed coverage breakdown with uncovered words
 - `oov_rate(tokens, vocab_index)` — fraction of tokens not in vocabulary
+- `corpus_statistics(corpus)` — word count, character count, unique words, average word length
 
 ### Caching
 - `CachedEncoder(merges; max_size)` — create a cached encoder for repeated words
