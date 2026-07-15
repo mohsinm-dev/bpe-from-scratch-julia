@@ -663,18 +663,20 @@ end
 
 
 """
-    pad_sequence(ids, max_len; pad_id=0) → Vector{Int}
+    pad_sequence(ids, max_len; pad_id=0, side=:right) → Vector{Int}
 
-Right-pad a sequence of integer IDs to a fixed length.
+Pad a sequence of integer IDs to a fixed length.
 
+`side=:right` appends padding (default), `side=:left` prepends padding.
 If the sequence is already longer than `max_len`, it is returned unchanged.
 """
-function pad_sequence(ids::Vector{Int}, max_len::Int; pad_id::Int=0)::Vector{Int}
+function pad_sequence(ids::Vector{Int}, max_len::Int; pad_id::Int=0, side::Symbol=:right)::Vector{Int}
     current_len = length(ids)
     if current_len >= max_len
         return copy(ids)
     end
-    return vcat(ids, fill(pad_id, max_len - current_len))
+    padding = fill(pad_id, max_len - current_len)
+    return side == :left ? vcat(padding, ids) : vcat(ids, padding)
 end
 
 
