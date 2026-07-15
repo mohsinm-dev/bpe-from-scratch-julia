@@ -352,6 +352,9 @@ end
     @test pad_sequence([1, 2, 3, 4], 2) == [1, 2, 3, 4]
     # empty input
     @test pad_sequence(Int[], 3) == [0, 0, 0]
+    # left padding
+    @test pad_sequence([1, 2, 3], 5, side=:left) == [0, 0, 1, 2, 3]
+    @test pad_sequence([1, 2], 4, pad_id=99, side=:left) == [99, 99, 1, 2]
 end
 
 @testset "truncate_sequence" begin
@@ -1218,6 +1221,19 @@ end
     @test stats3.hits == 0
     @test stats3.misses == 0
     @test stats3.size == 0
+end
+
+@testset "prune_vocabulary" begin
+    index = Dict("lo" => 1, "w" => 2, "</w>" => 3, "er" => 4, "low" => 5)
+    tokens = ["lo", "w", "</w>", "lo", "w", "</w>", "low", "</w>"]
+    pruned = prune_vocabulary(index, tokens, 2)
+    # "lo", "w", "</w>" appear >= 2 times, "er" appears 0 but is 2 chars so pruned
+    @test haskey(pruned, "lo")
+    @test haskey(pruned, "w")
+    @test haskey(pruned, "</w>")
+    @test !haskey(pruned, "er")
+    # single-char tokens always kept
+    @test haskey(pruned, "w")
 end
 
 @testset "corpus_statistics" begin
