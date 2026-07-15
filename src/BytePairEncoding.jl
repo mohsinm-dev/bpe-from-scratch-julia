@@ -27,7 +27,8 @@ export pretokenize, count_frequencies_pretokenized, tokenize,
     LLAMA_PATTERN, CLIP_PATTERN
 
 # --- Token-to-ID mapping ---
-export build_vocab_index, tokens_to_ids, ids_to_tokens, add_special_tokens
+export build_vocab_index, tokens_to_ids, ids_to_tokens, add_special_tokens,
+    prune_vocabulary
 
 # --- Sequence utilities ---
 export pad_sequence, truncate_sequence, prepare_batch, attention_mask
@@ -2051,6 +2052,27 @@ function oov_rate(tokens::Vector{String}, vocab_index::Dict{String,Int}; unk_tok
     isempty(tokens) && return 0.0
     unk_count = count(t -> !haskey(vocab_index, t), tokens)
     return unk_count / length(tokens)
+end
+
+
+"""
+    prune_vocabulary(vocab_index, tokens, min_count) → Dict{String,Int}
+
+Remove tokens from a vocabulary index that appear fewer than `min_count` times
+in the given token list. Single-character tokens are always kept to guarantee
+encodability.
+"""
+function prune_vocabulary(vocab_index::Dict{String,Int}, tokens::Vector{String}, min_count::Int)::Dict{String,Int}
+    freqs = token_frequencies(tokens)
+    pruned = Dict{String,Int}()
+    id = 1
+    for (token, _) in sort(collect(vocab_index), by=x -> x[2])
+        if length(token) <= 1 || get(freqs, token, 0) >= min_count
+            pruned[token] = id
+            id += 1
+        end
+    end
+    return pruned
 end
 
 
