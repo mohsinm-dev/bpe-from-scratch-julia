@@ -192,6 +192,23 @@ println(format_merge_history(history))
 # ...
 ```
 
+### Reporting
+
+```julia
+# Quick overview of a trained tokenizer
+println(tokenizer_summary(tokenizer))
+# BPETokenizer Summary
+#   Vocabulary size: 42
+#   Merge rules:     10
+#   ...
+
+# Visual token length distribution
+println(token_length_histogram(tokenizer.vocab))
+#   1 | ########                  4
+#   2 | ################          8
+#   3 | ################################ 16
+```
+
 ### Extended vocabulary analysis
 
 ```julia
@@ -374,6 +391,8 @@ julia scripts/playground.jl
 - `vocabulary_coverage_report(text, merges)` — detailed coverage breakdown with uncovered words
 - `oov_rate(tokens, vocab_index)` — fraction of tokens not in vocabulary
 - `corpus_statistics(corpus)` — word count, character count, unique words, average word length
+- `tokenizer_summary(tokenizer)` — formatted overview of tokenizer state
+- `token_length_histogram(vocab)` — text bar chart of token length distribution
 
 ### Caching
 - `CachedEncoder(merges; max_size)` — create a cached encoder for repeated words
