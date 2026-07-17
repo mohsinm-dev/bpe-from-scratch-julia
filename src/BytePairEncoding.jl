@@ -45,7 +45,7 @@ export compression_ratio, token_frequencies, vocab_size_history,
     token_length_distribution, subword_fertility, vocab_overlap,
     compare_tokenizers, compare_compression, format_merge_history,
     token_entropy, vocabulary_coverage_report, oov_rate,
-    corpus_statistics, tokenizer_summary
+    corpus_statistics, tokenizer_summary, token_length_histogram
 
 # --- Subword regularization ---
 export nbest_encode, sample_segmentation
@@ -2090,6 +2090,28 @@ function corpus_statistics(corpus::String)
     avg_word_length = word_count == 0 ? 0.0 : sum(length(String(w)) for w in words) / word_count
     return (word_count=word_count, char_count=char_count,
             unique_words=unique_words, avg_word_length=avg_word_length)
+end
+
+
+"""
+    token_length_histogram(vocab; max_width=40) → String
+
+Render a text-based bar chart showing the distribution of token lengths
+in the vocabulary. Each line shows the length, count, and a bar of `#` chars
+scaled to `max_width`.
+"""
+function token_length_histogram(vocab::Set{String}; max_width::Int=40)::String
+    dist = token_length_distribution(vocab)
+    isempty(dist) && return ""
+    max_count = maximum(values(dist))
+    lines = String[]
+    for len in sort(collect(keys(dist)))
+        count = dist[len]
+        bar_len = max_count == 0 ? 0 : round(Int, count / max_count * max_width)
+        bar = "#" ^ bar_len
+        push!(lines, "$(lpad(len, 3)) | $(rpad(bar, max_width)) $(count)")
+    end
+    return join(lines, "\n")
 end
 
 
