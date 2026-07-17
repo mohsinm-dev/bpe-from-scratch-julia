@@ -45,7 +45,7 @@ export compression_ratio, token_frequencies, vocab_size_history,
     token_length_distribution, subword_fertility, vocab_overlap,
     compare_tokenizers, compare_compression, format_merge_history,
     token_entropy, vocabulary_coverage_report, oov_rate,
-    corpus_statistics
+    corpus_statistics, tokenizer_summary
 
 # --- Subword regularization ---
 export nbest_encode, sample_segmentation
@@ -2090,6 +2090,24 @@ function corpus_statistics(corpus::String)
     avg_word_length = word_count == 0 ? 0.0 : sum(length(String(w)) for w in words) / word_count
     return (word_count=word_count, char_count=char_count,
             unique_words=unique_words, avg_word_length=avg_word_length)
+end
+
+
+"""
+    tokenizer_summary(t::BPETokenizer) → String
+
+Return a formatted summary string with key tokenizer statistics:
+vocabulary size, merge count, and special tokens.
+"""
+function tokenizer_summary(t::BPETokenizer)::String
+    lines = String[]
+    push!(lines, "BPETokenizer Summary")
+    push!(lines, "  Vocabulary size: $(length(t.vocab))")
+    push!(lines, "  Merge rules:     $(length(t.merges))")
+    push!(lines, "  Special tokens:  $(join(t.special_tokens, ", "))")
+    avg_len = average_token_length(t.vocab)
+    push!(lines, "  Avg token length: $(round(avg_len, digits=2))")
+    return join(lines, "\n")
 end
 
 
