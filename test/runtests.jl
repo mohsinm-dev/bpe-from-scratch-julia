@@ -1223,6 +1223,26 @@ end
     @test stats3.size == 0
 end
 
+@testset "tokenizer_summary" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    summary = tokenizer_summary(t)
+    @test occursin("Vocabulary size:", summary)
+    @test occursin("Merge rules:", summary)
+    @test occursin("Special tokens:", summary)
+    @test occursin("Avg token length:", summary)
+end
+
+@testset "token_length_histogram" begin
+    vocab = Set(["a", "ab", "abc", "de", "f"])
+    hist = token_length_histogram(vocab)
+    @test occursin("#", hist)
+    @test occursin("1", hist)
+    @test occursin("2", hist)
+    # empty vocab
+    @test token_length_histogram(Set{String}()) == ""
+end
+
 @testset "prune_vocabulary" begin
     index = Dict("lo" => 1, "w" => 2, "</w>" => 3, "er" => 4, "low" => 5)
     tokens = ["lo", "w", "</w>", "lo", "w", "</w>", "low", "</w>"]
