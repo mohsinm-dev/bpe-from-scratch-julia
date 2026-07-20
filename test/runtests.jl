@@ -1223,6 +1223,25 @@ end
     @test stats3.size == 0
 end
 
+@testset "save_tokenizer_json and load_tokenizer_json" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    tmpfile = tempname() * ".json"
+    try
+        save_tokenizer_json(t, tmpfile)
+        t2 = load_tokenizer_json(tmpfile)
+        @test t2.merges == t.merges
+        @test t2.vocab_index == t.vocab_index
+        @test t2.special_tokens == t.special_tokens
+        # encode produces same results
+        @test encode(t2, "low lower") == encode(t, "low lower")
+    finally
+        isfile(tmpfile) && rm(tmpfile)
+    end
+    # missing file
+    @test_throws TokenizerError load_tokenizer_json("nonexistent.json")
+end
+
 @testset "tokenizer_summary" begin
     corpus = "low low low lower lower lowest"
     t = train_tokenizer(corpus, 10)

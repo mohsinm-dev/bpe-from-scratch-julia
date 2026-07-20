@@ -939,10 +939,27 @@ function load_tokenizer_json(filepath::String)::BPETokenizer
     end
     text = read(filepath, String)
 
-    # parse merges: find all ["x", "y"] pairs
+    # parse merges: extract content between "merges": [ and the matching ]
     merges = Tuple{String,String}[]
-    for m in eachmatch(r"\[\"([^\"]*)\",\s*\"([^\"]*)\"\]", text)
-        push!(merges, (m.captures[1], m.captures[2]))
+    merges_start = findfirst("\"merges\"", text)
+    if merges_start !== nothing
+        bracket_start = findnext('[', text, last(merges_start))
+        if bracket_start !== nothing
+            depth = 1
+            pos = bracket_start + 1
+            while pos <= length(text) && depth > 0
+                if text[pos] == '['
+                    depth += 1
+                elseif text[pos] == ']'
+                    depth -= 1
+                end
+                pos += 1
+            end
+            merges_text = text[bracket_start+1:pos-2]
+            for m in eachmatch(r"\[\"([^\"]*)\",\s*\"([^\"]*)\"\]", merges_text)
+                push!(merges, (m.captures[1], m.captures[2]))
+            end
+        end
     end
 
     # parse vocab: find "token": id pairs inside "vocab": { ... }
