@@ -6,7 +6,8 @@ export TokenizerError, BPETokenizer, TokenizerConfig, MergeRecord, CachedEncoder
 # --- Preprocessing & I/O ---
 export preprocess_text, load_corpus, normalize_unicode, is_valid_utf8,
     save_merges, load_merges, save_vocab, save_vocab_index, load_vocab_index,
-    save_config, load_config, save_tokenizer, load_tokenizer
+    save_config, load_config, save_tokenizer, load_tokenizer,
+    save_tokenizer_json, load_tokenizer_json
 
 # --- Core BPE training ---
 export word_to_symbols, word_to_graphemes, count_word_frequencies, initialize_word_symbols,
@@ -890,6 +891,82 @@ function load_tokenizer(dir::String)::BPETokenizer
         @warn "tokenizer validation: $w"
     end
     return t
+end
+
+
+"""
+    save_tokenizer_json(t::BPETokenizer, filepath)
+
+Save a tokenizer to a single JSON file containing merges, vocabulary index,
+and special tokens.
+"""
+function save_tokenizer_json(t::BPETokenizer, filepath::String)
+    open(filepath, "w") do io
+        println(io, "{")
+        # merges
+        println(io, "  \"merges\": [")
+        for (i, (a, b)) in enumerate(t.merges)
+            comma = i < length(t.merges) ? "," : ""
+            println(io, "    [\"$(a)\", \"$(b)\"]$comma")
+        end
+        println(io, "  ],")
+        # vocab_index
+        sorted_vocab = sort(collect(t.vocab_index), by=x -> x[2])
+        println(io, "  \"vocab\": {")
+        for (i, (token, id)) in enumerate(sorted_vocab)
+            comma = i < length(sorted_vocab) ? "," : ""
+            escaped = replace(token, "\"" => "\\\"")
+            println(io, "    \"$(escaped)\": $(id)$comma")
+        end
+        println(io, "  },")
+        # special tokens
+        st = join(["\"$t\"" for t in t.special_tokens], ", ")
+        println(io, "  \"special_tokens\": [$st]")
+        println(io, "}")
+    end
+end
+
+
+"""
+    load_tokenizer_json(filepath) → BPETokenizer
+
+Load a tokenizer from a single JSON file saved by `save_tokenizer_json`.
+Uses regex-based parsing to avoid external JSON dependencies.
+"""
+function load_tokenizer_json(filepath::String)::BPETokenizer
+    if !isfile(filepath)
+        throw(TokenizerError("tokenizer JSON file not found: $filepath"))
+    end
+    text = read(filepath, String)
+
+    # parse merges: find all ["x", "y"] pairs
+    merges = Tuple{String,String}[]
+    for m in eachmatch(r"\[\"([^\"]*)\",\s*\"([^\"]*)\"\]", text)
+        push!(merges, (m.captures[1], m.captures[2]))
+    end
+
+    # parse vocab: find "token": id pairs inside "vocab": { ... }
+    vocab_match = match(r"\"vocab\"\s*:\s*\{([^}]*)\}", text)
+    vocab_index = Dict{String,Int}()
+    if vocab_match !== nothing
+        for m in eachmatch(r"\"([^\"]*)\"\s*:\s*(\d+)", vocab_match.captures[1])
+            token = replace(m.captures[1], "\\\"" => "\"")
+            vocab_index[token] = parse(Int, m.captures[2])
+        end
+    end
+
+    # parse special_tokens
+    st_match = match(r"\"special_tokens\"\s*:\s*\[([^\]]*)\]", text)
+    special_tokens = String[]
+    if st_match !== nothing
+        for m in eachmatch(r"\"([^\"]+)\"", st_match.captures[1])
+            push!(special_tokens, m.captures[1])
+        end
+    end
+
+    vocab = Set(keys(vocab_index))
+    id_to_token = Dict{Int,String}(v => k for (k, v) in vocab_index)
+    return BPETokenizer(merges, vocab, vocab_index, id_to_token, special_tokens)
 end
 
 
