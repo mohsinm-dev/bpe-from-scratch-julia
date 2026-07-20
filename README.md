@@ -174,6 +174,17 @@ scores = train_unigram(corpus, 50)                     # train vocab with scores
 tokens = viterbi_segment("lower", scores)               # optimal segmentation
 ```
 
+### JSON tokenizer export
+
+```julia
+# Save everything to a single JSON file
+save_tokenizer_json(tokenizer, "tokenizer.json")
+
+# Load it back
+loaded = load_tokenizer_json("tokenizer.json")
+@assert encode(loaded, "test") == encode(tokenizer, "test")
+```
+
 ### Configuration files
 
 ```julia
@@ -334,6 +345,8 @@ julia scripts/playground.jl
 - `decode(tokenizer, ids)` — convert IDs back to text
 - `save_tokenizer(tokenizer, dir)` — save tokenizer state to directory
 - `load_tokenizer(dir)` — load tokenizer from directory
+- `save_tokenizer_json(tokenizer, path)` — save to single JSON file
+- `load_tokenizer_json(path)` — load from JSON file
 
 ### Encoding and decoding
 - `encode_word(word, merges)` — tokenize a single word using learned merges
