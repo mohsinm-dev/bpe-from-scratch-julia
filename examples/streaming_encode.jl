@@ -21,3 +21,11 @@ end)
 
 println("\nDone. $(length(tokens)) tokens total from streaming encode.")
 println("First 10 tokens: $(tokens[1:min(10, length(tokens))])")
+
+# Batch streaming: process file in chunks
+println("\n--- Batch streaming (batch_size=3) ---")
+batches = encode_streaming_batch(corpus_path, merges, batch_size=3)
+for (i, batch) in enumerate(batches)
+    println("  batch $i: $(length(batch)) tokens")
+end
+println("$(length(batches)) batches total.")
