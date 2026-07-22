@@ -1223,6 +1223,30 @@ end
     @test stats3.size == 0
 end
 
+@testset "decode_to_words" begin
+    tokens = ["low", "</w>", "er", "</w>"]
+    @test decode_to_words(tokens) == ["low", "er"]
+    # trailing tokens without </w>
+    @test decode_to_words(["h", "i"]) == ["hi"]
+    # empty
+    @test decode_to_words(String[]) == String[]
+    # single word
+    @test decode_to_words(["hello", "</w>"]) == ["hello"]
+end
+
+@testset "encode_streaming_batch" begin
+    corpus_path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    corpus = load_corpus(corpus_path)
+    _, merges = train_bpe(corpus, 10)
+
+    batches = encode_streaming_batch(corpus_path, merges, batch_size=2)
+    @test length(batches) >= 1
+    @test all(b -> length(b) > 0, batches)
+
+    # missing file
+    @test_throws TokenizerError encode_streaming_batch("nonexistent.txt", merges)
+end
+
 @testset "save_tokenizer_json and load_tokenizer_json" begin
     corpus = "low low low lower lower lowest"
     t = train_tokenizer(corpus, 10)
