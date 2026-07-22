@@ -21,7 +21,8 @@ export train_tokenizer, encode, decode, train_from_config
 # --- Encoding & decoding ---
 export encode_word, encode_text, decode_tokens, encode_batch,
     encode_word_with_dropout, encode_with_protected_tokens,
-    encode_byte_level, encode_streaming
+    encode_byte_level, encode_streaming,
+    decode_to_words, encode_streaming_batch
 
 # --- Pre-tokenization ---
 export pretokenize, count_frequencies_pretokenized, tokenize,
@@ -416,6 +417,32 @@ function decode_tokens(tokens::Vector{String})::String
     text = join(tokens, "")
     text = replace(text, "</w>" => " ")
     return strip(text) |> String
+end
+
+
+"""
+    decode_to_words(tokens) → Vector{String}
+
+Split a BPE token sequence into individual words by grouping tokens
+at `</w>` boundaries. Each group of tokens up to and including a `</w>`
+marker forms one word.
+"""
+function decode_to_words(tokens::Vector{String})::Vector{String}
+    words = String[]
+    current = String[]
+    for token in tokens
+        if token == "</w>"
+            push!(words, join(current))
+            current = String[]
+        else
+            push!(current, token)
+        end
+    end
+    # trailing tokens without </w>
+    if !isempty(current)
+        push!(words, join(current))
+    end
+    return words
 end
 
 
