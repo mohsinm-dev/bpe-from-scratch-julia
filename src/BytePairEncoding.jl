@@ -2050,6 +2050,44 @@ end
 
 
 """
+    encode_streaming_batch(filepath, merges; batch_size=100) → Vector{Vector{String}}
+
+Encode a text file in batches, returning one token sequence per batch of lines.
+Useful for processing large files in chunks without loading everything into memory.
+"""
+function encode_streaming_batch(
+    filepath::String,
+    merges::Vector{Tuple{String,String}};
+    batch_size::Int=100
+)::Vector{Vector{String}}
+    if !isfile(filepath)
+        throw(TokenizerError("file not found: $filepath"))
+    end
+    batches = Vector{String}[]
+    current_batch = String[]
+    line_count = 0
+    open(filepath, "r") do io
+        for line in eachline(io)
+            stripped = strip(line)
+            isempty(stripped) && continue
+            tokens = encode_text(String(stripped), merges)
+            append!(current_batch, tokens)
+            line_count += 1
+            if line_count >= batch_size
+                push!(batches, current_batch)
+                current_batch = String[]
+                line_count = 0
+            end
+        end
+    end
+    if !isempty(current_batch)
+        push!(batches, current_batch)
+    end
+    return batches
+end
+
+
+"""
     CachedEncoder
 
 Wraps a set of BPE merges with an LRU-style cache for repeated word encodings.
