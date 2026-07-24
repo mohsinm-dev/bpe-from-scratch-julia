@@ -15,7 +15,7 @@ end
     corpus = load_corpus(path)
     @test length(corpus) > 0
     @test occursin("low", corpus)
-    @test_throws ErrorException load_corpus("nonexistent_file.txt")
+    @test_throws TokenizerError load_corpus("nonexistent_file.txt")
 end
 
 @testset "normalize_unicode" begin
@@ -142,7 +142,7 @@ end
     finally
         isfile(tmpfile) && rm(tmpfile)
     end
-    @test_throws ErrorException load_merges("nonexistent_merges.txt")
+    @test_throws TokenizerError load_merges("nonexistent_merges.txt")
 end
 
 @testset "save_vocab" begin
@@ -317,7 +317,7 @@ end
     finally
         isfile(tmpfile) && rm(tmpfile)
     end
-    @test_throws ErrorException load_vocab_index("nonexistent_vocab_index.txt")
+    @test_throws TokenizerError load_vocab_index("nonexistent_vocab_index.txt")
 end
 
 @testset "token-to-ID round-trip" begin
@@ -485,7 +485,7 @@ end
     end
 
     # load_tokenizer error on missing dir
-    @test_throws ErrorException load_tokenizer("nonexistent_tokenizer_dir")
+    @test_throws TokenizerError load_tokenizer("nonexistent_tokenizer_dir")
 
     # custom special tokens
     t3 = train_tokenizer(corpus, 5, special_tokens=["<bos>", "<eos>"])
@@ -963,12 +963,12 @@ end
 end
 
 @testset "error recovery: corrupted and missing files" begin
-    # missing files raise errors
-    @test_throws ErrorException load_merges("does_not_exist.tsv")
-    @test_throws ErrorException load_vocab_index("does_not_exist.tsv")
-    @test_throws ErrorException load_corpus("does_not_exist.txt")
+    # missing files raise TokenizerError
+    @test_throws TokenizerError load_merges("does_not_exist.tsv")
+    @test_throws TokenizerError load_vocab_index("does_not_exist.tsv")
+    @test_throws TokenizerError load_corpus("does_not_exist.txt")
     @test_throws ErrorException load_config("does_not_exist.json")
-    @test_throws ErrorException load_tokenizer("does_not_exist_dir")
+    @test_throws TokenizerError load_tokenizer("does_not_exist_dir")
     @test_throws ErrorException count_word_frequencies_streaming("does_not_exist.txt")
 
     # malformed merges file (missing tab separator) loads with zero entries
