@@ -123,7 +123,7 @@ Raises an error if the file does not exist.
 """
 function load_corpus(filepath::String)::String
     if !isfile(filepath)
-        error("corpus file not found: $filepath")
+        throw(TokenizerError("corpus file not found: $filepath"))
     end
     return strip(read(filepath, String)) |> String
 end
@@ -168,9 +168,11 @@ Example:
 "low lower lowest lower" -> Dict("low" => 1, "lower" => 2, "lowest" => 1)
 """
 function count_word_frequencies(corpus::String)::Dict{String,Int}
+    words = split(corpus)
     frequencies = Dict{String,Int}()
+    sizehint!(frequencies, length(words))
 
-    for word in split(corpus)
+    for word in words
         current_count = get(frequencies, word, 0)
         frequencies[word] = current_count + 1
     end
@@ -213,6 +215,7 @@ function count_pairs(
     word_symbols::Dict{Vector{String},Int},
 )::Dict{Tuple{String,String},Int}
     pair_counts = Dict{Tuple{String,String},Int}()
+    sizehint!(pair_counts, length(word_symbols) * 4)
 
     for (symbols, frequency) in word_symbols
         if length(symbols) < 2
@@ -469,7 +472,7 @@ Raises an error if the file does not exist.
 """
 function load_merges(filepath::String)::Vector{Tuple{String,String}}
     if !isfile(filepath)
-        error("merges file not found: $filepath")
+        throw(TokenizerError("merges file not found: $filepath"))
     end
     merges = Tuple{String,String}[]
     for line in eachline(filepath)
@@ -678,7 +681,7 @@ Raises an error if the file does not exist.
 """
 function load_vocab_index(filepath::String)::Dict{String,Int}
     if !isfile(filepath)
-        error("vocab index file not found: $filepath")
+        throw(TokenizerError("vocab index file not found: $filepath"))
     end
     index = Dict{String,Int}()
     for line in eachline(filepath)
@@ -898,7 +901,7 @@ Raises an error if the directory does not exist.
 """
 function load_tokenizer(dir::String)::BPETokenizer
     if !isdir(dir)
-        error("tokenizer directory not found: $dir")
+        throw(TokenizerError("tokenizer directory not found: $dir"))
     end
     merges = load_merges(joinpath(dir, "merges.tsv"))
     vocab_index = load_vocab_index(joinpath(dir, "vocab_index.tsv"))
