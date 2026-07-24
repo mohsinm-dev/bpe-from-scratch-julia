@@ -963,13 +963,21 @@ end
 end
 
 @testset "error recovery: corrupted and missing files" begin
-    # missing files raise TokenizerError
+    # missing files raise TokenizerError with descriptive messages
     @test_throws TokenizerError load_merges("does_not_exist.tsv")
     @test_throws TokenizerError load_vocab_index("does_not_exist.tsv")
     @test_throws TokenizerError load_corpus("does_not_exist.txt")
     @test_throws ErrorException load_config("does_not_exist.json")
     @test_throws TokenizerError load_tokenizer("does_not_exist_dir")
     @test_throws ErrorException count_word_frequencies_streaming("does_not_exist.txt")
+
+    # verify error messages contain the filepath
+    try
+        load_corpus("missing_file.txt")
+    catch e
+        @test e isa TokenizerError
+        @test occursin("missing_file.txt", e.msg)
+    end
 
     # malformed merges file (missing tab separator) loads with zero entries
     tmpfile = tempname()
