@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        julia-version: ['1.9', '1.10', '1']
+        julia-version: ['1.9', '1.10', '1.11', '1']
     steps:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@v2
@@ -27,3 +27,4 @@ jobs:
           julia examples/multilingual.jl
           julia examples/streaming_encode.jl
           julia examples/training_comparison.jl
+          julia examples/nlp_pipeline.jl
