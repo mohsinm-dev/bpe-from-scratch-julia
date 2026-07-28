@@ -4,7 +4,8 @@ module BytePairEncoding
 export TokenizerError, BPETokenizer, TokenizerConfig, MergeRecord, CachedEncoder
 
 # --- Preprocessing & I/O ---
-export preprocess_text, load_corpus, normalize_unicode, is_valid_utf8,
+export preprocess_text, load_corpus, corpus_from_directory,
+    normalize_unicode, is_valid_utf8,
     save_merges, load_merges, save_vocab, save_vocab_index, load_vocab_index,
     save_config, load_config, save_tokenizer, load_tokenizer,
     save_tokenizer_json, load_tokenizer_json
@@ -126,6 +127,27 @@ function load_corpus(filepath::String)::String
         throw(TokenizerError("corpus file not found: $filepath"))
     end
     return strip(read(filepath, String)) |> String
+end
+
+
+"""
+    corpus_from_directory(dirpath; extension=".txt") → String
+
+Read and concatenate all files with the given extension from a directory
+into a single corpus string, separated by newlines.
+"""
+function corpus_from_directory(dirpath::String; extension::String=".txt")::String
+    if !isdir(dirpath)
+        throw(TokenizerError("directory not found: $dirpath"))
+    end
+    parts = String[]
+    for fname in sort(readdir(dirpath))
+        endswith(fname, extension) || continue
+        content = strip(read(joinpath(dirpath, fname), String))
+        isempty(content) && continue
+        push!(parts, String(content))
+    end
+    return join(parts, "\n")
 end
 
 
