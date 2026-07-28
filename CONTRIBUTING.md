@@ -28,6 +28,33 @@ Requires Julia 1.9 or later.
 4. Update the README with usage examples.
 5. Update `CHANGELOG.md`.
 
+## Benchmarks
+
+If your change affects performance, run the relevant benchmarks before and after:
+
+```bash
+julia benchmarks/training.jl
+julia benchmarks/encoding.jl
+```
+
+Or run all benchmarks at once: `make bench`
+
+Include benchmark results in your PR description if you claim a performance improvement.
+
+## Testing
+
+Run the full test suite:
+
+```bash
+julia test/runtests.jl
+```
+
+Smoke-test examples to make sure they still run:
+
+```bash
+make examples
+```
+
 ## Reporting issues
 
 Open an issue with:
