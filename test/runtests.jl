@@ -1231,6 +1231,32 @@ end
     @test stats3.size == 0
 end
 
+@testset "corpus_from_directory" begin
+    dir = mktempdir()
+    try
+        open(joinpath(dir, "a.txt"), "w") do io
+            print(io, "hello world")
+        end
+        open(joinpath(dir, "b.txt"), "w") do io
+            print(io, "foo bar")
+        end
+        open(joinpath(dir, "c.md"), "w") do io
+            print(io, "ignored")
+        end
+        corpus = corpus_from_directory(dir)
+        @test occursin("hello world", corpus)
+        @test occursin("foo bar", corpus)
+        @test !occursin("ignored", corpus)
+        # custom extension
+        corpus_md = corpus_from_directory(dir, extension=".md")
+        @test occursin("ignored", corpus_md)
+    finally
+        rm(dir, recursive=true)
+    end
+    # missing directory
+    @test_throws TokenizerError corpus_from_directory("nonexistent_dir")
+end
+
 @testset "decode_to_words" begin
     tokens = ["low", "</w>", "er", "</w>"]
     @test decode_to_words(tokens) == ["low", "er"]
