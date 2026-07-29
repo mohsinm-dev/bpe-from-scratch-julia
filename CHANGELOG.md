@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-07-29
+
+### Added
+- `corpus_statistics()` for quick corpus profiling (word count, unique words, avg length)
+- `attention_mask()` generates 1/0 masks from padded token sequences
+- `prune_vocabulary()` removes infrequent tokens while preserving single-char tokens
+- `tokenizer_summary()` prints a formatted overview of tokenizer state
+- `token_length_histogram()` renders a text bar chart of token length distribution
+- `save_tokenizer_json` / `load_tokenizer_json` for single-file JSON export/import
+- `decode_to_words()` splits token sequences at `</w>` boundaries into words
+- `encode_streaming_batch()` encodes files in configurable batch sizes
+- `corpus_from_directory()` loads and concatenates text files from a folder
+- Left-pad support via `side=:left` kwarg on `pad_sequence`
+- NLP pipeline example (`examples/nlp_pipeline.jl`)
+- Batch streaming demo in streaming encode example
+- Julia 1.11 added to CI test matrix
+
+### Changed
+- `load_corpus`, `load_merges`, `load_vocab_index`, `load_tokenizer` now throw `TokenizerError` instead of generic `error()` for consistent error handling
+- `count_pairs` and `count_word_frequencies` use `sizehint!` for fewer hash resizes
+- `.editorconfig` extended with Makefile and TOML settings
+- CONTRIBUTING.md expanded with benchmarking and testing guidance
+
 ## [0.3.1] - 2026-07-12
 
 ### Added
