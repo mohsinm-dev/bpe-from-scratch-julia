@@ -343,6 +343,7 @@ julia scripts/playground.jl
 - `train_tokenizer(corpus, num_merges; special_tokens, verbose, min_frequency)` — train a complete tokenizer
 - `encode(tokenizer, text)` — tokenize text to integer IDs
 - `decode(tokenizer, ids)` — convert IDs back to text
+- `batch_decode(tokenizer, batch_ids)` — decode multiple ID sequences at once
 - `save_tokenizer(tokenizer, dir)` — save tokenizer state to directory
 - `load_tokenizer(dir)` — load tokenizer from directory
 - `save_tokenizer_json(tokenizer, path)` — save to single JSON file
