@@ -61,6 +61,7 @@ export validate_merges, validate_vocab_index, validate_tokenizer
 
 # --- Caching ---
 export cached_encode_word, cache_stats, clear_cache!
+export batch_decode
 
 
 using Unicode
@@ -2325,6 +2326,16 @@ Returns 1 for real tokens and 0 for padding tokens.
 """
 function attention_mask(ids::Vector{Int}; pad_id::Int=0)::Vector{Int}
     return [id == pad_id ? 0 : 1 for id in ids]
+end
+
+
+"""
+    batch_decode(t::BPETokenizer, batch_ids) → Vector{String}
+
+Decode multiple ID sequences back to text strings.
+"""
+function batch_decode(t::BPETokenizer, batch_ids::Vector{Vector{Int}})::Vector{String}
+    return [decode(t, ids) for ids in batch_ids]
 end
 
 end
