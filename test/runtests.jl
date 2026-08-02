@@ -1375,3 +1375,13 @@ end
     @test length(tokens) > 0
     @test t2 < 10.0
 end
+
+@testset "batch_decode" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    ids1 = encode(t, "low")
+    ids2 = encode(t, "lower")
+    results = batch_decode(t, [ids1, ids2])
+    @test results == ["low", "lower"]
+    @test batch_decode(t, Vector{Int}[]) == String[]
+end
