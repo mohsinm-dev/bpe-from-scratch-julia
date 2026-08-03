@@ -1385,3 +1385,15 @@ end
     @test results == ["low", "lower"]
     @test batch_decode(t, Vector{Int}[]) == String[]
 end
+
+@testset "token_pair_statistics" begin
+    tokens = ["lo", "w", "</w>", "lo", "w", "er", "</w>"]
+    stats = token_pair_statistics(tokens)
+    @test stats[("lo", "w")] == 2
+    @test stats[("w", "</w>")] == 1
+    @test stats[("w", "er")] == 1
+    # single token
+    @test token_pair_statistics(["a"]) == Dict{Tuple{String,String},Int}()
+    # empty
+    @test token_pair_statistics(String[]) == Dict{Tuple{String,String},Int}()
+end
