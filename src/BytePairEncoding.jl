@@ -62,6 +62,7 @@ export validate_merges, validate_vocab_index, validate_tokenizer
 # --- Caching ---
 export cached_encode_word, cache_stats, clear_cache!
 export batch_decode
+export token_pair_statistics
 
 
 using Unicode
@@ -2336,6 +2337,22 @@ Decode multiple ID sequences back to text strings.
 """
 function batch_decode(t::BPETokenizer, batch_ids::Vector{Vector{Int}})::Vector{String}
     return [decode(t, ids) for ids in batch_ids]
+end
+
+
+"""
+    token_pair_statistics(tokens) → Dict{Tuple{String,String},Int}
+
+Count adjacent token pairs in an encoded sequence. Useful for analyzing
+which subword combinations appear most frequently after encoding.
+"""
+function token_pair_statistics(tokens::Vector{String})::Dict{Tuple{String,String},Int}
+    pairs = Dict{Tuple{String,String},Int}()
+    for i in 1:(length(tokens)-1)
+        pair = (tokens[i], tokens[i+1])
+        pairs[pair] = get(pairs, pair, 0) + 1
+    end
+    return pairs
 end
 
 end
