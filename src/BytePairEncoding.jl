@@ -64,6 +64,7 @@ export cached_encode_word, cache_stats, clear_cache!
 export batch_decode
 export token_pair_statistics
 export filter_vocabulary
+export encode_with_cache
 
 
 using Unicode
@@ -2365,6 +2366,24 @@ Useful for analyzing or pruning vocabularies by token size.
 """
 function filter_vocabulary(vocab::Set{String}; min_length::Int=1, max_length::Int=typemax(Int))::Set{String}
     return Set(t for t in vocab if min_length <= length(t) <= max_length)
+end
+
+
+"""
+    encode_with_cache(text, enc::CachedEncoder) → Vector{String}
+
+Encode a full text string using a CachedEncoder for word-level caching.
+Each unique word is encoded once and cached for subsequent occurrences.
+"""
+function encode_with_cache(text::String, enc::CachedEncoder)::Vector{String}
+    if isempty(text)
+        return String[]
+    end
+    tokens = String[]
+    for word in split(text)
+        append!(tokens, cached_encode_word(enc, String(word)))
+    end
+    return tokens
 end
 
 end
