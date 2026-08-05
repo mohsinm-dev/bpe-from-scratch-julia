@@ -63,6 +63,7 @@ export validate_merges, validate_vocab_index, validate_tokenizer
 export cached_encode_word, cache_stats, clear_cache!
 export batch_decode
 export token_pair_statistics
+export filter_vocabulary
 
 
 using Unicode
@@ -2353,6 +2354,17 @@ function token_pair_statistics(tokens::Vector{String})::Dict{Tuple{String,String
         pairs[pair] = get(pairs, pair, 0) + 1
     end
     return pairs
+end
+
+
+"""
+    filter_vocabulary(vocab; min_length=1, max_length=typemax(Int)) → Set{String}
+
+Filter a vocabulary set to only include tokens within the given length range.
+Useful for analyzing or pruning vocabularies by token size.
+"""
+function filter_vocabulary(vocab::Set{String}; min_length::Int=1, max_length::Int=typemax(Int))::Set{String}
+    return Set(t for t in vocab if min_length <= length(t) <= max_length)
 end
 
 end
