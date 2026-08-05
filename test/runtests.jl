@@ -1397,3 +1397,11 @@ end
     # empty
     @test token_pair_statistics(String[]) == Dict{Tuple{String,String},Int}()
 end
+
+@testset "filter_vocabulary" begin
+    vocab = Set(["a", "ab", "abc", "abcd", "</w>"])
+    @test filter_vocabulary(vocab, min_length=2) == Set(["ab", "abc", "abcd", "</w>"])
+    @test filter_vocabulary(vocab, max_length=2) == Set(["a", "ab"])
+    @test filter_vocabulary(vocab, min_length=2, max_length=3) == Set(["ab", "abc", "</w>"])
+    @test filter_vocabulary(Set{String}()) == Set{String}()
+end
