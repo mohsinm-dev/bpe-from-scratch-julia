@@ -1405,3 +1405,15 @@ end
     @test filter_vocabulary(vocab, min_length=2, max_length=3) == Set(["ab", "abc", "</w>"])
     @test filter_vocabulary(Set{String}()) == Set{String}()
 end
+
+@testset "encode_with_cache" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    enc = CachedEncoder(merges)
+    tokens = encode_with_cache("low lower low", enc)
+    @test length(tokens) > 0
+    @test decode_tokens(tokens) == "low lower low"
+    stats = cache_stats(enc)
+    @test stats.hits >= 1  # "low" encoded twice
+    @test encode_with_cache("", enc) == String[]
+end
