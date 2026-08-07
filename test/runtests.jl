@@ -1417,3 +1417,17 @@ end
     @test stats.hits >= 1  # "low" encoded twice
     @test encode_with_cache("", enc) == String[]
 end
+
+@testset "vocabulary_diff" begin
+    v1 = Set(["a", "b", "c"])
+    v2 = Set(["b", "c", "d", "e"])
+    diff = vocabulary_diff(v1, v2)
+    @test diff.added == Set(["d", "e"])
+    @test diff.removed == Set(["a"])
+    @test diff.common == Set(["b", "c"])
+    # identical vocabs
+    diff2 = vocabulary_diff(v1, v1)
+    @test isempty(diff2.added)
+    @test isempty(diff2.removed)
+    @test diff2.common == v1
+end
