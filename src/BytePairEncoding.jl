@@ -65,6 +65,7 @@ export batch_decode
 export token_pair_statistics
 export filter_vocabulary
 export encode_with_cache
+export vocabulary_diff
 
 
 using Unicode
@@ -2384,6 +2385,20 @@ function encode_with_cache(text::String, enc::CachedEncoder)::Vector{String}
         append!(tokens, cached_encode_word(enc, String(word)))
     end
     return tokens
+end
+
+
+"""
+    vocabulary_diff(vocab1, vocab2) → NamedTuple{(:added, :removed, :common)}
+
+Compare two vocabularies and return the tokens added, removed, and in common.
+Useful for tracking vocabulary changes between training runs.
+"""
+function vocabulary_diff(vocab1::Set{String}, vocab2::Set{String})
+    added = setdiff(vocab2, vocab1)
+    removed = setdiff(vocab1, vocab2)
+    common = intersect(vocab1, vocab2)
+    return (added=added, removed=removed, common=common)
 end
 
 end
