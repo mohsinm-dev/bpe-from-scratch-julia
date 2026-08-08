@@ -1441,3 +1441,22 @@ end
     @test par_results == seq_results
     @test parallel_encode_batch(String[], merges) == Vector{String}[]
 end
+
+@testset "corpus_from_files" begin
+    dir = mktempdir()
+    try
+        f1 = joinpath(dir, "a.txt")
+        f2 = joinpath(dir, "b.txt")
+        open(f1, "w") do io print(io, "hello world") end
+        open(f2, "w") do io print(io, "foo bar") end
+        corpus = corpus_from_files([f1, f2])
+        @test occursin("hello world", corpus)
+        @test occursin("foo bar", corpus)
+        # missing file
+        @test_throws TokenizerError corpus_from_files(["nonexistent.txt"])
+        # empty list
+        @test corpus_from_files(String[]) == ""
+    finally
+        rm(dir, recursive=true)
+    end
+end
