@@ -354,6 +354,7 @@ julia scripts/playground.jl
 - `encode_text(text, merges)` — tokenize a full text string
 - `decode_tokens(tokens)` — reconstruct text from BPE tokens
 - `encode_batch(texts, merges)` — encode multiple texts at once
+- `parallel_encode_batch(texts, merges)` — threaded batch encoding
 - `encode_word_with_dropout(word, merges; dropout)` — stochastic tokenization
 - `encode_streaming(filepath, merges; callback)` — encode a file line by line
 
@@ -381,6 +382,7 @@ julia scripts/playground.jl
 ### Preprocessing and I/O
 - `preprocess_text(text; lowercase)` — normalize text for training
 - `load_corpus(filepath)` — read a corpus from file
+- `corpus_from_files(filepaths)` — concatenate multiple text files into one corpus
 - `save_merges(merges, filepath)` — write merge rules to file
 - `load_merges(filepath)` — read merge rules from file
 - `save_vocab(vocab, filepath)` — export vocabulary to file
