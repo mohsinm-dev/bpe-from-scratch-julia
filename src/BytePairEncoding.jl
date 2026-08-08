@@ -66,6 +66,7 @@ export token_pair_statistics
 export filter_vocabulary
 export encode_with_cache
 export vocabulary_diff
+export parallel_encode_batch
 
 
 using Unicode
@@ -2399,6 +2400,25 @@ function vocabulary_diff(vocab1::Set{String}, vocab2::Set{String})
     removed = setdiff(vocab1, vocab2)
     common = intersect(vocab1, vocab2)
     return (added=added, removed=removed, common=common)
+end
+
+
+"""
+    parallel_encode_batch(texts, merges) → Vector{Vector{String}}
+
+Encode multiple texts using threads when available. Falls back to
+sequential `encode_batch` when threading is not beneficial.
+"""
+function parallel_encode_batch(texts::Vector{String}, merges::Vector{Tuple{String,String}})::Vector{Vector{String}}
+    n = length(texts)
+    if n < 10 || Threads.nthreads() <= 1
+        return encode_batch(texts, merges)
+    end
+    results = Vector{Vector{String}}(undef, n)
+    Threads.@threads for i in 1:n
+        results[i] = encode_text(texts[i], merges)
+    end
+    return results
 end
 
 end
