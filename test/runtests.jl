@@ -1431,3 +1431,13 @@ end
     @test isempty(diff2.removed)
     @test diff2.common == v1
 end
+
+@testset "parallel_encode_batch" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    texts = ["low", "lower", "lowest"]
+    par_results = parallel_encode_batch(texts, merges)
+    seq_results = encode_batch(texts, merges)
+    @test par_results == seq_results
+    @test parallel_encode_batch(String[], merges) == Vector{String}[]
+end
