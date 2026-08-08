@@ -67,6 +67,7 @@ export filter_vocabulary
 export encode_with_cache
 export vocabulary_diff
 export parallel_encode_batch
+export corpus_from_files
 
 
 using Unicode
@@ -2419,6 +2420,26 @@ function parallel_encode_batch(texts::Vector{String}, merges::Vector{Tuple{Strin
         results[i] = encode_text(texts[i], merges)
     end
     return results
+end
+
+
+"""
+    corpus_from_files(filepaths) → String
+
+Read and concatenate multiple text files into a single corpus string,
+separated by newlines. Raises an error if any file does not exist.
+"""
+function corpus_from_files(filepaths::Vector{String})::String
+    parts = String[]
+    for fp in filepaths
+        if !isfile(fp)
+            throw(TokenizerError("file not found: $fp"))
+        end
+        content = strip(read(fp, String))
+        isempty(content) && continue
+        push!(parts, String(content))
+    end
+    return join(parts, "\n")
 end
 
 end
