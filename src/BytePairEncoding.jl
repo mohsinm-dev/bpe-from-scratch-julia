@@ -69,6 +69,7 @@ export vocabulary_diff
 export parallel_encode_batch
 export corpus_from_files
 export special_token_ids
+export encode_with_offsets
 
 
 using Unicode
@@ -2451,6 +2452,32 @@ Return a mapping of special token strings to their integer IDs.
 """
 function special_token_ids(t::BPETokenizer)::Dict{String,Int}
     return Dict(token => t.vocab_index[token] for token in t.special_tokens if haskey(t.vocab_index, token))
+end
+
+
+"""
+    encode_with_offsets(word, merges) → Vector{Tuple{String,Int,Int}}
+
+Encode a word and return each token with its start and end character offsets
+in the original word. Useful for mapping tokens back to source text spans.
+"""
+function encode_with_offsets(word::String, merges::Vector{Tuple{String,String}})::Vector{Tuple{String,Int,Int}}
+    symbols = word_to_symbols(word)
+    for merge in merges
+        symbols = merge_symbols(symbols, merge)
+    end
+    result = Tuple{String,Int,Int}[]
+    pos = 1
+    for token in symbols
+        if token == "</w>"
+            push!(result, (token, pos, pos))
+        else
+            token_end = pos + length(token) - 1
+            push!(result, (token, pos, token_end))
+            pos = token_end + 1
+        end
+    end
+    return result
 end
 
 end
