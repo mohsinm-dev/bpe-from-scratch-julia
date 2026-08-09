@@ -68,6 +68,7 @@ export encode_with_cache
 export vocabulary_diff
 export parallel_encode_batch
 export corpus_from_files
+export special_token_ids
 
 
 using Unicode
@@ -2440,6 +2441,16 @@ function corpus_from_files(filepaths::Vector{String})::String
         push!(parts, String(content))
     end
     return join(parts, "\n")
+end
+
+
+"""
+    special_token_ids(t::BPETokenizer) → Dict{String,Int}
+
+Return a mapping of special token strings to their integer IDs.
+"""
+function special_token_ids(t::BPETokenizer)::Dict{String,Int}
+    return Dict(token => t.vocab_index[token] for token in t.special_tokens if haskey(t.vocab_index, token))
 end
 
 end
