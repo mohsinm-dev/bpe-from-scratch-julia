@@ -1460,3 +1460,12 @@ end
         rm(dir, recursive=true)
     end
 end
+
+@testset "special_token_ids" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    ids = special_token_ids(t)
+    @test ids["<unk>"] == t.vocab_index["<unk>"]
+    @test ids["<pad>"] == t.vocab_index["<pad>"]
+    @test length(ids) == 2
+end
