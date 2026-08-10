@@ -351,6 +351,7 @@ julia scripts/playground.jl
 
 ### Encoding and decoding
 - `encode_word(word, merges)` — tokenize a single word using learned merges
+- `encode_with_offsets(word, merges)` — tokenize with character offset tracking
 - `encode_text(text, merges)` — tokenize a full text string
 - `decode_tokens(tokens)` — reconstruct text from BPE tokens
 - `encode_batch(texts, merges)` — encode multiple texts at once
