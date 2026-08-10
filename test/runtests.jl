@@ -1469,3 +1469,15 @@ end
     @test ids["<pad>"] == t.vocab_index["<pad>"]
     @test length(ids) == 2
 end
+
+@testset "encode_with_offsets" begin
+    merges = [("l", "o"), ("lo", "w")]
+    offsets = encode_with_offsets("low", merges)
+    @test offsets[1] == ("low", 1, 3)
+    @test offsets[2] == ("</w>", 4, 4)
+    # no merges
+    offsets2 = encode_with_offsets("ab", Tuple{String,String}[])
+    @test offsets2[1] == ("a", 1, 1)
+    @test offsets2[2] == ("b", 2, 2)
+    @test offsets2[3] == ("</w>", 3, 3)
+end
