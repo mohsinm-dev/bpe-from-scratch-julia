@@ -71,6 +71,7 @@ export corpus_from_files
 export special_token_ids
 export encode_with_offsets
 export validate_encoding
+export vocab_growth_rate
 
 
 using Unicode
@@ -2492,6 +2493,25 @@ function validate_encoding(t::BPETokenizer, text::String)::Bool
     ids = encode(t, text)
     decoded = decode(t, ids)
     return decoded == preprocess_text(text)
+end
+
+
+"""
+    vocab_growth_rate(history) → Vector{Float64}
+
+Compute the per-step vocabulary growth rate from a vocab size history.
+Returns the percentage change at each merge step.
+"""
+function vocab_growth_rate(history::Vector{Int})::Vector{Float64}
+    if length(history) < 2
+        return Float64[]
+    end
+    rates = Float64[]
+    for i in 2:length(history)
+        rate = (history[i] - history[i-1]) / history[i-1] * 100.0
+        push!(rates, rate)
+    end
+    return rates
 end
 
 end
