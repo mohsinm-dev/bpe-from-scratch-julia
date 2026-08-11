@@ -1481,3 +1481,10 @@ end
     @test offsets2[2] == ("b", 2, 2)
     @test offsets2[3] == ("</w>", 3, 3)
 end
+
+@testset "validate_encoding" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test validate_encoding(t, "low lower") == true
+    @test validate_encoding(t, "low lower lowest") == true
+end
