@@ -70,6 +70,7 @@ export parallel_encode_batch
 export corpus_from_files
 export special_token_ids
 export encode_with_offsets
+export validate_encoding
 
 
 using Unicode
@@ -2478,6 +2479,19 @@ function encode_with_offsets(word::String, merges::Vector{Tuple{String,String}})
         end
     end
     return result
+end
+
+
+"""
+    validate_encoding(t::BPETokenizer, text) → Bool
+
+Check that encoding then decoding a text produces the original text.
+Returns true if the round-trip is lossless, false otherwise.
+"""
+function validate_encoding(t::BPETokenizer, text::String)::Bool
+    ids = encode(t, text)
+    decoded = decode(t, ids)
+    return decoded == preprocess_text(text)
 end
 
 end
