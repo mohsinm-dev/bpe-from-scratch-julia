@@ -1488,3 +1488,14 @@ end
     @test validate_encoding(t, "low lower") == true
     @test validate_encoding(t, "low lower lowest") == true
 end
+
+@testset "vocab_growth_rate" begin
+    history = [10, 11, 12, 14]
+    rates = vocab_growth_rate(history)
+    @test length(rates) == 3
+    @test rates[1] ≈ 10.0
+    @test rates[2] ≈ 100/11
+    # single element
+    @test vocab_growth_rate([10]) == Float64[]
+    @test vocab_growth_rate(Int[]) == Float64[]
+end
