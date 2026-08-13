@@ -72,6 +72,7 @@ export special_token_ids
 export encode_with_offsets
 export validate_encoding
 export vocab_growth_rate
+export token_type_ids
 
 
 using Unicode
@@ -2512,6 +2513,18 @@ function vocab_growth_rate(history::Vector{Int})::Vector{Float64}
         push!(rates, rate)
     end
     return rates
+end
+
+
+"""
+    token_type_ids(len_a, len_b) → Vector{Int}
+
+Generate segment IDs for paired sequences (e.g. sentence A + sentence B).
+Returns 0 for the first `len_a` positions and 1 for the next `len_b` positions.
+Used for transformer-style segment embeddings.
+"""
+function token_type_ids(len_a::Int, len_b::Int)::Vector{Int}
+    return vcat(zeros(Int, len_a), ones(Int, len_b))
 end
 
 end
