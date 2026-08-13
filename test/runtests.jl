@@ -1499,3 +1499,10 @@ end
     @test vocab_growth_rate([10]) == Float64[]
     @test vocab_growth_rate(Int[]) == Float64[]
 end
+
+@testset "token_type_ids" begin
+    @test token_type_ids(3, 2) == [0, 0, 0, 1, 1]
+    @test token_type_ids(0, 3) == [1, 1, 1]
+    @test token_type_ids(2, 0) == [0, 0]
+    @test token_type_ids(0, 0) == Int[]
+end
