@@ -371,6 +371,7 @@ julia scripts/playground.jl
 - `truncate_sequence(ids, max_len)` — truncate sequence to max length
 - `prepare_batch(batch, max_len; pad_id)` — truncate and pad a batch of sequences
 - `attention_mask(ids; pad_id)` — generate 1/0 attention mask from padded sequences
+- `token_type_ids(len_a, len_b)` — segment IDs for paired sequence inputs
 
 ### Pre-tokenization
 - `pretokenize(text; pattern)` — regex-based word splitting (GPT-2-style)
