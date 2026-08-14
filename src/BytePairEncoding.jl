@@ -73,6 +73,7 @@ export encode_with_offsets
 export validate_encoding
 export vocab_growth_rate
 export token_type_ids
+export merge_frequency_histogram
 
 
 using Unicode
@@ -2525,6 +2526,24 @@ Used for transformer-style segment embeddings.
 """
 function token_type_ids(len_a::Int, len_b::Int)::Vector{Int}
     return vcat(zeros(Int, len_a), ones(Int, len_b))
+end
+
+
+"""
+    merge_frequency_histogram(history; max_width=40) → String
+
+Render a text-based bar chart of merge step frequencies from a MergeRecord history.
+"""
+function merge_frequency_histogram(history::Vector{MergeRecord}; max_width::Int=40)::String
+    isempty(history) && return ""
+    max_freq = maximum(r.frequency for r in history)
+    lines = String[]
+    for r in history
+        bar_len = max_freq == 0 ? 0 : round(Int, r.frequency / max_freq * max_width)
+        bar = "#" ^ bar_len
+        push!(lines, "$(lpad(r.step, 4)) | $(rpad(bar, max_width)) $(r.frequency)")
+    end
+    return join(lines, "\n")
 end
 
 end
