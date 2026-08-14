@@ -1506,3 +1506,12 @@ end
     @test token_type_ids(2, 0) == [0, 0]
     @test token_type_ids(0, 0) == Int[]
 end
+
+@testset "merge_frequency_histogram" begin
+    corpus = "low low low lower lower lowest"
+    _, _, history = train_bpe_with_history(corpus, 5)
+    hist = merge_frequency_histogram(history)
+    @test occursin("#", hist)
+    @test length(split(hist, "\n")) == length(history)
+    @test merge_frequency_histogram(MergeRecord[]) == ""
+end
