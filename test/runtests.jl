@@ -1528,3 +1528,11 @@ end
     tokens3 = encode_sentences("low lower", merges)
     @test !("</s>" in tokens3)
 end
+
+@testset "normalize_token" begin
+    @test normalize_token("low</w>") == "low"
+    @test normalize_token("</w>") == ""
+    @test normalize_token("##er") == "er"
+    @test normalize_token("hello") == "hello"
+    @test normalize_token("") == ""
+end
