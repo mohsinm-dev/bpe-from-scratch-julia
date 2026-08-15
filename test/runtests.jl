@@ -1515,3 +1515,16 @@ end
     @test length(split(hist, "\n")) == length(history)
     @test merge_frequency_histogram(MergeRecord[]) == ""
 end
+
+@testset "encode_sentences" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    tokens = encode_sentences("low lower. lowest low.", merges)
+    @test "</s>" in tokens
+    # custom separator
+    tokens2 = encode_sentences("low. lower.", merges, sep_token="[SEP]")
+    @test "[SEP]" in tokens2
+    # single sentence (no separator)
+    tokens3 = encode_sentences("low lower", merges)
+    @test !("</s>" in tokens3)
+end
