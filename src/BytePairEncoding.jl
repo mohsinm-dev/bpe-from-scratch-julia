@@ -74,6 +74,7 @@ export validate_encoding
 export vocab_growth_rate
 export token_type_ids
 export merge_frequency_histogram
+export encode_sentences
 
 
 using Unicode
@@ -2544,6 +2545,27 @@ function merge_frequency_histogram(history::Vector{MergeRecord}; max_width::Int=
         push!(lines, "$(lpad(r.step, 4)) | $(rpad(bar, max_width)) $(r.frequency)")
     end
     return join(lines, "\n")
+end
+
+
+"""
+    encode_sentences(text, merges; sep_token="</s>") → Vector{String}
+
+Split text into sentences (by period, exclamation, or question mark),
+encode each sentence, and join them with a separator token.
+"""
+function encode_sentences(text::String, merges::Vector{Tuple{String,String}}; sep_token::String="</s>")::Vector{String}
+    sentences = split(text, r"[.!?]+")
+    tokens = String[]
+    for (i, sent) in enumerate(sentences)
+        s = strip(String(sent))
+        isempty(s) && continue
+        append!(tokens, encode_text(s, merges))
+        if i < length(sentences)
+            push!(tokens, sep_token)
+        end
+    end
+    return tokens
 end
 
 end
