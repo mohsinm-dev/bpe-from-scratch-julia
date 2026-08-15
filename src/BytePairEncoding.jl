@@ -75,6 +75,7 @@ export vocab_growth_rate
 export token_type_ids
 export merge_frequency_histogram
 export encode_sentences
+export normalize_token
 
 
 using Unicode
@@ -2566,6 +2567,18 @@ function encode_sentences(text::String, merges::Vector{Tuple{String,String}}; se
         end
     end
     return tokens
+end
+
+
+"""
+    normalize_token(token) → String
+
+Strip BPE markers (</w>, ##) from a token for display or analysis purposes.
+"""
+function normalize_token(token::String)::String
+    t = replace(token, "</w>" => "")
+    t = replace(t, r"^##" => "")
+    return t
 end
 
 end
