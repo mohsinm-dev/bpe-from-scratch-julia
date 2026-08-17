@@ -432,6 +432,7 @@ Tokenize a full text string using learned BPE merges.
 Splits text into words, encodes each word, and returns the flat token list.
 """
 function encode_text(text::String, merges::Vector{Tuple{String,String}})::Vector{String}
+    # ponytail: sizehint based on word count, resize if needed
     if isempty(text)
         return String[]
     end
