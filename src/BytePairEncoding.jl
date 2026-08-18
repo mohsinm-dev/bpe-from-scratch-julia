@@ -77,6 +77,7 @@ export merge_frequency_histogram
 export encode_sentences
 export normalize_token
 export incremental_train_bpe
+export tokenizer_equality
 
 
 using Unicode
@@ -2621,6 +2622,18 @@ function incremental_train_bpe(
         ws = new_ws
     end
     return (ws, merges)
+end
+
+
+"""
+    tokenizer_equality(t1::BPETokenizer, t2::BPETokenizer) → Bool
+
+Check if two tokenizers are functionally equivalent (same merges, vocab, and special tokens).
+"""
+function tokenizer_equality(t1::BPETokenizer, t2::BPETokenizer)::Bool
+    return t1.merges == t2.merges &&
+           t1.vocab_index == t2.vocab_index &&
+           t1.special_tokens == t2.special_tokens
 end
 
 end
