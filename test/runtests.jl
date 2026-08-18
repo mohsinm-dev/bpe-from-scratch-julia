@@ -1536,3 +1536,14 @@ end
     @test normalize_token("hello") == "hello"
     @test normalize_token("") == ""
 end
+
+@testset "incremental_train_bpe" begin
+    corpus = "low low low lower lower lowest"
+    vocab1, merges1 = train_bpe(corpus, 3)
+    vocab2, merges2 = incremental_train_bpe(vocab1, merges1, 3)
+    @test length(merges2) == length(merges1) + 3
+    @test merges2[1:3] == merges1
+    # encoding with extended merges should still decode correctly
+    tokens = encode_text("low lower", merges2)
+    @test decode_tokens(tokens) == "low lower"
+end
