@@ -194,6 +194,15 @@ loaded = load_config("config.json")
 tokenizer = train_from_config(corpus, loaded)
 ```
 
+### Incremental training
+
+```julia
+# Train in stages
+vocab, merges = train_bpe(corpus, 10)
+vocab2, merges2 = incremental_train_bpe(vocab, merges, 10)
+# merges2 contains all 20 merges
+```
+
 ### Merge history tracking
 
 ```julia
