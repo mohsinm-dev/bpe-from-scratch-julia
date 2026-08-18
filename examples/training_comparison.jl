@@ -38,3 +38,10 @@ bpe_tokens = encode_text(text, bpe_merges)
 bpe_ratio = compression_ratio(text, bpe_tokens)
 println("Compression (BPE): $(round(bpe_ratio, digits=2)) chars/token")
 println("Fertility (BPE):   $(round(subword_fertility(text, bpe_merges), digits=2)) tokens/word")
+
+# --- Incremental training demo ---
+println("\n--- Incremental Training ---")
+vocab_inc, merges_inc = train_bpe(corpus, 5, verbose=true)
+println("After 5 merges: $(length(merges_inc)) merges")
+vocab_inc2, merges_inc2 = incremental_train_bpe(vocab_inc, merges_inc, 5, verbose=true)
+println("After 5 more: $(length(merges_inc2)) merges total")
