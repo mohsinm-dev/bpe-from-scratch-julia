@@ -76,6 +76,7 @@ export token_type_ids
 export merge_frequency_histogram
 export encode_sentences
 export normalize_token
+export incremental_train_bpe
 
 
 using Unicode
@@ -2580,6 +2581,46 @@ function normalize_token(token::String)::String
     t = replace(token, "</w>" => "")
     t = replace(t, r"^##" => "")
     return t
+end
+
+
+"""
+    incremental_train_bpe(word_symbols, existing_merges, num_merges; verbose=false, min_frequency=0)
+
+Continue BPE training from an existing state. Takes previously trained word_symbols
+and merges, then performs additional merge steps. Returns the updated state.
+"""
+function incremental_train_bpe(
+    word_symbols::Dict{Vector{String},Int},
+    existing_merges::Vector{Tuple{String,String}},
+    num_merges::Int;
+    verbose::Bool=false,
+    min_frequency::Int=0
+)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    merges = copy(existing_merges)
+    ws = copy(word_symbols)
+
+    for i in 1:num_merges
+        pair_counts = count_pairs(ws)
+        pair = best_pair(pair_counts)
+        if pair === nothing
+            verbose && println("stopping early: no more pairs at step $i")
+            break
+        end
+        if min_frequency > 0 && pair_counts[pair] < min_frequency
+            break
+        end
+        if verbose
+            println("merge $(length(merges)+1): $(pair[1]) + $(pair[2]) (freq=$(pair_counts[pair]))")
+        end
+        push!(merges, pair)
+        new_ws = Dict{Vector{String},Int}()
+        for (symbols, freq) in ws
+            new_ws[merge_symbols(symbols, pair)] = freq
+        end
+        ws = new_ws
+    end
+    return (ws, merges)
 end
 
 end
