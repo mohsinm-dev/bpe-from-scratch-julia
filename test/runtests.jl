@@ -1564,3 +1564,14 @@ end
     t3 = train_tokenizer(corpus, 5)
     @test !tokenizer_equality(t1, t3)
 end
+
+@testset "top_merges" begin
+    corpus = "low low low lower lower lowest"
+    _, _, history = train_bpe_with_history(corpus, 5)
+    top = top_merges(history, 2)
+    @test length(top) == 2
+    @test top[1].frequency >= top[2].frequency
+    # request more than available
+    @test length(top_merges(history, 100)) == length(history)
+    @test top_merges(MergeRecord[], 5) == MergeRecord[]
+end
