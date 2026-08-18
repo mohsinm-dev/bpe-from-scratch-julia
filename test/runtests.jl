@@ -1547,3 +1547,20 @@ end
     tokens = encode_text("low lower", merges2)
     @test decode_tokens(tokens) == "low lower"
 end
+
+@testset "tokenizer_equality" begin
+    corpus = "low low low lower lower lowest"
+    t1 = train_tokenizer(corpus, 10)
+    # save and reload should be equal
+    dir = mktempdir()
+    try
+        save_tokenizer(t1, dir)
+        t2 = load_tokenizer(dir)
+        @test tokenizer_equality(t1, t2)
+    finally
+        rm(dir, recursive=true)
+    end
+    # different training produces different tokenizer
+    t3 = train_tokenizer(corpus, 5)
+    @test !tokenizer_equality(t1, t3)
+end
