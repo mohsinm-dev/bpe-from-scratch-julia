@@ -78,6 +78,7 @@ export encode_sentences
 export normalize_token
 export incremental_train_bpe
 export tokenizer_equality
+export top_merges
 
 
 using Unicode
@@ -2634,6 +2635,18 @@ function tokenizer_equality(t1::BPETokenizer, t2::BPETokenizer)::Bool
     return t1.merges == t2.merges &&
            t1.vocab_index == t2.vocab_index &&
            t1.special_tokens == t2.special_tokens
+end
+
+
+"""
+    top_merges(history, n) → Vector{MergeRecord}
+
+Return the N merge steps with the highest pair frequency from a merge history.
+Useful for identifying the most impactful merges during training.
+"""
+function top_merges(history::Vector{MergeRecord}, n::Int)::Vector{MergeRecord}
+    sorted = sort(history, by=r -> -r.frequency)
+    return sorted[1:min(n, length(sorted))]
 end
 
 end
