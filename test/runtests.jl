@@ -1575,3 +1575,13 @@ end
     @test length(top_merges(history, 100)) == length(history)
     @test top_merges(MergeRecord[], 5) == MergeRecord[]
 end
+
+@testset "tokenizer_info" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    info = tokenizer_info(t)
+    @test occursin("Vocabulary size:", info)
+    @test occursin("Merge rules:", info)
+    @test occursin("Validation:", info)
+    @test occursin("valid", info)
+end
