@@ -67,3 +67,12 @@ function main()
 end
 
 main()
+
+# Print full tokenizer diagnostics
+if length(ARGS) >= 1
+    tokenizer_dir = ARGS[1]
+    if isdir(tokenizer_dir)
+        t = load_tokenizer(tokenizer_dir)
+        println("\n", tokenizer_info(t))
+    end
+end
