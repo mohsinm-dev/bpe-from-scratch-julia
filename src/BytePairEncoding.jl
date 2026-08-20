@@ -79,6 +79,7 @@ export normalize_token
 export incremental_train_bpe
 export tokenizer_equality
 export top_merges
+export tokenizer_info
 
 
 using Unicode
@@ -2647,6 +2648,27 @@ Useful for identifying the most impactful merges during training.
 function top_merges(history::Vector{MergeRecord}, n::Int)::Vector{MergeRecord}
     sorted = sort(history, by=r -> -r.frequency)
     return sorted[1:min(n, length(sorted))]
+end
+
+
+"""
+    tokenizer_info(t::BPETokenizer) → String
+
+Return a detailed diagnostics string for a tokenizer, including
+vocabulary size, merge count, special tokens, and validation status.
+"""
+function tokenizer_info(t::BPETokenizer)::String
+    warnings = validate_tokenizer(t)
+    status = isempty(warnings) ? "valid" : "$(length(warnings)) warning(s)"
+    lines = String[]
+    push!(lines, "BPETokenizer Diagnostics")
+    push!(lines, "  Vocabulary size:  $(length(t.vocab))")
+    push!(lines, "  Merge rules:      $(length(t.merges))")
+    push!(lines, "  Special tokens:   $(join(t.special_tokens, ", "))")
+    push!(lines, "  ID range:         1..$(length(t.vocab_index))")
+    push!(lines, "  Avg token length: $(round(average_token_length(t.vocab), digits=2))")
+    push!(lines, "  Validation:       $status")
+    return join(lines, "\n")
 end
 
 end
