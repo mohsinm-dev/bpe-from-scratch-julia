@@ -81,6 +81,7 @@ export tokenizer_equality
 export top_merges
 export tokenizer_info
 export byte_pair_frequency_table
+export estimated_vocab_size
 
 
 using Unicode
@@ -2690,6 +2691,20 @@ function byte_pair_frequency_table(word_symbols::Dict{Vector{String},Int}; top_n
         push!(lines, "$(lpad(i, 4)) | $(rpad(pair_str, 15)) | $(lpad(freq, 9))")
     end
     return join(lines, "\n")
+end
+
+
+"""
+    estimated_vocab_size(corpus, num_merges) → Int
+
+Estimate the final vocabulary size after training without performing full training.
+Uses the initial character vocabulary size plus the number of merges as an upper bound.
+"""
+function estimated_vocab_size(corpus::String, num_merges::Int)::Int
+    processed = preprocess_text(corpus)
+    chars = Set(string(c) for c in processed if !isspace(c))
+    # initial vocab = unique chars + </w> marker, then each merge adds one token
+    return length(chars) + 1 + num_merges
 end
 
 end
