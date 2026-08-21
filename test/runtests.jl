@@ -1597,3 +1597,14 @@ end
     # empty word_symbols
     @test byte_pair_frequency_table(Dict{Vector{String},Int}()) == "Rank | Pair            | Frequency\n" * "-" ^ 45
 end
+
+@testset "estimated_vocab_size" begin
+    corpus = "low low low lower lower lowest"
+    est = estimated_vocab_size(corpus, 10)
+    # should be close to actual
+    _, merges = train_bpe(corpus, 10)
+    actual_vocab = get_vocabulary(train_bpe(corpus, 10)[1])
+    # estimate is an upper bound
+    @test est >= length(actual_vocab) - 5  # allow some slack
+    @test est > 0
+end
