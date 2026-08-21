@@ -62,3 +62,12 @@ Open an issue with:
 - What actually happened
 - Minimal reproduction steps
 - Julia version (`julia --version`)
+
+## Adding new functions
+
+When adding a new exported function:
+
+1. Add the export statement in the appropriate section of `BytePairEncoding.jl`
+2. Include a docstring with signature, description, and example if non-obvious
+3. Add tests in `test/runtests.jl` covering normal use and edge cases
+4. Update the API reference in `README.md` if the function is user-facing
