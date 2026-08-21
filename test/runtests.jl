@@ -1585,3 +1585,15 @@ end
     @test occursin("Validation:", info)
     @test occursin("valid", info)
 end
+
+@testset "byte_pair_frequency_table" begin
+    corpus = "low low low lower lower lowest"
+    freqs = count_word_frequencies(corpus)
+    ws = initialize_word_symbols(freqs)
+    table = byte_pair_frequency_table(ws)
+    @test occursin("Rank", table)
+    @test occursin("Frequency", table)
+    @test length(split(table, "\n")) >= 3  # header + separator + at least 1 row
+    # empty word_symbols
+    @test byte_pair_frequency_table(Dict{Vector{String},Int}()) == "Rank | Pair            | Frequency\n" * "-" ^ 45
+end
