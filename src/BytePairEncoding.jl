@@ -80,6 +80,7 @@ export incremental_train_bpe
 export tokenizer_equality
 export top_merges
 export tokenizer_info
+export byte_pair_frequency_table
 
 
 using Unicode
@@ -2668,6 +2669,26 @@ function tokenizer_info(t::BPETokenizer)::String
     push!(lines, "  ID range:         1..$(length(t.vocab_index))")
     push!(lines, "  Avg token length: $(round(average_token_length(t.vocab), digits=2))")
     push!(lines, "  Validation:       $status")
+    return join(lines, "\n")
+end
+
+
+"""
+    byte_pair_frequency_table(word_symbols; top_n=20) → String
+
+Format the top-N most frequent adjacent pairs as a readable table.
+"""
+function byte_pair_frequency_table(word_symbols::Dict{Vector{String},Int}; top_n::Int=20)::String
+    pair_counts = count_pairs(word_symbols)
+    sorted = sort(collect(pair_counts), by=x -> -x[2])
+    n = min(top_n, length(sorted))
+    lines = ["Rank | Pair            | Frequency"]
+    push!(lines, "-" ^ 45)
+    for i in 1:n
+        pair, freq = sorted[i]
+        pair_str = "$(pair[1]) + $(pair[2])"
+        push!(lines, "$(lpad(i, 4)) | $(rpad(pair_str, 15)) | $(lpad(freq, 9))")
+    end
     return join(lines, "\n")
 end
 
