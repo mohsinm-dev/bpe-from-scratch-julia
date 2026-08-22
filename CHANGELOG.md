@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-08-22
+
+### Added
+- `batch_decode()` for decoding multiple ID sequences at once
+- `token_pair_statistics()` for analyzing adjacent token patterns
+- `filter_vocabulary()` to filter tokens by length range
+- `encode_with_cache()` for text-level cached encoding via CachedEncoder
+- `vocabulary_diff()` to compare two tokenizer vocabularies
+- `parallel_encode_batch()` for threaded batch encoding
+- `corpus_from_files()` to load and concatenate an explicit file list
+- `special_token_ids()` helper for BPETokenizer
+- `encode_with_offsets()` returns character offset spans with tokens
+- `validate_encoding()` round-trip consistency checker
+- `vocab_growth_rate()` for analyzing vocabulary expansion over merges
+- `token_type_ids()` for segment embeddings in paired sequences
+- `merge_frequency_histogram()` for visualizing merge step frequencies
+- `encode_sentences()` for sentence-aware tokenization with separators
+- `normalize_token()` utility for stripping BPE markers
+- `incremental_train_bpe()` to continue training from existing state
+- `tokenizer_equality()` for comparing two tokenizers
+- `top_merges()` to extract most impactful merge steps
+- `tokenizer_info()` detailed diagnostics string
+- `byte_pair_frequency_table()` formatted pair frequency display
+- `estimated_vocab_size()` quick vocabulary size prediction
+- Encoding throughput benchmark (`benchmarks/throughput.jl`)
+- Julia-specific `.editorconfig` settings
+- Function contribution guidelines in CONTRIBUTING.md
+
+### Changed
+- `encode_text` annotated with allocation awareness comment
+- Training comparison example expanded with incremental training demo
+- `analyze.jl` script outputs tokenizer diagnostics
+
+
 ## [0.4.0] - 2026-07-29
 
 ### Added
