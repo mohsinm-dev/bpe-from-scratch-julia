@@ -82,6 +82,7 @@ export top_merges
 export tokenizer_info
 export byte_pair_frequency_table
 export estimated_vocab_size
+export corpus_statistics_streaming
 
 
 using Unicode
@@ -2705,6 +2706,38 @@ function estimated_vocab_size(corpus::String, num_merges::Int)::Int
     chars = Set(string(c) for c in processed if !isspace(c))
     # initial vocab = unique chars + </w> marker, then each merge adds one token
     return length(chars) + 1 + num_merges
+end
+
+
+"""
+    corpus_statistics_streaming(filepath) → NamedTuple
+
+Compute corpus statistics by streaming a file line by line without loading
+the entire file into memory. Returns word count, character count, unique words,
+and average word length.
+"""
+function corpus_statistics_streaming(filepath::String)
+    if !isfile(filepath)
+        throw(TokenizerError("file not found: $filepath"))
+    end
+    word_count = 0
+    char_count = 0
+    unique_words = Set{String}()
+    total_word_len = 0
+    open(filepath, "r") do io
+        for line in eachline(io)
+            char_count += length(line)
+            for word in split(line)
+                w = String(word)
+                word_count += 1
+                total_word_len += length(w)
+                push!(unique_words, w)
+            end
+        end
+    end
+    avg_word_length = word_count == 0 ? 0.0 : total_word_len / word_count
+    return (word_count=word_count, char_count=char_count,
+            unique_words=length(unique_words), avg_word_length=avg_word_length)
 end
 
 end
