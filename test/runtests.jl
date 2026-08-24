@@ -1623,3 +1623,16 @@ end
     # missing file
     @test_throws TokenizerError corpus_statistics_streaming("nonexistent.txt")
 end
+
+@testset "merge_statistics" begin
+    merges = [("l", "o"), ("lo", "w"), ("low", "</w>")]
+    stats = merge_statistics(merges)
+    @test stats.count == 3
+    @test stats.avg_token_length > 0.0
+    @test stats.max_token_length == 6  # "low</w>"
+    @test stats.longest_token == "low</w>"
+    # empty merges
+    empty_stats = merge_statistics(Tuple{String,String}[])
+    @test empty_stats.count == 0
+    @test empty_stats.avg_token_length == 0.0
+end
