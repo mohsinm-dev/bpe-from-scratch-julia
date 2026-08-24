@@ -83,6 +83,7 @@ export tokenizer_info
 export byte_pair_frequency_table
 export estimated_vocab_size
 export corpus_statistics_streaming
+export merge_statistics
 
 
 using Unicode
@@ -2738,6 +2739,26 @@ function corpus_statistics_streaming(filepath::String)
     avg_word_length = word_count == 0 ? 0.0 : total_word_len / word_count
     return (word_count=word_count, char_count=char_count,
             unique_words=length(unique_words), avg_word_length=avg_word_length)
+end
+
+
+"""
+    merge_statistics(merges) → NamedTuple
+
+Compute summary statistics about a set of merge rules: total count,
+average merged token length, and the longest merged token.
+"""
+function merge_statistics(merges::Vector{Tuple{String,String}})
+    if isempty(merges)
+        return (count=0, avg_token_length=0.0, max_token_length=0, longest_token="")
+    end
+    tokens = [a * b for (a, b) in merges]
+    lengths = [length(t) for t in tokens]
+    max_idx = argmax(lengths)
+    return (count=length(merges),
+            avg_token_length=sum(lengths) / length(lengths),
+            max_token_length=lengths[max_idx],
+            longest_token=tokens[max_idx])
 end
 
 end
