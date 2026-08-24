@@ -1608,3 +1608,18 @@ end
     @test est >= length(actual_vocab) - 5  # allow some slack
     @test est > 0
 end
+
+@testset "corpus_statistics_streaming" begin
+    path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    stats = corpus_statistics_streaming(path)
+    @test stats.word_count > 0
+    @test stats.char_count > 0
+    @test stats.unique_words > 0
+    @test stats.avg_word_length > 0.0
+    # compare with in-memory version
+    corpus = load_corpus(path)
+    mem_stats = corpus_statistics(corpus)
+    @test stats.word_count == mem_stats.word_count
+    # missing file
+    @test_throws TokenizerError corpus_statistics_streaming("nonexistent.txt")
+end
