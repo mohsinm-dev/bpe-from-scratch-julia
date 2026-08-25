@@ -418,6 +418,8 @@ julia scripts/playground.jl
 - `vocabulary_coverage_report(text, merges)` — detailed coverage breakdown with uncovered words
 - `oov_rate(tokens, vocab_index)` — fraction of tokens not in vocabulary
 - `corpus_statistics(corpus)` — word count, character count, unique words, average word length
+- `corpus_statistics_streaming(filepath)` — streaming version for large files
+- `merge_statistics(merges)` — summary stats for merge rules
 - `tokenizer_summary(tokenizer)` — formatted overview of tokenizer state
 - `token_length_histogram(vocab)` — text bar chart of token length distribution
 
