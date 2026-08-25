@@ -84,6 +84,7 @@ export byte_pair_frequency_table
 export estimated_vocab_size
 export corpus_statistics_streaming
 export merge_statistics
+export is_trained
 
 
 using Unicode
@@ -2759,6 +2760,17 @@ function merge_statistics(merges::Vector{Tuple{String,String}})
             avg_token_length=sum(lengths) / length(lengths),
             max_token_length=lengths[max_idx],
             longest_token=tokens[max_idx])
+end
+
+
+"""
+    is_trained(t::BPETokenizer) → Bool
+
+Check whether a tokenizer has been trained (has at least one merge rule
+and a non-empty vocabulary beyond special tokens).
+"""
+function is_trained(t::BPETokenizer)::Bool
+    return !isempty(t.merges) && length(t.vocab) > length(t.special_tokens)
 end
 
 end
