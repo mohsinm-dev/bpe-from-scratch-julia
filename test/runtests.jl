@@ -1636,3 +1636,12 @@ end
     @test empty_stats.count == 0
     @test empty_stats.avg_token_length == 0.0
 end
+
+@testset "is_trained" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test is_trained(t) == true
+    # zero merges produces untrained tokenizer
+    t0 = train_tokenizer(corpus, 0)
+    @test is_trained(t0) == false
+end
