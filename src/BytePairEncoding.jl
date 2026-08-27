@@ -116,6 +116,7 @@ export detokenize
 export token_ids_to_text
 export format_token_table
 export unique_token_count
+export token_to_id
 
 
 using Unicode
@@ -3127,6 +3128,11 @@ end
 
 function unique_token_count(tokens::Vector{String})::Int
     return length(Set(tokens))
+end
+
+
+function token_to_id(t::BPETokenizer, token::String)::Int
+    return get(t.vocab_index, token, get(t.vocab_index, "<unk>", 0))
 end
 
 end
