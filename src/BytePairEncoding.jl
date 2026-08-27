@@ -115,6 +115,7 @@ export encode_with_bos_eos
 export detokenize
 export token_ids_to_text
 export format_token_table
+export unique_token_count
 
 
 using Unicode
@@ -3121,6 +3122,11 @@ function format_token_table(tokens::Vector{String}; max_col::Int=80)::String
         push!(lines, "$(lpad(i, 3)) | $(rpad(display_token, 15)) | $(lpad(length(token), 6))")
     end
     return join(lines, "\n")
+end
+
+
+function unique_token_count(tokens::Vector{String})::Int
+    return length(Set(tokens))
 end
 
 end
