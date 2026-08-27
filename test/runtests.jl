@@ -1871,3 +1871,9 @@ end
     @test length(split(table, "\n")) == length(tokens) + 2
     @test format_token_table(String[]) == ""
 end
+
+@testset "unique_token_count" begin
+    @test unique_token_count(["a", "b", "a", "c"]) == 3
+    @test unique_token_count(String[]) == 0
+    @test unique_token_count(["x"]) == 1
+end
