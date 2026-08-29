@@ -117,6 +117,7 @@ export token_ids_to_text
 export format_token_table
 export unique_token_count
 export token_to_id
+export id_to_token
 
 
 using Unicode
@@ -3133,6 +3134,11 @@ end
 
 function token_to_id(t::BPETokenizer, token::String)::Int
     return get(t.vocab_index, token, get(t.vocab_index, "<unk>", 0))
+end
+
+
+function id_to_token(t::BPETokenizer, id::Int)::String
+    return get(t.id_to_token, id, "<unk>")
 end
 
 end
