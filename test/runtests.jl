@@ -1877,3 +1877,11 @@ end
     @test unique_token_count(String[]) == 0
     @test unique_token_count(["x"]) == 1
 end
+
+@testset "token_to_id" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    unk_id = t.vocab_index["<unk>"]
+    @test token_to_id(t, "<unk>") == unk_id
+    @test token_to_id(t, "nonexistent") == unk_id
+end
