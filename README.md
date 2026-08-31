@@ -471,3 +471,5 @@ Or run all at once: `make bench`
 - `decode_safe(tokenizer, ids)` — decode with unknown ID tracking
 - `detokenize(tokens)` — intuitive token-to-text conversion
 - `token_ids_to_text(tokenizer, ids)` — IDs to text with special token filtering
+- `token_to_id(tokenizer, token)` — single-token ID lookup
+- `id_to_token(tokenizer, id)` — single-ID token lookup
