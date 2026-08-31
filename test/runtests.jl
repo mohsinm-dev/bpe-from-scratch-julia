@@ -1885,3 +1885,10 @@ end
     @test token_to_id(t, "<unk>") == unk_id
     @test token_to_id(t, "nonexistent") == unk_id
 end
+
+@testset "id_to_token" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test id_to_token(t, t.vocab_index["<unk>"]) == "<unk>"
+    @test id_to_token(t, 99999) == "<unk>"
+end
