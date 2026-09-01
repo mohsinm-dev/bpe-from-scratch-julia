@@ -1645,3 +1645,10 @@ end
     t0 = train_tokenizer(corpus, 0)
     @test is_trained(t0) == false
 end
+
+@testset "corpus_vocabulary" begin
+    vocab = corpus_vocabulary("low low lower lowest higher")
+    @test vocab == Set(["low", "lower", "lowest", "higher"])
+    @test length(vocab) == 4
+    @test corpus_vocabulary("") == Set{String}()
+end
