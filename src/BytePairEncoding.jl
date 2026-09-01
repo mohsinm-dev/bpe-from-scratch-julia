@@ -85,6 +85,7 @@ export estimated_vocab_size
 export corpus_statistics_streaming
 export merge_statistics
 export is_trained
+export corpus_vocabulary
 
 
 using Unicode
@@ -2771,6 +2772,16 @@ and a non-empty vocabulary beyond special tokens).
 """
 function is_trained(t::BPETokenizer)::Bool
     return !isempty(t.merges) && length(t.vocab) > length(t.special_tokens)
+end
+
+
+"""
+    corpus_vocabulary(corpus) → Set{String}
+
+Extract the set of unique words from a text corpus.
+"""
+function corpus_vocabulary(corpus::String)::Set{String}
+    return Set(String(w) for w in split(corpus))
 end
 
 end
