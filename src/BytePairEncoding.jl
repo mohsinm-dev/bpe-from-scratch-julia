@@ -86,9 +86,11 @@ export corpus_statistics_streaming
 export merge_statistics
 export is_trained
 export corpus_vocabulary
+export split_corpus
 
 
 using Unicode
+using Random
 
 """
     TokenizerError <: Exception
@@ -2782,6 +2784,24 @@ Extract the set of unique words from a text corpus.
 """
 function corpus_vocabulary(corpus::String)::Set{String}
     return Set(String(w) for w in split(corpus))
+end
+
+
+"""
+    split_corpus(corpus; ratio=0.8, seed=42) → Tuple{String,String}
+
+Split a corpus into train and test sets by words. Uses a deterministic
+shuffle based on the seed for reproducibility.
+"""
+function split_corpus(corpus::String; ratio::Float64=0.8, seed::Int=42)::Tuple{String,String}
+    words = split(corpus)
+    n = length(words)
+    rng = Random.MersenneTwister(seed)
+    indices = Random.shuffle(rng, collect(1:n))
+    split_point = round(Int, n * ratio)
+    train_words = [String(words[i]) for i in indices[1:split_point]]
+    test_words = [String(words[i]) for i in indices[split_point+1:end]]
+    return (join(train_words, " "), join(test_words, " "))
 end
 
 end
