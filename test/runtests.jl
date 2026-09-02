@@ -1652,3 +1652,17 @@ end
     @test length(vocab) == 4
     @test corpus_vocabulary("") == Set{String}()
 end
+
+@testset "split_corpus" begin
+    corpus = join(["word$i" for i in 1:100], " ")
+    train, test = split_corpus(corpus)
+    @test length(split(train)) == 80
+    @test length(split(test)) == 20
+    # deterministic
+    train2, test2 = split_corpus(corpus)
+    @test train == train2
+    @test test == test2
+    # custom ratio
+    train3, test3 = split_corpus(corpus, ratio=0.5)
+    @test length(split(train3)) == 50
+end
