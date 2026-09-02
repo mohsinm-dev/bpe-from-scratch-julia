@@ -394,6 +394,8 @@ julia scripts/playground.jl
 - `preprocess_text(text; lowercase)` — normalize text for training
 - `load_corpus(filepath)` — read a corpus from file
 - `corpus_from_files(filepaths)` — concatenate multiple text files into one corpus
+- `corpus_vocabulary(corpus)` — extract unique words from corpus
+- `split_corpus(corpus; ratio)` — split corpus into train/test sets
 - `save_merges(merges, filepath)` — write merge rules to file
 - `load_merges(filepath)` — read merge rules from file
 - `save_vocab(vocab, filepath)` — export vocabulary to file
