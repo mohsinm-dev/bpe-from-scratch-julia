@@ -1666,3 +1666,11 @@ end
     train3, test3 = split_corpus(corpus, ratio=0.5)
     @test length(split(train3)) == 50
 end
+
+@testset "char_coverage" begin
+    vocab = Set(["l", "o", "w", "</w>", "lo"])
+    @test char_coverage("low", vocab) ≈ 1.0
+    @test char_coverage("xyz", vocab) ≈ 0.0
+    @test char_coverage("lx", vocab) ≈ 0.5
+    @test char_coverage("", vocab) == 0.0
+end
