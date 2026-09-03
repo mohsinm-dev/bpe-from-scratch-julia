@@ -87,6 +87,7 @@ export merge_statistics
 export is_trained
 export corpus_vocabulary
 export split_corpus
+export char_coverage
 
 
 using Unicode
@@ -2802,6 +2803,20 @@ function split_corpus(corpus::String; ratio::Float64=0.8, seed::Int=42)::Tuple{S
     train_words = [String(words[i]) for i in indices[1:split_point]]
     test_words = [String(words[i]) for i in indices[split_point+1:end]]
     return (join(train_words, " "), join(test_words, " "))
+end
+
+
+"""
+    char_coverage(text, vocab) → Float64
+
+Compute the fraction of characters in `text` that appear as single-character
+tokens in the vocabulary. Returns 0.0 for empty text.
+"""
+function char_coverage(text::String, vocab::Set{String})::Float64
+    chars = collect(text)
+    isempty(chars) && return 0.0
+    covered = count(c -> string(c) in vocab, chars)
+    return covered / length(chars)
 end
 
 end
