@@ -88,6 +88,7 @@ export is_trained
 export corpus_vocabulary
 export split_corpus
 export char_coverage
+export unknown_characters
 
 
 using Unicode
@@ -2817,6 +2818,17 @@ function char_coverage(text::String, vocab::Set{String})::Float64
     isempty(chars) && return 0.0
     covered = count(c -> string(c) in vocab, chars)
     return covered / length(chars)
+end
+
+
+"""
+    unknown_characters(text, vocab) → Set{Char}
+
+Find all characters in `text` that do not appear as single-character tokens
+in the vocabulary.
+"""
+function unknown_characters(text::String, vocab::Set{String})::Set{Char}
+    return Set(c for c in text if !(string(c) in vocab))
 end
 
 end
