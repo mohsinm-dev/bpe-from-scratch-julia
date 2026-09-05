@@ -408,6 +408,8 @@ julia scripts/playground.jl
 - `most_common_tokens(tokens, n)` — top-N most frequent tokens
 - `average_token_length(vocab)` — mean character count of tokens
 - `coverage(text, merges)` — fraction of words fully encodable
+- `char_coverage(text, vocab)` — fraction of characters in vocabulary
+- `unknown_characters(text, vocab)` — characters not in vocabulary
 
 ### Byte-level BPE
 - `text_to_bytes(text)` — convert text to hex byte strings
