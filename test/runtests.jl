@@ -1674,3 +1674,11 @@ end
     @test char_coverage("lx", vocab) ≈ 0.5
     @test char_coverage("", vocab) == 0.0
 end
+
+@testset "unknown_characters" begin
+    vocab = Set(["l", "o", "w", "</w>"])
+    @test unknown_characters("low", vocab) == Set{Char}()
+    @test unknown_characters("lowx", vocab) == Set([x])
+    @test unknown_characters("xyz", vocab) == Set([x, y, z])
+    @test unknown_characters("", vocab) == Set{Char}()
+end
