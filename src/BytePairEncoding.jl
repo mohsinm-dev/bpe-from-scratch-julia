@@ -89,6 +89,7 @@ export corpus_vocabulary
 export split_corpus
 export char_coverage
 export unknown_characters
+export encode_truncated
 
 
 using Unicode
@@ -2829,6 +2830,17 @@ in the vocabulary.
 """
 function unknown_characters(text::String, vocab::Set{String})::Set{Char}
     return Set(c for c in text if !(string(c) in vocab))
+end
+
+
+"""
+    encode_truncated(t::BPETokenizer, text, max_tokens) → Vector{Int}
+
+Encode text and truncate the result to at most `max_tokens` token IDs.
+"""
+function encode_truncated(t::BPETokenizer, text::String, max_tokens::Int)::Vector{Int}
+    ids = encode(t, text)
+    return length(ids) <= max_tokens ? ids : ids[1:max_tokens]
 end
 
 end
