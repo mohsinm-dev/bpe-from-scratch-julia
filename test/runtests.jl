@@ -1682,3 +1682,15 @@ end
     @test unknown_characters("xyz", vocab) == Set([x, y, z])
     @test unknown_characters("", vocab) == Set{Char}()
 end
+
+@testset "encode_truncated" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    full_ids = encode(t, "low lower lowest")
+    trunc_ids = encode_truncated(t, "low lower lowest", 2)
+    @test length(trunc_ids) == 2
+    @test trunc_ids == full_ids[1:2]
+    # no truncation needed
+    short_ids = encode_truncated(t, "low", 100)
+    @test short_ids == encode(t, "low")
+end
