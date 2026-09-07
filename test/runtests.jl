@@ -1701,3 +1701,10 @@ end
     @test filtered == ["lo", "w", "</w>"]
     @test remove_special_tokens_from(String[], ["<pad>"]) == String[]
 end
+
+@testset "token_count" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    @test token_count("low lower", merges) == length(encode_text("low lower", merges))
+    @test token_count("", merges) == 0
+end
