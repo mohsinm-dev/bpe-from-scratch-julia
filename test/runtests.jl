@@ -1694,3 +1694,10 @@ end
     short_ids = encode_truncated(t, "low", 100)
     @test short_ids == encode(t, "low")
 end
+
+@testset "remove_special_tokens_from" begin
+    tokens = ["<bos>", "lo", "w", "</w>", "<eos>"]
+    filtered = remove_special_tokens_from(tokens, ["<bos>", "<eos>"])
+    @test filtered == ["lo", "w", "</w>"]
+    @test remove_special_tokens_from(String[], ["<pad>"]) == String[]
+end
