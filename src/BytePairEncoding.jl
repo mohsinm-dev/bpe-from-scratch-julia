@@ -91,6 +91,7 @@ export char_coverage
 export unknown_characters
 export encode_truncated
 export remove_special_tokens_from
+export token_count
 
 
 using Unicode
@@ -2853,6 +2854,16 @@ Filter out special tokens from an encoded token sequence.
 function remove_special_tokens_from(tokens::Vector{String}, special_tokens::Vector{String})::Vector{String}
     special_set = Set(special_tokens)
     return filter(t -> !(t in special_set), tokens)
+end
+
+
+"""
+    token_count(text, merges) → Int
+
+Count the number of tokens produced by encoding a text string.
+"""
+function token_count(text::String, merges::Vector{Tuple{String,String}})::Int
+    return length(encode_text(text, merges))
 end
 
 end
