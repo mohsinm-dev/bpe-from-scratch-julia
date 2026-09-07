@@ -90,6 +90,7 @@ export split_corpus
 export char_coverage
 export unknown_characters
 export encode_truncated
+export remove_special_tokens_from
 
 
 using Unicode
@@ -2841,6 +2842,17 @@ Encode text and truncate the result to at most `max_tokens` token IDs.
 function encode_truncated(t::BPETokenizer, text::String, max_tokens::Int)::Vector{Int}
     ids = encode(t, text)
     return length(ids) <= max_tokens ? ids : ids[1:max_tokens]
+end
+
+
+"""
+    remove_special_tokens_from(tokens, special_tokens) → Vector{String}
+
+Filter out special tokens from an encoded token sequence.
+"""
+function remove_special_tokens_from(tokens::Vector{String}, special_tokens::Vector{String})::Vector{String}
+    special_set = Set(special_tokens)
+    return filter(t -> !(t in special_set), tokens)
 end
 
 end
