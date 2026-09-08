@@ -92,6 +92,7 @@ export unknown_characters
 export encode_truncated
 export remove_special_tokens_from
 export token_count
+export encode_parallel
 
 
 using Unicode
@@ -2864,6 +2865,24 @@ Count the number of tokens produced by encoding a text string.
 """
 function token_count(text::String, merges::Vector{Tuple{String,String}})::Int
     return length(encode_text(text, merges))
+end
+
+
+"""
+    encode_parallel(t::BPETokenizer, texts) → Vector{Vector{Int}}
+
+Encode multiple texts to integer IDs using threads when available.
+"""
+function encode_parallel(t::BPETokenizer, texts::Vector{String})::Vector{Vector{Int}}
+    n = length(texts)
+    if n < 10 || Threads.nthreads() <= 1
+        return [encode(t, text) for text in texts]
+    end
+    results = Vector{Vector{Int}}(undef, n)
+    Threads.@threads for i in 1:n
+        results[i] = encode(t, texts[i])
+    end
+    return results
 end
 
 end
