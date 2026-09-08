@@ -1708,3 +1708,13 @@ end
     @test token_count("low lower", merges) == length(encode_text("low lower", merges))
     @test token_count("", merges) == 0
 end
+
+@testset "encode_parallel" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    texts = ["low", "lower", "lowest"]
+    par = encode_parallel(t, texts)
+    seq = [encode(t, text) for text in texts]
+    @test par == seq
+    @test encode_parallel(t, String[]) == Vector{Int}[]
+end
