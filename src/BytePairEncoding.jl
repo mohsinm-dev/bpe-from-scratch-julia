@@ -93,6 +93,7 @@ export encode_truncated
 export remove_special_tokens_from
 export token_count
 export encode_parallel
+export prefix_tokens
 
 
 using Unicode
@@ -2883,6 +2884,16 @@ function encode_parallel(t::BPETokenizer, texts::Vector{String})::Vector{Vector{
         results[i] = encode(t, texts[i])
     end
     return results
+end
+
+
+"""
+    prefix_tokens(vocab, prefix) → Set{String}
+
+Find all tokens in the vocabulary that start with the given prefix.
+"""
+function prefix_tokens(vocab::Set{String}, prefix::String)::Set{String}
+    return Set(t for t in vocab if startswith(t, prefix))
 end
 
 end
