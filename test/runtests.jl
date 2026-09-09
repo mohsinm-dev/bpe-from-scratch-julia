@@ -1718,3 +1718,11 @@ end
     @test par == seq
     @test encode_parallel(t, String[]) == Vector{Int}[]
 end
+
+@testset "prefix_tokens and suffix_tokens" begin
+    vocab = Set(["low", "lower", "lowest", "high", "lo", "</w>"])
+    @test prefix_tokens(vocab, "lo") == Set(["low", "lower", "lowest", "lo"])
+    @test suffix_tokens(vocab, "est") == Set(["lowest"])
+    @test prefix_tokens(vocab, "xyz") == Set{String}()
+    @test suffix_tokens(vocab, "xyz") == Set{String}()
+end
