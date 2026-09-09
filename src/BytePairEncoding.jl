@@ -94,6 +94,7 @@ export remove_special_tokens_from
 export token_count
 export encode_parallel
 export prefix_tokens
+export suffix_tokens
 
 
 using Unicode
@@ -2894,6 +2895,16 @@ Find all tokens in the vocabulary that start with the given prefix.
 """
 function prefix_tokens(vocab::Set{String}, prefix::String)::Set{String}
     return Set(t for t in vocab if startswith(t, prefix))
+end
+
+
+"""
+    suffix_tokens(vocab, suffix) → Set{String}
+
+Find all tokens in the vocabulary that end with the given suffix.
+"""
+function suffix_tokens(vocab::Set{String}, suffix::String)::Set{String}
+    return Set(t for t in vocab if endswith(t, suffix))
 end
 
 end
