@@ -1726,3 +1726,10 @@ end
     @test prefix_tokens(vocab, "xyz") == Set{String}()
     @test suffix_tokens(vocab, "xyz") == Set{String}()
 end
+
+@testset "is_special_token" begin
+    specials = ["<unk>", "<pad>", "<bos>"]
+    @test is_special_token("<unk>", specials) == true
+    @test is_special_token("hello", specials) == false
+    @test is_special_token("<pad>", specials) == true
+end
