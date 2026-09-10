@@ -95,6 +95,7 @@ export token_count
 export encode_parallel
 export prefix_tokens
 export suffix_tokens
+export is_special_token
 
 
 using Unicode
@@ -2905,6 +2906,16 @@ Find all tokens in the vocabulary that end with the given suffix.
 """
 function suffix_tokens(vocab::Set{String}, suffix::String)::Set{String}
     return Set(t for t in vocab if endswith(t, suffix))
+end
+
+
+"""
+    is_special_token(token, special_tokens) → Bool
+
+Check whether a token is in the special tokens list.
+"""
+function is_special_token(token::String, special_tokens::Vector{String})::Bool
+    return token in special_tokens
 end
 
 end
