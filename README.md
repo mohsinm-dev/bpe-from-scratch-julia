@@ -453,6 +453,8 @@ julia benchmarks/byte_level.jl    # byte-level BPE performance
 julia benchmarks/memory.jl        # memory usage profiling
 julia benchmarks/cache.jl         # cached vs uncached encoding
 julia --threads=4 benchmarks/parallel.jl  # multi-threaded training
+julia benchmarks/throughput.jl    # encoding throughput at various scales
+julia benchmarks/batch_encoding.jl # sequential vs parallel batch encoding
 ```
 
 Or run all at once: `make bench`
