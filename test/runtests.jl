@@ -1733,3 +1733,11 @@ end
     @test is_special_token("hello", specials) == false
     @test is_special_token("<pad>", specials) == true
 end
+
+@testset "common_prefixes" begin
+    vocab = Set(["low", "lower", "lowest", "high", "higher"])
+    prefixes = common_prefixes(vocab)
+    @test prefixes["lo"] >= 3
+    @test prefixes["hi"] >= 2
+    @test common_prefixes(Set{String}()) == Dict{String,Int}()
+end
