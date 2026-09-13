@@ -96,6 +96,7 @@ export encode_parallel
 export prefix_tokens
 export suffix_tokens
 export is_special_token
+export common_prefixes
 
 
 using Unicode
@@ -2916,6 +2917,23 @@ Check whether a token is in the special tokens list.
 """
 function is_special_token(token::String, special_tokens::Vector{String})::Bool
     return token in special_tokens
+end
+
+
+"""
+    common_prefixes(vocab; min_count=2, max_prefix_len=4) → Dict{String,Int}
+
+Find common prefixes among vocabulary tokens and count how many tokens share each prefix.
+"""
+function common_prefixes(vocab::Set{String}; min_count::Int=2, max_prefix_len::Int=4)::Dict{String,Int}
+    prefix_counts = Dict{String,Int}()
+    for token in vocab
+        for plen in 1:min(max_prefix_len, length(token)-1)
+            prefix = token[1:plen]
+            prefix_counts[prefix] = get(prefix_counts, prefix, 0) + 1
+        end
+    end
+    return Dict(p => c for (p, c) in prefix_counts if c >= min_count)
 end
 
 end
