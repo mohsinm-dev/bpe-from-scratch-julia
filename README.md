@@ -458,3 +458,6 @@ julia benchmarks/batch_encoding.jl # sequential vs parallel batch encoding
 ```
 
 Or run all at once: `make bench`
+- `prefix_tokens(vocab, prefix)` — tokens starting with a prefix
+- `suffix_tokens(vocab, suffix)` — tokens ending with a suffix
+- `common_prefixes(vocab)` — find shared prefixes among tokens
