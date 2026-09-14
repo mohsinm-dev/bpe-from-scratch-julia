@@ -1749,3 +1749,11 @@ end
     @test avg > 0.0
     @test average_compression(String[], merges) == 0.0
 end
+
+@testset "batch_coverage" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    covs = batch_coverage(["low lower", "xyz abc"], merges)
+    @test length(covs) == 2
+    @test covs[1] > covs[2]
+end
