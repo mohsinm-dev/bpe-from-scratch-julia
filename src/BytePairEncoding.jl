@@ -98,6 +98,7 @@ export suffix_tokens
 export is_special_token
 export common_prefixes
 export average_compression
+export batch_coverage
 
 
 using Unicode
@@ -2942,6 +2943,11 @@ function average_compression(texts::Vector{String}, merges::Vector{Tuple{String,
     isempty(texts) && return 0.0
     total = sum(compression_ratio(t, encode_text(t, merges)) for t in texts)
     return total / length(texts)
+end
+
+
+function batch_coverage(texts::Vector{String}, merges::Vector{Tuple{String,String}})::Vector{Float64}
+    return [coverage(text, merges) for text in texts]
 end
 
 end
