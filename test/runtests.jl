@@ -1741,3 +1741,11 @@ end
     @test prefixes["hi"] >= 2
     @test common_prefixes(Set{String}()) == Dict{String,Int}()
 end
+
+@testset "average_compression" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 10)
+    avg = average_compression(["low lower", "lowest"], merges)
+    @test avg > 0.0
+    @test average_compression(String[], merges) == 0.0
+end
