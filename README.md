@@ -461,3 +461,5 @@ Or run all at once: `make bench`
 - `prefix_tokens(vocab, prefix)` — tokens starting with a prefix
 - `suffix_tokens(vocab, suffix)` — tokens ending with a suffix
 - `common_prefixes(vocab)` — find shared prefixes among tokens
+- `average_compression(texts, merges)` — average compression across texts
+- `batch_coverage(texts, merges)` — coverage for each text in a batch
