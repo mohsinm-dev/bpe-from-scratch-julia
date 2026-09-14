@@ -97,6 +97,7 @@ export prefix_tokens
 export suffix_tokens
 export is_special_token
 export common_prefixes
+export average_compression
 
 
 using Unicode
@@ -2934,6 +2935,13 @@ function common_prefixes(vocab::Set{String}; min_count::Int=2, max_prefix_len::I
         end
     end
     return Dict(p => c for (p, c) in prefix_counts if c >= min_count)
+end
+
+
+function average_compression(texts::Vector{String}, merges::Vector{Tuple{String,String}})::Float64
+    isempty(texts) && return 0.0
+    total = sum(compression_ratio(t, encode_text(t, merges)) for t in texts)
+    return total / length(texts)
 end
 
 end
