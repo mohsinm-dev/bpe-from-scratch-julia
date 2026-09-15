@@ -99,6 +99,7 @@ export is_special_token
 export common_prefixes
 export average_compression
 export batch_coverage
+export merge_depth
 
 
 using Unicode
@@ -2948,6 +2949,19 @@ end
 
 function batch_coverage(texts::Vector{String}, merges::Vector{Tuple{String,String}})::Vector{Float64}
     return [coverage(text, merges) for text in texts]
+end
+
+
+function merge_depth(merges::Vector{Tuple{String,String}})::Int
+    isempty(merges) && return 0
+    depths = Dict{String,Int}()
+    max_d = 0
+    for (a, b) in merges
+        d = max(get(depths, a, 0), get(depths, b, 0)) + 1
+        depths[a * b] = d
+        max_d = max(max_d, d)
+    end
+    return max_d
 end
 
 end
