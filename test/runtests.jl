@@ -1757,3 +1757,10 @@ end
     @test length(covs) == 2
     @test covs[1] > covs[2]
 end
+
+@testset "merge_depth" begin
+    merges = [("l", "o"), ("lo", "w"), ("low", "</w>")]
+    @test merge_depth(merges) == 3
+    @test merge_depth([("a", "b")]) == 1
+    @test merge_depth(Tuple{String,String}[]) == 0
+end
