@@ -1764,3 +1764,12 @@ end
     @test merge_depth([("a", "b")]) == 1
     @test merge_depth(Tuple{String,String}[]) == 0
 end
+
+@testset "tokenizer_hash" begin
+    corpus = "low low low lower lower lowest"
+    t1 = train_tokenizer(corpus, 10)
+    t2 = train_tokenizer(corpus, 10)
+    @test tokenizer_hash(t1) == tokenizer_hash(t2)
+    t3 = train_tokenizer(corpus, 5)
+    @test tokenizer_hash(t1) != tokenizer_hash(t3)
+end
