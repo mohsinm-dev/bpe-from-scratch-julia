@@ -100,6 +100,7 @@ export common_prefixes
 export average_compression
 export batch_coverage
 export merge_depth
+export tokenizer_hash
 
 
 using Unicode
@@ -2962,6 +2963,11 @@ function merge_depth(merges::Vector{Tuple{String,String}})::Int
         max_d = max(max_d, d)
     end
     return max_d
+end
+
+
+function tokenizer_hash(t::BPETokenizer)::UInt64
+    return hash(t.merges, hash(t.special_tokens, hash(sort(collect(t.vocab_index)))))
 end
 
 end
