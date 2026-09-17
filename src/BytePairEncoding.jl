@@ -101,6 +101,7 @@ export average_compression
 export batch_coverage
 export merge_depth
 export tokenizer_hash
+export decode_safe
 
 
 using Unicode
@@ -2968,6 +2969,22 @@ end
 
 function tokenizer_hash(t::BPETokenizer)::UInt64
     return hash(t.merges, hash(t.special_tokens, hash(sort(collect(t.vocab_index)))))
+end
+
+
+function decode_safe(t::BPETokenizer, ids::Vector{Int})::Tuple{String,Vector{Int}}
+    unknown_ids = Int[]
+    string_tokens = String[]
+    for id in ids
+        token = get(t.id_to_token, id, nothing)
+        if token === nothing
+            push!(unknown_ids, id)
+            push!(string_tokens, "<unk>")
+        else
+            push!(string_tokens, token)
+        end
+    end
+    return (decode_tokens(string_tokens), unknown_ids)
 end
 
 end
