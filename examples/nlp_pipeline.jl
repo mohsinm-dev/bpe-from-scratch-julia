@@ -32,3 +32,10 @@ end
 # Vocabulary histogram
 println("\nToken length distribution:")
 println(token_length_histogram(tokenizer.vocab, max_width=30))
+
+# --- Safe decoding demo ---
+println("\n--- Safe Decoding ---")
+ids_with_unknown = vcat(encode(tokenizer, "low"), [99999])
+decoded_text, unknown_ids = decode_safe(tokenizer, ids_with_unknown)
+println("Decoded: $decoded_text")
+println("Unknown IDs: $unknown_ids")
