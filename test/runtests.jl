@@ -1773,3 +1773,14 @@ end
     t3 = train_tokenizer(corpus, 5)
     @test tokenizer_hash(t1) != tokenizer_hash(t3)
 end
+
+@testset "decode_safe" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    ids = encode(t, "low lower")
+    text, unknowns = decode_safe(t, ids)
+    @test text == "low lower"
+    @test isempty(unknowns)
+    text2, unknowns2 = decode_safe(t, [ids[1], 99999])
+    @test 99999 in unknowns2
+end
