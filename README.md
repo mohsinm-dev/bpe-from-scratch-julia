@@ -463,3 +463,4 @@ Or run all at once: `make bench`
 - `common_prefixes(vocab)` — find shared prefixes among tokens
 - `average_compression(texts, merges)` — average compression across texts
 - `batch_coverage(texts, merges)` — coverage for each text in a batch
+- `tokenize_file(filepath, merges; output)` — tokenize a file with optional output
