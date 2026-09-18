@@ -1784,3 +1784,12 @@ end
     text2, unknowns2 = decode_safe(t, [ids[1], 99999])
     @test 99999 in unknowns2
 end
+
+@testset "tokenize_file" begin
+    corpus_path = joinpath(@__DIR__, "..", "data", "sample_corpus.txt")
+    corpus = load_corpus(corpus_path)
+    _, merges = train_bpe(corpus, 10)
+    tokens = tokenize_file(corpus_path, merges)
+    @test length(tokens) > 0
+    @test_throws TokenizerError tokenize_file("nonexistent.txt", merges)
+end
