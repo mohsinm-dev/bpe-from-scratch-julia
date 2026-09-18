@@ -102,6 +102,7 @@ export batch_coverage
 export merge_depth
 export tokenizer_hash
 export decode_safe
+export tokenize_file
 
 
 using Unicode
@@ -2985,6 +2986,20 @@ function decode_safe(t::BPETokenizer, ids::Vector{Int})::Tuple{String,Vector{Int
         end
     end
     return (decode_tokens(string_tokens), unknown_ids)
+end
+
+
+function tokenize_file(filepath::String, merges::Vector{Tuple{String,String}}; output::Union{Nothing,String}=nothing)::Vector{String}
+    isfile(filepath) || throw(TokenizerError("file not found: $filepath"))
+    tokens = encode_streaming(filepath, merges)
+    if output !== nothing
+        open(output, "w") do io
+            for token in tokens
+                println(io, token)
+            end
+        end
+    end
+    return tokens
 end
 
 end
