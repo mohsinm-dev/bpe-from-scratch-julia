@@ -103,6 +103,7 @@ export merge_depth
 export tokenizer_hash
 export decode_safe
 export tokenize_file
+export merge_rule_frequency
 
 
 using Unicode
@@ -3000,6 +3001,23 @@ function tokenize_file(filepath::String, merges::Vector{Tuple{String,String}}; o
         end
     end
     return tokens
+end
+
+
+function merge_rule_frequency(merges::Vector{Tuple{String,String}}, corpus::String)::Vector{Int}
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    freqs = Int[]
+    for merge in merges
+        pair_counts = count_pairs(word_symbols)
+        push!(freqs, get(pair_counts, merge, 0))
+        new_ws = Dict{Vector{String},Int}()
+        for (symbols, f) in word_symbols
+            new_ws[merge_symbols(symbols, merge)] = f
+        end
+        word_symbols = new_ws
+    end
+    return freqs
 end
 
 end
