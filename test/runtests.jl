@@ -1793,3 +1793,11 @@ end
     @test length(tokens) > 0
     @test_throws TokenizerError tokenize_file("nonexistent.txt", merges)
 end
+
+@testset "merge_rule_frequency" begin
+    corpus = "low low low lower lower lowest"
+    _, merges = train_bpe(corpus, 5)
+    freqs = merge_rule_frequency(merges, corpus)
+    @test length(freqs) == length(merges)
+    @test all(f -> f > 0, freqs)
+end
