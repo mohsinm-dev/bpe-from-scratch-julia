@@ -105,6 +105,7 @@ export decode_safe
 export tokenize_file
 export merge_rule_frequency
 export vocab_intersection
+export training_progress
 
 
 using Unicode
@@ -3029,6 +3030,26 @@ function vocab_intersection(vocabs::Vector{Set{String}})::Set{String}
         result = intersect(result, vocabs[i])
     end
     return result
+end
+
+
+function training_progress(corpus::String, num_merges::Int; callback::Function)::Tuple{Dict{Vector{String},Int},Vector{Tuple{String,String}}}
+    frequencies = count_word_frequencies(corpus)
+    word_symbols = initialize_word_symbols(frequencies)
+    merges = Tuple{String,String}[]
+    for i in 1:num_merges
+        pair_counts = count_pairs(word_symbols)
+        pair = best_pair(pair_counts)
+        pair === nothing && break
+        push!(merges, pair)
+        callback(i, num_merges, pair, pair_counts[pair])
+        new_ws = Dict{Vector{String},Int}()
+        for (symbols, freq) in word_symbols
+            new_ws[merge_symbols(symbols, pair)] = freq
+        end
+        word_symbols = new_ws
+    end
+    return (word_symbols, merges)
 end
 
 end
