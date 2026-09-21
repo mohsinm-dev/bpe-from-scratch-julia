@@ -1801,3 +1801,11 @@ end
     @test length(freqs) == length(merges)
     @test all(f -> f > 0, freqs)
 end
+
+@testset "vocab_intersection" begin
+    v1 = Set(["a", "b", "c"])
+    v2 = Set(["b", "c", "d"])
+    v3 = Set(["c", "d", "e"])
+    @test vocab_intersection([v1, v2]) == Set(["b", "c"])
+    @test vocab_intersection([v1, v2, v3]) == Set(["c"])
+end
