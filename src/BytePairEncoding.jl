@@ -104,6 +104,7 @@ export tokenizer_hash
 export decode_safe
 export tokenize_file
 export merge_rule_frequency
+export vocab_intersection
 
 
 using Unicode
@@ -3018,6 +3019,16 @@ function merge_rule_frequency(merges::Vector{Tuple{String,String}}, corpus::Stri
         word_symbols = new_ws
     end
     return freqs
+end
+
+
+function vocab_intersection(vocabs::Vector{Set{String}})::Set{String}
+    isempty(vocabs) && return Set{String}()
+    result = copy(vocabs[1])
+    for i in 2:length(vocabs)
+        result = intersect(result, vocabs[i])
+    end
+    return result
 end
 
 end
