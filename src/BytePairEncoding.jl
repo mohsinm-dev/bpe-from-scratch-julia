@@ -106,6 +106,7 @@ export tokenize_file
 export merge_rule_frequency
 export vocab_intersection
 export training_progress
+export vocab_to_json_string
 
 
 using Unicode
@@ -3050,6 +3051,13 @@ function training_progress(corpus::String, num_merges::Int; callback::Function):
         word_symbols = new_ws
     end
     return (word_symbols, merges)
+end
+
+
+function vocab_to_json_string(vocab_index::Dict{String,Int})::String
+    sorted = sort(collect(vocab_index), by=x -> x[2])
+    entries = ["    \"$(replace(k, "\"" => "\\\""))\": $v" for (k, v) in sorted]
+    return "{\n" * join(entries, ",\n") * "\n}"
 end
 
 end
