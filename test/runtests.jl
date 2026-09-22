@@ -1809,3 +1809,12 @@ end
     @test vocab_intersection([v1, v2]) == Set(["b", "c"])
     @test vocab_intersection([v1, v2, v3]) == Set(["c"])
 end
+
+@testset "training_progress" begin
+    corpus = "low low low lower lower lowest"
+    steps_seen = Int[]
+    vocab, merges = training_progress(corpus, 5,
+        callback=(step, total, pair, freq) -> push!(steps_seen, step))
+    @test length(steps_seen) == length(merges)
+    @test steps_seen == collect(1:length(merges))
+end
