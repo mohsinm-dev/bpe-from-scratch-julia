@@ -107,6 +107,7 @@ export merge_rule_frequency
 export vocab_intersection
 export training_progress
 export vocab_to_json_string
+export max_token_id
 
 
 using Unicode
@@ -3058,6 +3059,11 @@ function vocab_to_json_string(vocab_index::Dict{String,Int})::String
     sorted = sort(collect(vocab_index), by=x -> x[2])
     entries = ["    \"$(replace(k, "\"" => "\\\""))\": $v" for (k, v) in sorted]
     return "{\n" * join(entries, ",\n") * "\n}"
+end
+
+
+function max_token_id(t::BPETokenizer)::Int
+    return maximum(values(t.vocab_index))
 end
 
 end
