@@ -108,6 +108,7 @@ export vocab_intersection
 export training_progress
 export vocab_to_json_string
 export max_token_id
+export vocab_size
 
 
 using Unicode
@@ -3064,6 +3065,11 @@ end
 
 function max_token_id(t::BPETokenizer)::Int
     return maximum(values(t.vocab_index))
+end
+
+
+function vocab_size(t::BPETokenizer)::Int
+    return length(t.vocab)
 end
 
 end
