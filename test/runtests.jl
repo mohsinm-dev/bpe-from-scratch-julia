@@ -1818,3 +1818,10 @@ end
     @test length(steps_seen) == length(merges)
     @test steps_seen == collect(1:length(merges))
 end
+
+@testset "vocab_to_json_string" begin
+    index = Dict("lo" => 1, "w" => 2)
+    json = vocab_to_json_string(index)
+    @test occursin("\"lo\": 1", json)
+    @test startswith(json, "{")
+end
