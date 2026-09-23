@@ -1825,3 +1825,10 @@ end
     @test occursin("\"lo\": 1", json)
     @test startswith(json, "{")
 end
+
+@testset "max_token_id and vocab_size" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test max_token_id(t) == length(t.vocab_index)
+    @test vocab_size(t) == length(t.vocab)
+end
