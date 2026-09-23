@@ -464,3 +464,4 @@ Or run all at once: `make bench`
 - `average_compression(texts, merges)` — average compression across texts
 - `batch_coverage(texts, merges)` — coverage for each text in a batch
 - `tokenize_file(filepath, merges; output)` — tokenize a file with optional output
+- `examples/analysis_demo.jl` — vocabulary and encoding analysis tools
