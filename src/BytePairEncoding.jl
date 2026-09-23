@@ -110,6 +110,7 @@ export vocab_to_json_string
 export max_token_id
 export vocab_size
 export merge_count
+export has_token
 
 
 using Unicode
@@ -3076,6 +3077,11 @@ end
 
 function merge_count(t::BPETokenizer)::Int
     return length(t.merges)
+end
+
+
+function has_token(t::BPETokenizer, token::String)::Bool
+    return haskey(t.vocab_index, token)
 end
 
 end
