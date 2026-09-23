@@ -109,6 +109,7 @@ export training_progress
 export vocab_to_json_string
 export max_token_id
 export vocab_size
+export merge_count
 
 
 using Unicode
@@ -3070,6 +3071,11 @@ end
 
 function vocab_size(t::BPETokenizer)::Int
     return length(t.vocab)
+end
+
+
+function merge_count(t::BPETokenizer)::Int
+    return length(t.merges)
 end
 
 end
