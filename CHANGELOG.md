@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-09-24
+
+### Added
+- Corpus utilities: `corpus_vocabulary`, `split_corpus`, `char_coverage`, `unknown_characters`
+- Encoding: `encode_truncated`, `encode_parallel`, `tokenize_file`, `token_count`
+- Vocabulary: `prefix_tokens`, `suffix_tokens`, `common_prefixes`, `vocab_intersection`
+- Analysis: `average_compression`, `batch_coverage`, `merge_depth`, `merge_rule_frequency`
+- Tokenizer: `decode_safe`, `tokenizer_hash`, `training_progress`, `vocab_to_json_string`
+- Accessors: `max_token_id`, `vocab_size`, `merge_count`, `has_token`, `is_special_token`
+- Helpers: `remove_special_tokens_from`
+- Batch encoding benchmark and analysis demo example
+
+
 ## [0.5.0] - 2026-08-22
 
 ### Added
