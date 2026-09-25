@@ -1840,3 +1840,12 @@ end
     @test has_token(t, "<unk>") == true
     @test has_token(t, "nonexistent_xyz") == false
 end
+
+@testset "encode_with_bos_eos" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10, special_tokens=["<unk>", "<pad>", "<bos>", "<eos>"])
+    ids = encode_with_bos_eos(t, "low")
+    @test ids[1] == t.vocab_index["<bos>"]
+    @test ids[end] == t.vocab_index["<eos>"]
+    @test length(ids) == length(encode(t, "low")) + 2
+end
