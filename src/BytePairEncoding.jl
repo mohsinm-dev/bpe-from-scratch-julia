@@ -111,6 +111,7 @@ export max_token_id
 export vocab_size
 export merge_count
 export has_token
+export encode_with_bos_eos
 
 
 using Unicode
@@ -3082,6 +3083,13 @@ end
 
 function has_token(t::BPETokenizer, token::String)::Bool
     return haskey(t.vocab_index, token)
+end
+
+
+function encode_with_bos_eos(t::BPETokenizer, text::String; bos::String="<bos>", eos::String="<eos>")::Vector{Int}
+    ids = encode(t, text)
+    unk_id = get(t.vocab_index, "<unk>", 0)
+    return vcat([get(t.vocab_index, bos, unk_id)], ids, [get(t.vocab_index, eos, unk_id)])
 end
 
 end
