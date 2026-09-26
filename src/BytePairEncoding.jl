@@ -112,6 +112,7 @@ export vocab_size
 export merge_count
 export has_token
 export encode_with_bos_eos
+export detokenize
 
 
 using Unicode
@@ -3090,6 +3091,13 @@ function encode_with_bos_eos(t::BPETokenizer, text::String; bos::String="<bos>",
     ids = encode(t, text)
     unk_id = get(t.vocab_index, "<unk>", 0)
     return vcat([get(t.vocab_index, bos, unk_id)], ids, [get(t.vocab_index, eos, unk_id)])
+end
+
+
+function detokenize(tokens::Vector{String}; word_boundary::String="</w>")::String
+    text = join(tokens, "")
+    text = replace(text, word_boundary => " ")
+    return strip(text) |> String
 end
 
 end
