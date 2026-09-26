@@ -1849,3 +1849,9 @@ end
     @test ids[end] == t.vocab_index["<eos>"]
     @test length(ids) == length(encode(t, "low")) + 2
 end
+
+@testset "detokenize" begin
+    @test detokenize(["low", "</w>", "er", "</w>"]) == "low er"
+    @test detokenize(["h", "i", "</w>"]) == "hi"
+    @test detokenize(String[]) == ""
+end
