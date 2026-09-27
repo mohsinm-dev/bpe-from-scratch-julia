@@ -71,3 +71,10 @@ When adding a new exported function:
 2. Include a docstring with signature, description, and example if non-obvious
 3. Add tests in `test/runtests.jl` covering normal use and edge cases
 4. Update the API reference in `README.md` if the function is user-facing
+
+## Naming conventions
+
+- Function names use `snake_case`
+- Type names use `PascalCase`
+- Constants use `UPPER_SNAKE_CASE`
+- Predicate functions start with `is_` or `has_`
