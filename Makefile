@@ -23,3 +23,6 @@ examples:
 
 clean:
 	rm -rf /tmp/bpe_out output/
+
+analyze:
+	julia scripts/analyze.jl /tmp/bpe_out "the quick brown fox"
