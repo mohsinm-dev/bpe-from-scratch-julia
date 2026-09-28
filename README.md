@@ -468,3 +468,6 @@ Or run all at once: `make bench`
 - `encode_with_bos_eos(tokenizer, text)` — encode with sequence markers
 - `encode_truncated(tokenizer, text, max_tokens)` — encode with token limit
 - `encode_parallel(tokenizer, texts)` — threaded multi-text encoding
+- `decode_safe(tokenizer, ids)` — decode with unknown ID tracking
+- `detokenize(tokens)` — intuitive token-to-text conversion
+- `token_ids_to_text(tokenizer, ids)` — IDs to text with special token filtering
