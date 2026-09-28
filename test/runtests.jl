@@ -1855,3 +1855,11 @@ end
     @test detokenize(["h", "i", "</w>"]) == "hi"
     @test detokenize(String[]) == ""
 end
+
+@testset "token_ids_to_text" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    ids = encode(t, "low lower")
+    @test token_ids_to_text(t, ids) == "low lower"
+    @test token_ids_to_text(t, Int[]) == ""
+end
