@@ -113,6 +113,7 @@ export merge_count
 export has_token
 export encode_with_bos_eos
 export detokenize
+export token_ids_to_text
 
 
 using Unicode
@@ -3098,6 +3099,15 @@ function detokenize(tokens::Vector{String}; word_boundary::String="</w>")::Strin
     text = join(tokens, "")
     text = replace(text, word_boundary => " ")
     return strip(text) |> String
+end
+
+
+function token_ids_to_text(t::BPETokenizer, ids::Vector{Int}; skip_special::Bool=false)::String
+    tokens = [get(t.id_to_token, id, "<unk>") for id in ids]
+    if skip_special
+        tokens = remove_special_tokens_from(tokens, t.special_tokens)
+    end
+    return decode_tokens(tokens)
 end
 
 end
