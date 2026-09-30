@@ -114,6 +114,7 @@ export has_token
 export encode_with_bos_eos
 export detokenize
 export token_ids_to_text
+export format_token_table
 
 
 using Unicode
@@ -3108,6 +3109,18 @@ function token_ids_to_text(t::BPETokenizer, ids::Vector{Int}; skip_special::Bool
         tokens = remove_special_tokens_from(tokens, t.special_tokens)
     end
     return decode_tokens(tokens)
+end
+
+
+function format_token_table(tokens::Vector{String}; max_col::Int=80)::String
+    isempty(tokens) && return ""
+    lines = ["  # | Token           | Length"]
+    push!(lines, "  " * "-" ^ 35)
+    for (i, token) in enumerate(tokens)
+        display_token = length(token) > 15 ? token[1:12] * "..." : token
+        push!(lines, "$(lpad(i, 3)) | $(rpad(display_token, 15)) | $(lpad(length(token), 6))")
+    end
+    return join(lines, "\n")
 end
 
 end
