@@ -1863,3 +1863,11 @@ end
     @test token_ids_to_text(t, ids) == "low lower"
     @test token_ids_to_text(t, Int[]) == ""
 end
+
+@testset "format_token_table" begin
+    tokens = ["lo", "w", "</w>", "er"]
+    table = format_token_table(tokens)
+    @test occursin("Token", table)
+    @test length(split(table, "\n")) == length(tokens) + 2
+    @test format_token_table(String[]) == ""
+end
