@@ -1899,3 +1899,11 @@ end
     @test unk_token_id(t) == t.vocab_index["<unk>"]
     @test id_to_token(t, unk_token_id(t)) == "<unk>"
 end
+
+@testset "is_unk" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test is_unk(t, t.vocab_index["<unk>"])
+    @test is_unk(t, 99999)
+    @test !is_unk(t, t.vocab_index["<pad>"])
+end
