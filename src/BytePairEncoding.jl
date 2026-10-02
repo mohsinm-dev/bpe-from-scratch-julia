@@ -119,6 +119,7 @@ export unique_token_count
 export token_to_id
 export id_to_token
 export unk_token_id
+export is_unk
 
 
 using Unicode
@@ -3145,6 +3146,11 @@ end
 
 function unk_token_id(t::BPETokenizer)::Int
     return get(t.vocab_index, "<unk>", 0)
+end
+
+
+function is_unk(t::BPETokenizer, id::Int)::Bool
+    return id == get(t.vocab_index, "<unk>", 0) || !haskey(t.id_to_token, id)
 end
 
 end
