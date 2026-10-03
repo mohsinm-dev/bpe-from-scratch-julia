@@ -473,3 +473,5 @@ Or run all at once: `make bench`
 - `token_ids_to_text(tokenizer, ids)` — IDs to text with special token filtering
 - `token_to_id(tokenizer, token)` — single-token ID lookup
 - `id_to_token(tokenizer, id)` — single-ID token lookup
+- `unk_token_id(tokenizer)` — ID of the unknown token
+- `is_unk(tokenizer, id)` — check whether an ID maps to the unknown token
