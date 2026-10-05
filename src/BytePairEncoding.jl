@@ -120,6 +120,7 @@ export token_to_id
 export id_to_token
 export unk_token_id
 export is_unk
+export encode_to_tokens
 
 
 using Unicode
@@ -3151,6 +3152,11 @@ end
 
 function is_unk(t::BPETokenizer, id::Int)::Bool
     return id == get(t.vocab_index, "<unk>", 0) || !haskey(t.id_to_token, id)
+end
+
+
+function encode_to_tokens(t::BPETokenizer, text::String)::Vector{String}
+    return [get(t.id_to_token, id, "<unk>") for id in encode(t, text)]
 end
 
 end
