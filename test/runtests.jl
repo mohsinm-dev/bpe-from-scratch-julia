@@ -1907,3 +1907,11 @@ end
     @test is_unk(t, 99999)
     @test !is_unk(t, t.vocab_index["<pad>"])
 end
+
+@testset "encode_to_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    tokens = encode_to_tokens(t, "low lower")
+    @test tokens isa Vector{String}
+    @test length(tokens) == length(encode(t, "low lower"))
+end
