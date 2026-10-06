@@ -1915,3 +1915,10 @@ end
     @test tokens isa Vector{String}
     @test length(tokens) == length(encode(t, "low lower"))
 end
+
+@testset "count_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test count_tokens(t, "low lower") == length(encode(t, "low lower"))
+    @test count_tokens(t, "") == 0
+end
