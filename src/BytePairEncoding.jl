@@ -121,6 +121,7 @@ export id_to_token
 export unk_token_id
 export is_unk
 export encode_to_tokens
+export count_tokens
 
 
 using Unicode
@@ -3157,6 +3158,11 @@ end
 
 function encode_to_tokens(t::BPETokenizer, text::String)::Vector{String}
     return [get(t.id_to_token, id, "<unk>") for id in encode(t, text)]
+end
+
+
+function count_tokens(t::BPETokenizer, text::String)::Int
+    return length(encode(t, text))
 end
 
 end
