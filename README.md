@@ -475,3 +475,5 @@ Or run all at once: `make bench`
 - `id_to_token(tokenizer, id)` — single-ID token lookup
 - `unk_token_id(tokenizer)` — ID of the unknown token
 - `is_unk(tokenizer, id)` — check whether an ID maps to the unknown token
+- `encode_to_tokens(tokenizer, text)` — encode text to token strings
+- `count_tokens(tokenizer, text)` — number of tokens in encoded text
