@@ -1922,3 +1922,8 @@ end
     @test count_tokens(t, "low lower") == length(encode(t, "low lower"))
     @test count_tokens(t, "") == 0
 end
+
+@testset "token_lengths" begin
+    @test token_lengths(["lo", "w", "</w>"]) == [2, 1, 4]
+    @test token_lengths(String[]) == Int[]
+end
