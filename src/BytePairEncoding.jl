@@ -122,6 +122,7 @@ export unk_token_id
 export is_unk
 export encode_to_tokens
 export count_tokens
+export token_lengths
 
 
 using Unicode
@@ -3163,6 +3164,11 @@ end
 
 function count_tokens(t::BPETokenizer, text::String)::Int
     return length(encode(t, text))
+end
+
+
+function token_lengths(tokens::Vector{String})::Vector{Int}
+    return length.(tokens)
 end
 
 end
