@@ -1927,3 +1927,11 @@ end
     @test token_lengths(["lo", "w", "</w>"]) == [2, 1, 4]
     @test token_lengths(String[]) == Int[]
 end
+
+@testset "longest_token" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    lt = longest_token(t)
+    @test lt in t.vocab
+    @test all(length(v) <= length(lt) for v in t.vocab)
+end
