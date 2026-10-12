@@ -124,6 +124,7 @@ export encode_to_tokens
 export count_tokens
 export token_lengths
 export longest_token
+export tokens_of_length
 
 
 using Unicode
@@ -3176,6 +3177,11 @@ end
 function longest_token(t::BPETokenizer)::String
     isempty(t.vocab) && return ""
     return argmax(length, collect(t.vocab))
+end
+
+
+function tokens_of_length(t::BPETokenizer, n::Int)::Vector{String}
+    return sort([v for v in t.vocab if length(v) == n])
 end
 
 end
