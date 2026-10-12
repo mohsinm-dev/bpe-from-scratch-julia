@@ -1935,3 +1935,10 @@ end
     @test lt in t.vocab
     @test all(length(v) <= length(lt) for v in t.vocab)
 end
+
+@testset "tokens_of_length" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test all(length(v) == 1 for v in tokens_of_length(t, 1))
+    @test tokens_of_length(t, 1000) == String[]
+end
