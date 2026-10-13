@@ -477,3 +477,6 @@ Or run all at once: `make bench`
 - `is_unk(tokenizer, id)` — check whether an ID maps to the unknown token
 - `encode_to_tokens(tokenizer, text)` — encode text to token strings
 - `count_tokens(tokenizer, text)` — number of tokens in encoded text
+- `token_lengths(tokens)` — character length of each token
+- `longest_token(tokenizer)` — longest entry in the vocabulary
+- `tokens_of_length(tokenizer, n)` — vocabulary entries of length n
