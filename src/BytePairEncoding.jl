@@ -125,6 +125,7 @@ export count_tokens
 export token_lengths
 export longest_token
 export tokens_of_length
+export merge_rank
 
 
 using Unicode
@@ -3182,6 +3183,12 @@ end
 
 function tokens_of_length(t::BPETokenizer, n::Int)::Vector{String}
     return sort([v for v in t.vocab if length(v) == n])
+end
+
+
+function merge_rank(t::BPETokenizer, pair::Tuple{String,String})::Int
+    idx = findfirst(==(pair), t.merges)
+    return idx === nothing ? 0 : idx
 end
 
 end
