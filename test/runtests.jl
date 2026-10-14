@@ -1942,3 +1942,10 @@ end
     @test all(length(v) == 1 for v in tokens_of_length(t, 1))
     @test tokens_of_length(t, 1000) == String[]
 end
+
+@testset "merge_rank" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test merge_rank(t, t.merges[1]) == 1
+    @test merge_rank(t, ("zz", "qq")) == 0
+end
