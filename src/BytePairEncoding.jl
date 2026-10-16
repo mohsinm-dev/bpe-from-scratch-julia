@@ -126,6 +126,7 @@ export token_lengths
 export longest_token
 export tokens_of_length
 export merge_rank
+export vocab_by_id
 
 
 using Unicode
@@ -3189,6 +3190,11 @@ end
 function merge_rank(t::BPETokenizer, pair::Tuple{String,String})::Int
     idx = findfirst(==(pair), t.merges)
     return idx === nothing ? 0 : idx
+end
+
+
+function vocab_by_id(t::BPETokenizer)::Vector{String}
+    return [t.id_to_token[id] for id in sort(collect(keys(t.id_to_token)))]
 end
 
 end
