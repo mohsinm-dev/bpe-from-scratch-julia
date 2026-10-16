@@ -1949,3 +1949,11 @@ end
     @test merge_rank(t, t.merges[1]) == 1
     @test merge_rank(t, ("zz", "qq")) == 0
 end
+
+@testset "vocab_by_id" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    v = vocab_by_id(t)
+    @test length(v) == length(t.id_to_token)
+    @test v[1] == t.id_to_token[minimum(keys(t.id_to_token))]
+end
