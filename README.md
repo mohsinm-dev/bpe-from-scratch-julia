@@ -480,3 +480,5 @@ Or run all at once: `make bench`
 - `token_lengths(tokens)` — character length of each token
 - `longest_token(tokenizer)` — longest entry in the vocabulary
 - `tokens_of_length(tokenizer, n)` — vocabulary entries of length n
+- `merge_rank(tokenizer, pair)` — priority of a merge rule (0 if absent)
+- `vocab_by_id(tokenizer)` — vocabulary ordered by token ID
