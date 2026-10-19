@@ -1957,3 +1957,10 @@ end
     @test length(v) == length(t.id_to_token)
     @test v[1] == t.id_to_token[minimum(keys(t.id_to_token))]
 end
+
+@testset "tokens_per_word" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test tokens_per_word(t, "") == 0.0
+    @test tokens_per_word(t, "low lower") > 0.0
+end
