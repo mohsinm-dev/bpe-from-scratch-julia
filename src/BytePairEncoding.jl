@@ -127,6 +127,7 @@ export longest_token
 export tokens_of_length
 export merge_rank
 export vocab_by_id
+export tokens_per_word
 
 
 using Unicode
@@ -3195,6 +3196,13 @@ end
 
 function vocab_by_id(t::BPETokenizer)::Vector{String}
     return [t.id_to_token[id] for id in sort(collect(keys(t.id_to_token)))]
+end
+
+
+function tokens_per_word(t::BPETokenizer, text::String)::Float64
+    words = split(text)
+    isempty(words) && return 0.0
+    return length(encode(t, text)) / length(words)
 end
 
 end
