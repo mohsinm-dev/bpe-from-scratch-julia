@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-10-20
+
+### Added
+- Lookup: `unk_token_id`, `is_unk`, `merge_rank`, `vocab_by_id`
+- Encoding: `encode_to_tokens`, `count_tokens`, `tokens_per_word`
+- Vocabulary: `token_lengths`, `longest_token`, `tokens_of_length`
+
+
 ## [0.6.0] - 2026-09-24
 
 ### Added
