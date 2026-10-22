@@ -128,6 +128,7 @@ export tokens_of_length
 export merge_rank
 export vocab_by_id
 export tokens_per_word
+export pad_token_id
 
 
 using Unicode
@@ -3203,6 +3204,11 @@ function tokens_per_word(t::BPETokenizer, text::String)::Float64
     words = split(text)
     isempty(words) && return 0.0
     return length(encode(t, text)) / length(words)
+end
+
+
+function pad_token_id(t::BPETokenizer)::Int
+    return get(t.vocab_index, "<pad>", get(t.vocab_index, "<unk>", 0))
 end
 
 end
