@@ -1964,3 +1964,9 @@ end
     @test tokens_per_word(t, "") == 0.0
     @test tokens_per_word(t, "low lower") > 0.0
 end
+
+@testset "pad_token_id" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test pad_token_id(t) == t.vocab_index["<pad>"]
+end
