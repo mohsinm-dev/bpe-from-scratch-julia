@@ -129,6 +129,7 @@ export merge_rank
 export vocab_by_id
 export tokens_per_word
 export pad_token_id
+export shortest_token
 
 
 using Unicode
@@ -3209,6 +3210,12 @@ end
 
 function pad_token_id(t::BPETokenizer)::Int
     return get(t.vocab_index, "<pad>", get(t.vocab_index, "<unk>", 0))
+end
+
+
+function shortest_token(t::BPETokenizer)::String
+    isempty(t.vocab) && return ""
+    return argmin(length, collect(t.vocab))
 end
 
 end
