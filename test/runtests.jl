@@ -1970,3 +1970,11 @@ end
     t = train_tokenizer(corpus, 10)
     @test pad_token_id(t) == t.vocab_index["<pad>"]
 end
+
+@testset "shortest_token" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    st = shortest_token(t)
+    @test st in t.vocab
+    @test all(length(v) >= length(st) for v in t.vocab)
+end
