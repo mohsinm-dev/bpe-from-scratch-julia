@@ -483,3 +483,5 @@ Or run all at once: `make bench`
 - `merge_rank(tokenizer, pair)` — priority of a merge rule (0 if absent)
 - `vocab_by_id(tokenizer)` — vocabulary ordered by token ID
 - `tokens_per_word(tokenizer, text)` — average tokens per whitespace word
+- `pad_token_id(tokenizer)` — ID of the padding token
+- `shortest_token(tokenizer)` — shortest entry in the vocabulary
