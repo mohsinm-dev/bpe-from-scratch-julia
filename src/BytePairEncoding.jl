@@ -130,6 +130,7 @@ export vocab_by_id
 export tokens_per_word
 export pad_token_id
 export shortest_token
+export merges_containing
 
 
 using Unicode
@@ -3216,6 +3217,11 @@ end
 function shortest_token(t::BPETokenizer)::String
     isempty(t.vocab) && return ""
     return argmin(length, collect(t.vocab))
+end
+
+
+function merges_containing(t::BPETokenizer, symbol::String)::Vector{Tuple{String,String}}
+    return [m for m in t.merges if m[1] == symbol || m[2] == symbol]
 end
 
 end
