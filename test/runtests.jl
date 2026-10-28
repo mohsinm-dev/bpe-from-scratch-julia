@@ -1978,3 +1978,11 @@ end
     @test st in t.vocab
     @test all(length(v) >= length(st) for v in t.vocab)
 end
+
+@testset "merges_containing" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    a, b = t.merges[1]
+    @test t.merges[1] in merges_containing(t, a)
+    @test isempty(merges_containing(t, "zzz"))
+end
