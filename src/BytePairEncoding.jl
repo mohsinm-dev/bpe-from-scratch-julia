@@ -131,6 +131,7 @@ export tokens_per_word
 export pad_token_id
 export shortest_token
 export merges_containing
+export first_merge
 
 
 using Unicode
@@ -3222,6 +3223,11 @@ end
 
 function merges_containing(t::BPETokenizer, symbol::String)::Vector{Tuple{String,String}}
     return [m for m in t.merges if m[1] == symbol || m[2] == symbol]
+end
+
+
+function first_merge(t::BPETokenizer)::Union{Nothing,Tuple{String,String}}
+    return isempty(t.merges) ? nothing : first(t.merges)
 end
 
 end
