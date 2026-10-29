@@ -1986,3 +1986,9 @@ end
     @test t.merges[1] in merges_containing(t, a)
     @test isempty(merges_containing(t, "zzz"))
 end
+
+@testset "first_merge" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test first_merge(t) == t.merges[1]
+end
