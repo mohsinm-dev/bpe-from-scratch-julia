@@ -485,3 +485,5 @@ Or run all at once: `make bench`
 - `tokens_per_word(tokenizer, text)` — average tokens per whitespace word
 - `pad_token_id(tokenizer)` — ID of the padding token
 - `shortest_token(tokenizer)` — shortest entry in the vocabulary
+- `merges_containing(tokenizer, symbol)` — merge rules that use a symbol
+- `first_merge(tokenizer)` — highest-priority merge rule
