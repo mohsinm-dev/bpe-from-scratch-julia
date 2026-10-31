@@ -132,6 +132,7 @@ export pad_token_id
 export shortest_token
 export merges_containing
 export first_merge
+export last_merge
 
 
 using Unicode
@@ -3228,6 +3229,11 @@ end
 
 function first_merge(t::BPETokenizer)::Union{Nothing,Tuple{String,String}}
     return isempty(t.merges) ? nothing : first(t.merges)
+end
+
+
+function last_merge(t::BPETokenizer)::Union{Nothing,Tuple{String,String}}
+    return isempty(t.merges) ? nothing : last(t.merges)
 end
 
 end
