@@ -1992,3 +1992,9 @@ end
     t = train_tokenizer(corpus, 10)
     @test first_merge(t) == t.merges[1]
 end
+
+@testset "last_merge" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test last_merge(t) == t.merges[end]
+end
