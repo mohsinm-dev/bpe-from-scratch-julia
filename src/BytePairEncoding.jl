@@ -133,6 +133,7 @@ export shortest_token
 export merges_containing
 export first_merge
 export last_merge
+export single_char_tokens
 
 
 using Unicode
@@ -3234,6 +3235,11 @@ end
 
 function last_merge(t::BPETokenizer)::Union{Nothing,Tuple{String,String}}
     return isempty(t.merges) ? nothing : last(t.merges)
+end
+
+
+function single_char_tokens(t::BPETokenizer)::Vector{String}
+    return sort([v for v in t.vocab if length(v) == 1])
 end
 
 end
