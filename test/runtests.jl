@@ -1998,3 +1998,10 @@ end
     t = train_tokenizer(corpus, 10)
     @test last_merge(t) == t.merges[end]
 end
+
+@testset "single_char_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test all(length(v) == 1 for v in single_char_tokens(t))
+    @test issubset(single_char_tokens(t), t.vocab)
+end
