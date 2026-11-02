@@ -134,6 +134,7 @@ export merges_containing
 export first_merge
 export last_merge
 export single_char_tokens
+export multi_char_tokens
 
 
 using Unicode
@@ -3240,6 +3241,11 @@ end
 
 function single_char_tokens(t::BPETokenizer)::Vector{String}
     return sort([v for v in t.vocab if length(v) == 1])
+end
+
+
+function multi_char_tokens(t::BPETokenizer)::Vector{String}
+    return sort([v for v in t.vocab if length(v) > 1])
 end
 
 end
