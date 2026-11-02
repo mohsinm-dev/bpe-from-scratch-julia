@@ -487,3 +487,5 @@ Or run all at once: `make bench`
 - `shortest_token(tokenizer)` — shortest entry in the vocabulary
 - `merges_containing(tokenizer, symbol)` — merge rules that use a symbol
 - `first_merge(tokenizer)` — highest-priority merge rule
+- `last_merge(tokenizer)` — last learned merge rule
+- `single_char_tokens(tokenizer)` — one-character vocabulary entries
