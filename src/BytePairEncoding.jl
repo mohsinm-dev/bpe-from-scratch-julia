@@ -135,6 +135,7 @@ export first_merge
 export last_merge
 export single_char_tokens
 export multi_char_tokens
+export encode_lowercase
 
 
 using Unicode
@@ -3246,6 +3247,11 @@ end
 
 function multi_char_tokens(t::BPETokenizer)::Vector{String}
     return sort([v for v in t.vocab if length(v) > 1])
+end
+
+
+function encode_lowercase(t::BPETokenizer, text::String)::Vector{Int}
+    return encode(t, lowercase(text))
 end
 
 end
