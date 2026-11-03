@@ -2005,3 +2005,10 @@ end
     @test all(length(v) == 1 for v in single_char_tokens(t))
     @test issubset(single_char_tokens(t), t.vocab)
 end
+
+@testset "multi_char_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test all(length(v) > 1 for v in multi_char_tokens(t))
+    @test length(multi_char_tokens(t)) + length(single_char_tokens(t)) == length(t.vocab)
+end
