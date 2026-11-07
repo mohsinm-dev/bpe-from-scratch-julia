@@ -489,3 +489,5 @@ Or run all at once: `make bench`
 - `first_merge(tokenizer)` — highest-priority merge rule
 - `last_merge(tokenizer)` — last learned merge rule
 - `single_char_tokens(tokenizer)` — one-character vocabulary entries
+- `multi_char_tokens(tokenizer)` — vocabulary entries longer than one character
+- `encode_lowercase(tokenizer, text)` — lowercase text before encoding
