@@ -2012,3 +2012,9 @@ end
     @test all(length(v) > 1 for v in multi_char_tokens(t))
     @test length(multi_char_tokens(t)) + length(single_char_tokens(t)) == length(t.vocab)
 end
+
+@testset "encode_lowercase" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test encode_lowercase(t, "LOW Lower") == encode(t, "low lower")
+end
