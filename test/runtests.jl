@@ -2018,3 +2018,10 @@ end
     t = train_tokenizer(corpus, 10)
     @test encode_lowercase(t, "LOW Lower") == encode(t, "low lower")
 end
+
+@testset "count_unk" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test count_unk(t, "low lower") == 0
+    @test count_unk(t, "") == 0
+end
