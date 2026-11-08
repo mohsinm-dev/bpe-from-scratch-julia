@@ -136,6 +136,7 @@ export last_merge
 export single_char_tokens
 export multi_char_tokens
 export encode_lowercase
+export count_unk
 
 
 using Unicode
@@ -3252,6 +3253,12 @@ end
 
 function encode_lowercase(t::BPETokenizer, text::String)::Vector{Int}
     return encode(t, lowercase(text))
+end
+
+
+function count_unk(t::BPETokenizer, text::String)::Int
+    unk = get(t.vocab_index, "<unk>", 0)
+    return count(==(unk), encode(t, text))
 end
 
 end
