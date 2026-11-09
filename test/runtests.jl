@@ -2025,3 +2025,10 @@ end
     @test count_unk(t, "low lower") == 0
     @test count_unk(t, "") == 0
 end
+
+@testset "unk_ratio" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test unk_ratio(t, "") == 0.0
+    @test 0.0 <= unk_ratio(t, "low xyz") <= 1.0
+end
