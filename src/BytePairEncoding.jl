@@ -137,6 +137,7 @@ export single_char_tokens
 export multi_char_tokens
 export encode_lowercase
 export count_unk
+export unk_ratio
 
 
 using Unicode
@@ -3259,6 +3260,12 @@ end
 function count_unk(t::BPETokenizer, text::String)::Int
     unk = get(t.vocab_index, "<unk>", 0)
     return count(==(unk), encode(t, text))
+end
+
+
+function unk_ratio(t::BPETokenizer, text::String)::Float64
+    n = length(encode(t, text))
+    return n == 0 ? 0.0 : count_unk(t, text) / n
 end
 
 end
