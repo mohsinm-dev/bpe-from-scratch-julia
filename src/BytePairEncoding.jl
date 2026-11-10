@@ -138,6 +138,7 @@ export multi_char_tokens
 export encode_lowercase
 export count_unk
 export unk_ratio
+export id_range
 
 
 using Unicode
@@ -3266,6 +3267,12 @@ end
 function unk_ratio(t::BPETokenizer, text::String)::Float64
     n = length(encode(t, text))
     return n == 0 ? 0.0 : count_unk(t, text) / n
+end
+
+
+function id_range(t::BPETokenizer)::UnitRange{Int}
+    isempty(t.id_to_token) && return 1:0
+    return minimum(keys(t.id_to_token)):maximum(keys(t.id_to_token))
 end
 
 end
