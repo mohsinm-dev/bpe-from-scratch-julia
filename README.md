@@ -491,3 +491,5 @@ Or run all at once: `make bench`
 - `single_char_tokens(tokenizer)` — one-character vocabulary entries
 - `multi_char_tokens(tokenizer)` — vocabulary entries longer than one character
 - `encode_lowercase(tokenizer, text)` — lowercase text before encoding
+- `count_unk(tokenizer, text)` — number of unknown tokens after encoding
+- `unk_ratio(tokenizer, text)` — fraction of unknown tokens after encoding
