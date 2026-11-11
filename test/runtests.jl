@@ -2032,3 +2032,10 @@ end
     @test unk_ratio(t, "") == 0.0
     @test 0.0 <= unk_ratio(t, "low xyz") <= 1.0
 end
+
+@testset "id_range" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    r = id_range(t)
+    @test all(id in r for id in keys(t.id_to_token))
+end
