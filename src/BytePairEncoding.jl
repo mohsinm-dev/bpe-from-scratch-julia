@@ -139,6 +139,7 @@ export encode_lowercase
 export count_unk
 export unk_ratio
 export id_range
+export has_id
 
 
 using Unicode
@@ -3273,6 +3274,11 @@ end
 function id_range(t::BPETokenizer)::UnitRange{Int}
     isempty(t.id_to_token) && return 1:0
     return minimum(keys(t.id_to_token)):maximum(keys(t.id_to_token))
+end
+
+
+function has_id(t::BPETokenizer, id::Int)::Bool
+    return haskey(t.id_to_token, id)
 end
 
 end
