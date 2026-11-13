@@ -2039,3 +2039,10 @@ end
     r = id_range(t)
     @test all(id in r for id in keys(t.id_to_token))
 end
+
+@testset "has_id" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test has_id(t, t.vocab_index["<unk>"])
+    @test !has_id(t, 99999)
+end
