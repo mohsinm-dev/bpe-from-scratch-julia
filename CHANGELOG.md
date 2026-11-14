@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-11-14
+
+### Added
+- `pad_token_id`, `shortest_token`, `merges_containing`, `first_merge`, `last_merge`, `single_char_tokens`, `multi_char_tokens`, `encode_lowercase`, `count_unk`, `unk_ratio`, `id_range`, `has_id`
+
+
 ## [0.7.0] - 2026-10-20
 
 ### Added
