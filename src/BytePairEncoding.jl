@@ -140,6 +140,7 @@ export count_unk
 export unk_ratio
 export id_range
 export has_id
+export all_ids_valid
 
 
 using Unicode
@@ -3279,6 +3280,11 @@ end
 
 function has_id(t::BPETokenizer, id::Int)::Bool
     return haskey(t.id_to_token, id)
+end
+
+
+function all_ids_valid(t::BPETokenizer, ids::Vector{Int})::Bool
+    return all(id -> haskey(t.id_to_token, id), ids)
 end
 
 end
