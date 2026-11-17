@@ -493,3 +493,6 @@ Or run all at once: `make bench`
 - `encode_lowercase(tokenizer, text)` — lowercase text before encoding
 - `count_unk(tokenizer, text)` — number of unknown tokens after encoding
 - `unk_ratio(tokenizer, text)` — fraction of unknown tokens after encoding
+- `id_range(tokenizer)` — range of assigned token IDs
+- `has_id(tokenizer, id)` — check whether a token ID exists
+- `all_ids_valid(tokenizer, ids)` — check every ID in a sequence exists
