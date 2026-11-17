@@ -2046,3 +2046,11 @@ end
     @test has_id(t, t.vocab_index["<unk>"])
     @test !has_id(t, 99999)
 end
+
+@testset "all_ids_valid" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test all_ids_valid(t, encode(t, "low lower"))
+    @test !all_ids_valid(t, [99999])
+    @test all_ids_valid(t, Int[])
+end
