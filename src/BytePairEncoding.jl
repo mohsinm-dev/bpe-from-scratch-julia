@@ -141,6 +141,7 @@ export unk_ratio
 export id_range
 export has_id
 export all_ids_valid
+export encode_words
 
 
 using Unicode
@@ -3285,6 +3286,11 @@ end
 
 function all_ids_valid(t::BPETokenizer, ids::Vector{Int})::Bool
     return all(id -> haskey(t.id_to_token, id), ids)
+end
+
+
+function encode_words(t::BPETokenizer, text::String)::Vector{Vector{Int}}
+    return [encode(t, String(w)) for w in split(text)]
 end
 
 end
