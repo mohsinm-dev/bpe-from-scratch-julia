@@ -2054,3 +2054,11 @@ end
     @test !all_ids_valid(t, [99999])
     @test all_ids_valid(t, Int[])
 end
+
+@testset "encode_words" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    ws = encode_words(t, "low lower")
+    @test length(ws) == 2
+    @test ws[1] == encode(t, "low")
+end
