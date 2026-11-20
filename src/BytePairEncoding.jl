@@ -142,6 +142,7 @@ export id_range
 export has_id
 export all_ids_valid
 export encode_words
+export merge_pair_string
 
 
 using Unicode
@@ -3291,6 +3292,11 @@ end
 
 function encode_words(t::BPETokenizer, text::String)::Vector{Vector{Int}}
     return [encode(t, String(w)) for w in split(text)]
+end
+
+
+function merge_pair_string(pair::Tuple{String,String})::String
+    return pair[1] * pair[2]
 end
 
 end
