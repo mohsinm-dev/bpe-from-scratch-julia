@@ -2062,3 +2062,9 @@ end
     @test length(ws) == 2
     @test ws[1] == encode(t, "low")
 end
+
+@testset "merge_pair_string" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test merge_pair_string(("lo", "w")) == "low"
+end
