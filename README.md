@@ -496,3 +496,5 @@ Or run all at once: `make bench`
 - `id_range(tokenizer)` — range of assigned token IDs
 - `has_id(tokenizer, id)` — check whether a token ID exists
 - `all_ids_valid(tokenizer, ids)` — check every ID in a sequence exists
+- `encode_words(tokenizer, text)` — encode each word separately
+- `merge_pair_string(pair)` — string produced by a merge rule
