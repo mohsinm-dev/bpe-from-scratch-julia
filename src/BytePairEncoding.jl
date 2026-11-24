@@ -143,6 +143,7 @@ export has_id
 export all_ids_valid
 export encode_words
 export merge_pair_string
+export merged_tokens
 
 
 using Unicode
@@ -3297,6 +3298,11 @@ end
 
 function merge_pair_string(pair::Tuple{String,String})::String
     return pair[1] * pair[2]
+end
+
+
+function merged_tokens(t::BPETokenizer)::Vector{String}
+    return [merge_pair_string(m) for m in t.merges]
 end
 
 end
