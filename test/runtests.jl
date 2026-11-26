@@ -2068,3 +2068,10 @@ end
     t = train_tokenizer(corpus, 10)
     @test merge_pair_string(("lo", "w")) == "low"
 end
+
+@testset "merged_tokens" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test length(merged_tokens(t)) == length(t.merges)
+    @test merged_tokens(t)[1] == t.merges[1][1] * t.merges[1][2]
+end
