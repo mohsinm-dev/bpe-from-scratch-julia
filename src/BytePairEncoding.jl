@@ -144,6 +144,7 @@ export all_ids_valid
 export encode_words
 export merge_pair_string
 export merged_tokens
+export vocab_char_set
 
 
 using Unicode
@@ -3303,6 +3304,11 @@ end
 
 function merged_tokens(t::BPETokenizer)::Vector{String}
     return [merge_pair_string(m) for m in t.merges]
+end
+
+
+function vocab_char_set(t::BPETokenizer)::Set{Char}
+    return Set(c for v in t.vocab for c in v)
 end
 
 end
