@@ -2075,3 +2075,10 @@ end
     @test length(merged_tokens(t)) == length(t.merges)
     @test merged_tokens(t)[1] == t.merges[1][1] * t.merges[1][2]
 end
+
+@testset "vocab_char_set" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test 'l' in vocab_char_set(t)
+    @test !('Z' in vocab_char_set(t))
+end
