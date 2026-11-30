@@ -145,6 +145,7 @@ export encode_words
 export merge_pair_string
 export merged_tokens
 export vocab_char_set
+export special_token_count
 
 
 using Unicode
@@ -3309,6 +3310,11 @@ end
 
 function vocab_char_set(t::BPETokenizer)::Set{Char}
     return Set(c for v in t.vocab for c in v)
+end
+
+
+function special_token_count(t::BPETokenizer)::Int
+    return length(t.special_tokens)
 end
 
 end
