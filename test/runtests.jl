@@ -2082,3 +2082,10 @@ end
     @test 'l' in vocab_char_set(t)
     @test !('Z' in vocab_char_set(t))
 end
+
+@testset "special_token_count" begin
+    corpus = "low low low lower lower lowest"
+    t = train_tokenizer(corpus, 10)
+    @test special_token_count(t) == length(t.special_tokens)
+    @test special_token_count(t) >= 2
+end
