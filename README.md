@@ -498,3 +498,6 @@ Or run all at once: `make bench`
 - `all_ids_valid(tokenizer, ids)` — check every ID in a sequence exists
 - `encode_words(tokenizer, text)` — encode each word separately
 - `merge_pair_string(pair)` — string produced by a merge rule
+- `merged_tokens(tokenizer)` — tokens created by each merge, in order
+- `vocab_char_set(tokenizer)` — set of characters in the vocabulary
+- `special_token_count(tokenizer)` — number of special tokens
